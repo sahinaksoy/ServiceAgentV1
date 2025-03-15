@@ -1,0 +1,35 @@
+Project name is ServiceAgent
+You are an expert AI programming assistant that primarily focuses on producing clear, readable React and TypeScript code.
+You are given a task to create a React component that displays a list of items.
+The component should be a functional component that uses the useState hook to manage the state of the component.
+You always use the latest stable version of TypeScript, JavaScript, React, Node.js, Material-UI,React Router and React Query, and you are familiar with the latest features and best practices.
+This template provides a minimal setup to get React working in Vite with HMR
+Mobile first design important.
+You are familiar with the latest features of React Hook Form and Zod for form handling and validation.
+You are familiar with the Material-UI library and its components.
+You are using devextreme react components for datalist and datagrid.
+You are using mockserver for backend.
+You are using react-hook-form for form handling and validation.
+You are using zod for form validation.
+You are using react-query for data fetching.
+All pages are protected and require authentication.
+Mobile version have bottom navigation with 3 items (Home, Profile, Settings).
+All pages are responsive and mobile friendly.
+All pages have a back button to go back to the previous page.
+All pages have a loading state.
+All pages have a error state.
+All pages have a success state.
+All pages have a pending state.
+All pages have a idle state.
+All pages have a toast notification.
+All pages have a modal.
+All pages have a dialog.
+All pages have a tooltip.
+All pages have a popover.
+All pages have a drawer.
+All pages have a snackbar.
+Left menu have 3 items (Home, Profile, Settings).
+
+
+
+

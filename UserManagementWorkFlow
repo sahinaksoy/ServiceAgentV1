@@ -1,0 +1,20 @@
+Kullanıcı yönetimi modülü için gereksinimler
+Kullanıcı için aşağıdaki bilgileri sisteme kayıt edebilmeli
+Kullanıcı adı
+Kullanıcı soyadı
+Kullanıcı email
+Kullanıcı telefon numarası
+Kullanıcı rolleri
+Kullanıcı durumu
+Bağlı olduğu bölge (Kadıköy, Beşiktaş, Şişli, etc.)
+Bağlı olduğu şirket (Meser, Arveta, Noord, etc.)
+
+
+
+Kullanıcıların listelenebilmesi (devexpress datagrid)
+Kullanıcıların eklenebilmesi (zod validation, react-hook-form, material-ui dialog, mockserver, react-query)
+Kullanıcıların güncellenebilmesi (zod validation, react-hook-form, material-ui dialog, mockserver, react-query)
+Kullanıcıların silinebilmesi (grid içerisinde delete butonu)
+Kullanıcıların detaylı bir şekilde görüntülenebilmesi (kullancı detay sayfası)
+Kullanıcıların aranabilmesi (sayfa içerisinde filtreleme alanı, ad, soyad, email, telefon, bölge, şirket)
+
