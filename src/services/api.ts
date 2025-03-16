@@ -15,6 +15,107 @@ const api = axios.create({
 const mockCustomers: Customer[] = [
   {
     id: '1',
+    name: 'Bostancı 3M Migros',
+    email: 'bostanci@migros.com.tr',
+    phone: '5551234567',
+    address: 'Bostancı Mah. Kadıköy, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    name: 'Moda MM Migros',
+    email: 'moda@migros.com.tr',
+    phone: '5559876543',
+    address: 'Moda Cad. Kadıköy, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    name: 'Ataşehir Makro Migros',
+    email: 'atasehir@migros.com.tr',
+    phone: '5553456789',
+    address: 'Ataşehir Bulvarı, Ataşehir, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    name: 'Levent 5M Migros',
+    email: 'levent@migros.com.tr',
+    phone: '5557891234',
+    address: 'Levent Mah. Beşiktaş, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    name: 'Beylikdüzü MM Migros',
+    email: 'beylikduzu@migros.com.tr',
+    phone: '5552345678',
+    address: 'Beylikdüzü Mah. Beylikdüzü, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    name: 'Bakırköy 3M Migros',
+    email: 'bakirkoy@migros.com.tr',
+    phone: '5558765432',
+    address: 'Bakırköy Mah. Bakırköy, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '7',
+    name: 'Maltepe Makro Migros',
+    email: 'maltepe@migros.com.tr',
+    phone: '5554567890',
+    address: 'Maltepe Mah. Maltepe, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '8',
+    name: 'Üsküdar MM Migros',
+    email: 'uskudar@migros.com.tr',
+    phone: '5556789012',
+    address: 'Üsküdar Mah. Üsküdar, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '9',
+    name: 'Şişli 3M Migros',
+    email: 'sisli@migros.com.tr',
+    phone: '5550123456',
+    address: 'Şişli Mah. Şişli, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '10',
+    name: 'Beşiktaş MM Migros',
+    email: 'besiktas@migros.com.tr',
+    phone: '5559012345',
+    address: 'Beşiktaş Mah. Beşiktaş, İstanbul',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  // Eski müşteriler
+  {
+    id: '11',
     name: 'Meser Teknoloji',
     email: 'info@meser.com.tr',
     phone: '0212 555 1234',
@@ -24,7 +125,7 @@ const mockCustomers: Customer[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: '2',
+    id: '12',
     name: 'Arveta',
     email: 'info@arveta.com.tr',
     phone: '0216 444 5678',
@@ -34,7 +135,7 @@ const mockCustomers: Customer[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: '3',
+    id: '13',
     name: 'Noord',
     email: 'info@noord.com.tr',
     phone: '0212 333 9012',
@@ -50,11 +151,12 @@ const mockWorkOrders: WorkOrder[] = [
   {
     id: '1',
     type: 'emergency',
+    category: 'mechanical',
     priority: 'high',
     status: 'pending',
     summary: 'Klima bakımı yapılacak',
     dueDate: dayjs().add(3, 'day').format(),
-    company: '1',
+    store: '1',
     contact: '1',
     email: 'info@abcmarket.com',
     phone: '0212 555 0001',
@@ -69,11 +171,12 @@ const mockWorkOrders: WorkOrder[] = [
   {
     id: '2',
     type: 'maintenance',
+    category: 'electrical',
     priority: 'medium',
     status: 'inProgress',
     summary: 'Buzdolabı tamiri',
     dueDate: dayjs().add(5, 'day').format(),
-    company: '2',
+    store: '2',
     contact: '2',
     email: 'info@xyzmagaza.com',
     phone: '0216 555 0002',
@@ -133,14 +236,29 @@ const mockUsers: User[] = [
 // API fonksiyonları
 export const customerAPI = {
   getCustomers: async (): Promise<Customer[]> => {
-    // Simüle edilmiş API gecikmesi
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return mockCustomers;
+    try {
+      const response = await api.get('/customers');
+      // API yanıtının bir dizi olduğundan emin olalım
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        console.error('API yanıtı bir dizi değil:', response.data);
+        return []; // Boş dizi döndür
+      }
+    } catch (error) {
+      console.error('Müşteriler alınırken hata oluştu:', error);
+      return []; // Hata durumunda boş dizi döndür
+    }
   },
 
   getCustomerById: async (id: string): Promise<Customer | undefined> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return mockCustomers.find(customer => customer.id === id);
+    try {
+      const response = await api.get(`/customers/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Müşteri (ID: ${id}) alınırken hata oluştu:`, error);
+      return undefined;
+    }
   },
 
   createCustomer: async (data: CustomerFormData): Promise<Customer> => {
@@ -223,13 +341,29 @@ export const userAPI = {
 
 export const storeAPI = {
   getStores: async (): Promise<Store[]> => {
-    const response = await api.get('/stores');
-    return response.data;
+    try {
+      const response = await api.get('/stores');
+      // API yanıtının bir dizi olduğundan emin olalım
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        console.error('API yanıtı bir dizi değil:', response.data);
+        return []; // Boş dizi döndür
+      }
+    } catch (error) {
+      console.error('Mağazalar alınırken hata oluştu:', error);
+      return []; // Hata durumunda boş dizi döndür
+    }
   },
 
-  getStoreById: async (id: string): Promise<Store> => {
-    const response = await api.get(`/stores/${id}`);
-    return response.data;
+  getStoreById: async (id: string): Promise<Store | undefined> => {
+    try {
+      const response = await api.get(`/stores/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Mağaza (ID: ${id}) alınırken hata oluştu:`, error);
+      return undefined;
+    }
   },
 
   createStore: async (data: StoreFormData): Promise<Store> => {
@@ -249,8 +383,19 @@ export const storeAPI = {
 
 export const workOrderAPI = {
   getWorkOrders: async (): Promise<WorkOrder[]> => {
-    const response = await api.get('/work-orders');
-    return response.data;
+    try {
+      const response = await api.get('/work-orders');
+      // API yanıtının bir dizi olduğundan emin olalım
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        console.error('API yanıtı bir dizi değil:', response.data);
+        return []; // Boş dizi döndür
+      }
+    } catch (error) {
+      console.error('İş emirleri alınırken hata oluştu:', error);
+      return []; // Hata durumunda boş dizi döndür
+    }
   },
 
   getWorkOrderById: async (id: string): Promise<WorkOrder> => {
