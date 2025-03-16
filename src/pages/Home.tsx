@@ -1,6 +1,14 @@
 import { Box, Typography } from '@mui/material';
+import { usePageTitle } from '../contexts/PageTitleContext';
+import React from 'react';
 
 const Home = () => {
+  const { setTitle } = usePageTitle();
+
+  React.useEffect(() => {
+    setTitle('Ana Sayfa');
+  }, [setTitle]);
+
   return (
     <Box>
       <Typography variant="h5" gutterBottom>

@@ -1,17 +1,41 @@
 import { z } from 'zod';
-import { WorkOrderType } from '../types/workOrder';
+import { WorkOrderType, WorkOrderPriority } from '../types/workOrder';
 
 export const workOrderSchema = z.object({
-  type: z.enum(['emergency', 'maintenance', 'investment'] as const, {
-    required_error: 'Arıza türü seçilmelidir',
+  summary: z.string()
+    .min(10, 'Özet en az 10 karakter olmalıdır')
+    .max(500, 'Özet en fazla 500 karakter olabilir'),
+  priority: z.enum(['high', 'medium', 'low'] as const, {
+    required_error: 'Öncelik seçilmelidir',
   }),
-  region: z.string()
-    .min(2, 'Bölge seçilmelidir'),
-  date: z.string()
-    .min(1, 'Tarih seçilmelidir'),
-  description: z.string()
-    .min(10, 'Açıklama en az 10 karakter olmalıdır')
-    .max(500, 'Açıklama en fazla 500 karakter olabilir'),
-  assignedTo: z.string()
-    .min(1, 'Atanacak kişi seçilmelidir'),
+  type: z.enum(['emergency', 'maintenance', 'renovation', 'additional', 'investment'] as const, {
+    required_error: 'İş emri tipi seçilmelidir',
+  }),
+  dueDate: z.string()
+    .min(1, 'Son tarih seçilmelidir'),
+  company: z.string()
+    .min(1, 'Firma seçilmelidir'),
+  contact: z.string()
+    .min(1, 'İletişim kişisi seçilmelidir'),
+  email: z.string()
+    .email('Geçerli bir e-posta adresi giriniz')
+    .optional()
+    .or(z.literal('')),
+  phone: z.string()
+    .min(10, 'Telefon numarası en az 10 karakter olmalıdır')
+    .optional()
+    .or(z.literal('')),
+  mobile: z.string()
+    .min(10, 'Mobil numara en az 10 karakter olmalıdır')
+    .optional()
+    .or(z.literal('')),
+  serviceAddress: z.string()
+    .min(10, 'Servis adresi en az 10 karakter olmalıdır')
+    .max(500, 'Servis adresi en fazla 500 karakter olabilir'),
+  billingAddress: z.string()
+    .min(10, 'Fatura adresi en az 10 karakter olmalıdır')
+    .max(500, 'Fatura adresi en fazla 500 karakter olabilir'),
+  preferredDate1: z.string()
+    .min(1, 'Tercih edilen tarih seçilmelidir'),
+  assignedTo: z.string().min(1, 'Atanacak kullanıcı seçimi zorunludur'),
 }); 

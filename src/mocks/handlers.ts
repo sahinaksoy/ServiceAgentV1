@@ -2,6 +2,8 @@ import { http, HttpResponse } from 'msw';
 import { Customer } from '../types/customer';
 import { User, UserFormData } from '../types/user';
 import { Store, StoreFormData } from '../types/store';
+import { WorkOrder, WorkOrderFormData } from '../types/workOrder';
+import dayjs from 'dayjs';
 
 let customers: Customer[] = [
   {
@@ -93,6 +95,104 @@ let stores: Store[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
+];
+
+let workOrders: WorkOrder[] = [
+  {
+    id: '1',
+    type: 'emergency',
+    priority: 'high',
+    status: 'pending',
+    summary: 'Klima arızası acil müdahale gerekiyor',
+    dueDate: dayjs().add(1, 'day').format(),
+    company: '1',
+    contact: '1',
+    email: 'john@example.com',
+    phone: '5551234567',
+    mobile: '5551234568',
+    serviceAddress: 'İstanbul, Kadıköy',
+    billingAddress: 'İstanbul, Kadıköy',
+    preferredDate1: dayjs().add(1, 'day').format(),
+    assignedTo: '1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    type: 'maintenance',
+    priority: 'medium',
+    status: 'approved',
+    summary: 'Yıllık periyodik bakım',
+    dueDate: dayjs().add(5, 'day').format(),
+    company: '2',
+    contact: '2',
+    email: 'jane@example.com',
+    phone: '5559876543',
+    mobile: '5559876544',
+    serviceAddress: 'Ankara, Çankaya',
+    billingAddress: 'Ankara, Çankaya',
+    preferredDate1: dayjs().add(3, 'day').format(),
+    assignedTo: '2',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    type: 'renovation',
+    priority: 'low',
+    status: 'inProgress',
+    summary: 'Ofis tadilatı',
+    dueDate: dayjs().add(10, 'day').format(),
+    company: '1',
+    contact: '1',
+    email: 'john@example.com',
+    phone: '5551234567',
+    mobile: '5551234568',
+    serviceAddress: 'İzmir, Konak',
+    billingAddress: 'İzmir, Konak',
+    preferredDate1: dayjs().add(7, 'day').format(),
+    assignedTo: '3',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    type: 'additional',
+    priority: 'medium',
+    status: 'completed',
+    summary: 'Ek tesisat işleri',
+    dueDate: dayjs().subtract(2, 'day').format(),
+    company: '2',
+    contact: '2',
+    email: 'jane@example.com',
+    phone: '5559876543',
+    mobile: '5559876544',
+    serviceAddress: 'Bursa, Nilüfer',
+    billingAddress: 'Bursa, Nilüfer',
+    preferredDate1: dayjs().subtract(3, 'day').format(),
+    assignedTo: '1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    type: 'investment',
+    priority: 'high',
+    status: 'pending',
+    summary: 'Yeni şube kurulumu',
+    dueDate: dayjs().add(15, 'day').format(),
+    company: '1',
+    contact: '1',
+    email: 'john@example.com',
+    phone: '5551234567',
+    mobile: '5551234568',
+    serviceAddress: 'Antalya, Muratpaşa',
+    billingAddress: 'Antalya, Muratpaşa',
+    preferredDate1: dayjs().add(10, 'day').format(),
+    assignedTo: '2',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
 ];
 
 export const handlers = [
@@ -228,6 +328,54 @@ export const handlers = [
     }
 
     stores = stores.filter(store => store.id !== id);
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.get('/api/work-orders', () => {
+    return HttpResponse.json(workOrders);
+  }),
+
+  http.post('/api/work-orders', async ({ request }) => {
+    const workOrderData = (await request.json()) as WorkOrderFormData;
+    const newWorkOrder: WorkOrder = {
+      ...workOrderData,
+      id: Math.random().toString(36).substr(2, 9),
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    workOrders.push(newWorkOrder);
+    return HttpResponse.json(newWorkOrder, { status: 201 });
+  }),
+
+  http.put('/api/work-orders/:id', async ({ params, request }) => {
+    const { id } = params;
+    const workOrderData = (await request.json()) as WorkOrderFormData;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === id);
+
+    if (workOrderIndex === -1) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    const updatedWorkOrder: WorkOrder = {
+      ...workOrders[workOrderIndex],
+      ...workOrderData,
+      updatedAt: new Date().toISOString(),
+    };
+
+    workOrders[workOrderIndex] = updatedWorkOrder;
+    return HttpResponse.json(updatedWorkOrder);
+  }),
+
+  http.delete('/api/work-orders/:id', ({ params }) => {
+    const { id } = params;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === id);
+
+    if (workOrderIndex === -1) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    workOrders = workOrders.filter(wo => wo.id !== id);
     return new HttpResponse(null, { status: 204 });
   }),
 ]; 

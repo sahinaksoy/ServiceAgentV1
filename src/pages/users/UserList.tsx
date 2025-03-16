@@ -19,6 +19,8 @@ import { UserDialog } from '../../components/users/UserDialog';
 import { UserDetailDialog } from '../../components/users/UserDetailDialog';
 import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog';
 import { useUsers, useDeleteUser } from '../../hooks/useUsers';
+import { usePageTitle } from '../../contexts/PageTitleContext';
+import React from 'react';
 
 const UserList = () => {
   const theme = useTheme();
@@ -31,6 +33,11 @@ const UserList = () => {
 
   const { data: users, isLoading, error, refetch } = useUsers();
   const deleteUserMutation = useDeleteUser();
+  const { setTitle } = usePageTitle();
+
+  React.useEffect(() => {
+    setTitle('Kullanıcılar');
+  }, [setTitle]);
 
   const handleAdd = () => {
     setIsAddDialogOpen(true);

@@ -9,6 +9,8 @@ import UserList from './pages/users/UserList';
 import StoreList from './pages/stores/StoreList';
 import WorkOrderList from './pages/workOrders/WorkOrderList';
 import Settings from './pages/Settings';
+import CreateWorkOrder from './pages/workOrders/CreateWorkOrder';
+import { PageTitleProvider } from './contexts/PageTitleContext';
 
 // DevExtreme CSS imports
 import 'devextreme/dist/css/dx.light.css';
@@ -30,18 +32,21 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router>
-          <MainLayout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/work-orders" element={<WorkOrderList />} />
-              <Route path="/users" element={<UserList />} />
-              <Route path="/stores" element={<StoreList />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </MainLayout>
-        </Router>
+        <PageTitleProvider>
+          <Router>
+            <MainLayout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/work-orders" element={<WorkOrderList />} />
+                <Route path="/work-orders/create" element={<CreateWorkOrder />} />
+                <Route path="/users" element={<UserList />} />
+                <Route path="/stores" element={<StoreList />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </MainLayout>
+          </Router>
+        </PageTitleProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

@@ -18,6 +18,8 @@ import { Store, StoreFormData } from '../../types/store';
 import { useStores, useCreateStore, useUpdateStore, useDeleteStore } from '../../hooks/useStores';
 import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog';
 import { StoreDialog } from '../../components/stores/StoreDialog';
+import { usePageTitle } from '../../contexts/PageTitleContext';
+import React from 'react';
 
 const StoreList = () => {
   const theme = useTheme();
@@ -32,6 +34,12 @@ const StoreList = () => {
   const createStoreMutation = useCreateStore();
   const updateStoreMutation = useUpdateStore();
   const deleteStoreMutation = useDeleteStore();
+
+  const { setTitle } = usePageTitle();
+
+  React.useEffect(() => {
+    setTitle('Mağazalarım');
+  }, [setTitle]);
 
   const handleAdd = () => {
     setIsAddDialogOpen(true);

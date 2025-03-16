@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem, Autocomplete, Typography, Box } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WorkOrder, WorkOrderFormData } from '../../types/workOrder';
@@ -9,160 +9,425 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/tr';
 import { useGlobalUsers } from '../../hooks/useGlobalUsers';
+import { useGlobalCustomers } from '../../hooks/useGlobalCustomers';
+import { useNavigate } from 'react-router-dom';
 
 interface WorkOrderDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (data: WorkOrderFormData) => void;
-  workOrder?: WorkOrder;
+  isPage?: boolean;
+  open?: boolean;
+  mode?: 'add' | 'edit';
+  onClose?: () => void;
+  onSubmit: (data: WorkOrderFormData) => Promise<void>;
   regions: string[];
 }
 
+const priorityOptions = [
+  { value: 'high', label: 'Yüksek' },
+  { value: 'medium', label: 'Orta' },
+  { value: 'low', label: 'Düşük' },
+];
+
 const typeOptions = [
-  { value: 'emergency', label: 'Acil Çağrılar' },
-  { value: 'maintenance', label: 'Bakım' },
+  { value: 'emergency', label: 'Acil Çağrı' },
+  { value: 'maintenance', label: 'Periyodik Bakım' },
+  { value: 'renovation', label: 'Tadilat' },
+  { value: 'additional', label: 'İlave İş' },
   { value: 'investment', label: 'Yatırım' },
 ];
 
-export const WorkOrderDialog = ({ open, onClose, onSubmit, workOrder, regions }: WorkOrderDialogProps) => {
+export const WorkOrderDialog = ({ 
+  isPage = false, 
+  open = false, 
+  mode = 'add',
+  onClose,
+  onSubmit,
+  regions 
+}: WorkOrderDialogProps) => {
+  const navigate = useNavigate();
   const { data: users = [], isLoading: isUsersLoading } = useGlobalUsers();
+  const { data: customers = [], isLoading: isCustomersLoading } = useGlobalCustomers();
   const activeUsers = users.filter(user => user.status === 'active');
 
-  const { control, handleSubmit, formState: { errors } } = useForm<WorkOrderFormData>({
+  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<WorkOrderFormData>({
     resolver: zodResolver(workOrderSchema),
-    defaultValues: workOrder || {
+    defaultValues: {
+      summary: '',
+      priority: 'medium',
       type: 'emergency',
-      region: '',
-      date: dayjs().format(),
-      description: '',
+      dueDate: dayjs().format(),
+      company: '',
+      contact: '',
+      email: '',
+      phone: '',
+      mobile: '',
+      serviceAddress: '',
+      billingAddress: '',
+      preferredDate1: dayjs().format(),
       assignedTo: '',
     },
   });
 
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Yeni İş Emri Oluştur</DialogTitle>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="type"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Arıza Türü"
-                    fullWidth
-                    error={!!errors.type}
-                    helperText={errors.type?.message}
-                  >
-                    {typeOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="region"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Bölge"
-                    fullWidth
-                    error={!!errors.region}
-                    helperText={errors.region?.message}
-                  >
-                    {regions.map((region) => (
-                      <MenuItem key={region} value={region}>
-                        {region}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
-                <Controller
-                  name="date"
-                  control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <DatePicker
-                      {...field}
-                      label="Tarih"
-                      value={value ? dayjs(value) : null}
-                      onChange={(newValue) => {
-                        onChange(newValue ? newValue.format() : '');
-                      }}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          error: !!errors.date,
-                          helperText: errors.date?.message,
-                        },
-                      }}
-                    />
-                  )}
+  const findPriorityOption = (value: string | null) => {
+    return value ? priorityOptions.find(option => option.value === value) || null : null;
+  };
+
+  const findTypeOption = (value: string | null) => {
+    return value ? typeOptions.find(option => option.value === value) || null : null;
+  };
+
+  const findUser = (id: string | null) => {
+    return id ? activeUsers.find(user => user.id === id) || null : null;
+  };
+
+  const findCustomer = (id: string | null) => {
+    return id ? customers.find(customer => customer.id === id) || null : null;
+  };
+
+  const datePickerProps = {
+    fullWidth: true as const,
+    error: !!errors.dueDate,
+    helperText: errors.dueDate?.message,
+  };
+
+  const formContent = (
+    <Grid container spacing={2}>
+      {/* İş Emri Özeti */}
+      <Grid item xs={12}>
+        <Typography variant="subtitle1" gutterBottom>İş Emri Özeti</Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <Controller
+          name="summary"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Özet"
+              fullWidth
+              multiline
+              rows={2}
+              error={!!errors.summary}
+              helperText={errors.summary?.message}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="priority"
+          control={control}
+          render={({ field: { onChange, value, ...field } }) => (
+            <Autocomplete
+              {...field}
+              options={priorityOptions}
+              getOptionLabel={(option) => option.label}
+              value={findPriorityOption(value)}
+              onChange={(_, newValue) => onChange(newValue?.value || '')}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Öncelik"
+                  error={!!errors.priority}
+                  helperText={errors.priority?.message}
                 />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="assignedTo"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Atanacak Kişi"
-                    fullWidth
-                    error={!!errors.assignedTo}
-                    helperText={errors.assignedTo?.message}
-                    disabled={isUsersLoading}
-                  >
-                    {activeUsers.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {`${user.firstName} ${user.lastName}`}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
+              )}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="type"
+          control={control}
+          render={({ field: { onChange, value, ...field } }) => (
+            <Autocomplete
+              {...field}
+              options={typeOptions}
+              getOptionLabel={(option) => option.label}
+              value={findTypeOption(value)}
+              onChange={(_, newValue) => onChange(newValue?.value || '')}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Tip"
+                  error={!!errors.type}
+                  helperText={errors.type?.message}
+                />
+              )}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
+          <Controller
+            name="dueDate"
+            control={control}
+            render={({ field: { value, onChange, ...field } }) => (
+              <DatePicker
+                {...field}
+                label="Son Tarih"
+                value={value ? dayjs(value) : null}
+                onChange={(newValue) => {
+                  onChange(newValue ? newValue.format() : '');
+                }}
+                slotProps={{
+                  textField: datePickerProps
+                }}
               />
-            </Grid>
-            <Grid item xs={12}>
-              <Controller
-                name="description"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Açıklama"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    error={!!errors.description}
-                    helperText={errors.description?.message}
-                  />
-                )}
+            )}
+          />
+        </LocalizationProvider>
+      </Grid>
+
+      {/* İletişim Bilgileri */}
+      <Grid item xs={12}>
+        <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>İletişim Bilgileri</Typography>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="company"
+          control={control}
+          render={({ field: { onChange, value, ...field } }) => (
+            <Autocomplete
+              {...field}
+              options={customers}
+              getOptionLabel={(option) => option.name || ''}
+              value={findCustomer(value)}
+              onChange={(_, newValue) => {
+                onChange(newValue?.id || '');
+                if (newValue) {
+                  const formMethods = control._formValues;
+                  formMethods.email = newValue.email || '';
+                  formMethods.phone = newValue.phone || '';
+                  formMethods.serviceAddress = newValue.address || '';
+                  formMethods.billingAddress = newValue.address || '';
+                }
+              }}
+              loading={isCustomersLoading}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Firma"
+                  error={!!errors.company}
+                  helperText={errors.company?.message}
+                />
+              )}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="contact"
+          control={control}
+          render={({ field: { onChange, value, ...field } }) => (
+            <Autocomplete
+              {...field}
+              options={activeUsers}
+              getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+              value={findUser(value)}
+              onChange={(_, newValue) => onChange(newValue?.id || '')}
+              loading={isUsersLoading}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="İletişim Kişisi"
+                  error={!!errors.contact}
+                  helperText={errors.contact?.message}
+                />
+              )}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="E-posta"
+              fullWidth
+              error={!!errors.email}
+              helperText={errors.email?.message}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Telefon"
+              fullWidth
+              error={!!errors.phone}
+              helperText={errors.phone?.message}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="mobile"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Mobil"
+              fullWidth
+              error={!!errors.mobile}
+              helperText={errors.mobile?.message}
+            />
+          )}
+        />
+      </Grid>
+
+      {/* Atanacak Kullanıcı */}
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="assignedTo"
+          control={control}
+          render={({ field: { onChange, value, ...field } }) => (
+            <Autocomplete
+              {...field}
+              options={activeUsers}
+              getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+              value={findUser(value)}
+              onChange={(_, newValue) => onChange(newValue?.id || '')}
+              loading={isUsersLoading}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Atanacak Kullanıcı"
+                  error={!!errors.assignedTo}
+                  helperText={errors.assignedTo?.message}
+                />
+              )}
+            />
+          )}
+        />
+      </Grid>
+
+      {/* Adres Bilgileri */}
+      <Grid item xs={12}>
+        <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>Adres Bilgileri</Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <Controller
+          name="serviceAddress"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Servis Adresi"
+              fullWidth
+              multiline
+              rows={2}
+              error={!!errors.serviceAddress}
+              helperText={errors.serviceAddress?.message}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <Controller
+          name="billingAddress"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Fatura Adresi"
+              fullWidth
+              multiline
+              rows={2}
+              error={!!errors.billingAddress}
+              helperText={errors.billingAddress?.message}
+            />
+          )}
+        />
+      </Grid>
+
+      {/* Tercih Edilen Tarih */}
+      <Grid item xs={12}>
+        <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>Tercih</Typography>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
+          <Controller
+            name="preferredDate1"
+            control={control}
+            render={({ field: { value, onChange, ...field } }) => (
+              <DatePicker
+                {...field}
+                label="Tercih Edilen Tarih 1"
+                value={value ? dayjs(value) : null}
+                onChange={(newValue) => {
+                  onChange(newValue ? newValue.format() : '');
+                }}
+                slotProps={{
+                  textField: datePickerProps
+                }}
               />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>İptal</Button>
-          <Button type="submit" variant="contained" color="primary">
-            Ekip Şefi Onayına Gönder
+            )}
+          />
+        </LocalizationProvider>
+      </Grid>
+    </Grid>
+  );
+
+  return isPage ? (
+    <Box sx={{ p: 2 }}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        {formContent}
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            Kaydet
           </Button>
-        </DialogActions>
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/work-orders')}
+          >
+            İptal
+          </Button>
+        </Box>
       </form>
+    </Box>
+  ) : (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+    >
+      <DialogTitle>
+        {mode === 'edit' ? 'İş Emri Düzenle' : 'Yeni İş Emri'}
+      </DialogTitle>
+      <DialogContent sx={{ p: 2 }}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          {formContent}
+        </form>
+      </DialogContent>
+      <DialogActions sx={{ p: 2, pt: 0 }}>
+        <Button onClick={onClose}>İptal</Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit(onSubmit)}
+          disabled={isSubmitting}
+        >
+          Kaydet
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }; 
