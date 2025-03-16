@@ -60,6 +60,11 @@ const typeLabels = {
   investment: 'Yatırım',
 } as const;
 
+const categoryLabels = {
+  mechanical: 'Mekanik',
+  electrical: 'Elektrik',
+} as const;
+
 const statusColors = {
   pending: 'warning',
   approved: 'success',
@@ -255,12 +260,18 @@ const WorkOrderList = () => {
                     />
                   </Box>
 
-                  {/* Tip ve Öncelik */}
+                  {/* Tip, Kategori ve Öncelik */}
                   <Stack direction="row" spacing={1}>
                     <Chip
                       label={typeLabels[workOrder.type as keyof typeof typeLabels]}
                       variant="outlined"
                       size="small"
+                    />
+                    <Chip
+                      label={categoryLabels[workOrder.category as keyof typeof categoryLabels]}
+                      variant="outlined"
+                      size="small"
+                      color="info"
                     />
                     <Chip
                       label={priorityLabels[workOrder.priority as keyof typeof priorityLabels]}

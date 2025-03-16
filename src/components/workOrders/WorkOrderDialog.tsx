@@ -35,6 +35,11 @@ const typeOptions = [
   { value: 'investment', label: 'Yatırım' },
 ];
 
+const categoryOptions = [
+  { value: 'mechanical', label: 'Mekanik' },
+  { value: 'electrical', label: 'Elektrik' },
+];
+
 export const WorkOrderDialog = ({ 
   isPage = false, 
   open = false, 
@@ -54,6 +59,7 @@ export const WorkOrderDialog = ({
       summary: '',
       priority: 'medium',
       type: 'emergency',
+      category: 'mechanical',
       dueDate: dayjs().format(),
       company: '',
       contact: '',
@@ -62,7 +68,7 @@ export const WorkOrderDialog = ({
       mobile: '',
       serviceAddress: '',
       billingAddress: '',
-      preferredDate1: dayjs().format(),
+      preferredDate1: '',
       assignedTo: '',
     },
   });
@@ -73,6 +79,10 @@ export const WorkOrderDialog = ({
 
   const findTypeOption = (value: string | null) => {
     return value ? typeOptions.find(option => option.value === value) || null : null;
+  };
+
+  const findCategoryOption = (value: string | null) => {
+    return value ? categoryOptions.find(option => option.value === value) || null : null;
   };
 
   const findUser = (id: string | null) => {
@@ -159,6 +169,29 @@ export const WorkOrderDialog = ({
         />
       </Grid>
       <Grid item xs={12} sm={6}>
+        <Controller
+          name="category"
+          control={control}
+          render={({ field: { onChange, value, ...field } }) => (
+            <Autocomplete
+              {...field}
+              options={categoryOptions}
+              getOptionLabel={(option) => option.label}
+              value={findCategoryOption(value)}
+              onChange={(_, newValue) => onChange(newValue?.value || '')}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Kategori"
+                  error={!!errors.category}
+                  helperText={errors.category?.message}
+                />
+              )}
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
           <Controller
             name="dueDate"
@@ -178,6 +211,30 @@ export const WorkOrderDialog = ({
             )}
           />
         </LocalizationProvider>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controller
+          name="assignedTo"
+          control={control}
+          render={({ field: { onChange, value, ...field } }) => (
+            <Autocomplete
+              {...field}
+              options={activeUsers}
+              getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+              value={findUser(value)}
+              onChange={(_, newValue) => onChange(newValue?.id || '')}
+              loading={isUsersLoading}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Atanacak Kullanıcı"
+                  error={!!errors.assignedTo}
+                  helperText={errors.assignedTo?.message}
+                />
+              )}
+            />
+          )}
+        />
       </Grid>
 
       {/* İletişim Bilgileri */}
@@ -258,21 +315,6 @@ export const WorkOrderDialog = ({
       </Grid>
       <Grid item xs={12} sm={6}>
         <Controller
-          name="phone"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Telefon"
-              fullWidth
-              error={!!errors.phone}
-              helperText={errors.phone?.message}
-            />
-          )}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Controller
           name="mobile"
           control={control}
           render={({ field }) => (
@@ -282,32 +324,6 @@ export const WorkOrderDialog = ({
               fullWidth
               error={!!errors.mobile}
               helperText={errors.mobile?.message}
-            />
-          )}
-        />
-      </Grid>
-
-      {/* Atanacak Kullanıcı */}
-      <Grid item xs={12} sm={6}>
-        <Controller
-          name="assignedTo"
-          control={control}
-          render={({ field: { onChange, value, ...field } }) => (
-            <Autocomplete
-              {...field}
-              options={activeUsers}
-              getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
-              value={findUser(value)}
-              onChange={(_, newValue) => onChange(newValue?.id || '')}
-              loading={isUsersLoading}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Atanacak Kullanıcı"
-                  error={!!errors.assignedTo}
-                  helperText={errors.assignedTo?.message}
-                />
-              )}
             />
           )}
         />
@@ -333,49 +349,6 @@ export const WorkOrderDialog = ({
             />
           )}
         />
-      </Grid>
-      <Grid item xs={12}>
-        <Controller
-          name="billingAddress"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Fatura Adresi"
-              fullWidth
-              multiline
-              rows={2}
-              error={!!errors.billingAddress}
-              helperText={errors.billingAddress?.message}
-            />
-          )}
-        />
-      </Grid>
-
-      {/* Tercih Edilen Tarih */}
-      <Grid item xs={12}>
-        <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>Tercih</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
-          <Controller
-            name="preferredDate1"
-            control={control}
-            render={({ field: { value, onChange, ...field } }) => (
-              <DatePicker
-                {...field}
-                label="Tercih Edilen Tarih 1"
-                value={value ? dayjs(value) : null}
-                onChange={(newValue) => {
-                  onChange(newValue ? newValue.format() : '');
-                }}
-                slotProps={{
-                  textField: datePickerProps
-                }}
-              />
-            )}
-          />
-        </LocalizationProvider>
       </Grid>
     </Grid>
   );

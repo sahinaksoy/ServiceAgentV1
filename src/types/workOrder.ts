@@ -1,10 +1,12 @@
 export type WorkOrderType = 'emergency' | 'maintenance' | 'renovation' | 'additional' | 'investment';
 export type WorkOrderStatus = 'pending' | 'approved' | 'rejected' | 'inProgress' | 'completed';
 export type WorkOrderPriority = 'high' | 'medium' | 'low';
+export type WorkOrderCategory = 'mechanical' | 'electrical';
 
 export interface WorkOrder {
   id: string;
   type: WorkOrderType;
+  category: WorkOrderCategory;
   priority: WorkOrderPriority;
   status: WorkOrderStatus;
   summary: string;

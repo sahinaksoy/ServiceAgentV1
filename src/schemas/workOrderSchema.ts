@@ -11,6 +11,9 @@ export const workOrderSchema = z.object({
   type: z.enum(['emergency', 'maintenance', 'renovation', 'additional', 'investment'] as const, {
     required_error: 'İş emri tipi seçilmelidir',
   }),
+  category: z.enum(['mechanical', 'electrical', 'sensor', 'maintenance', 'temperature', 'glass', 'water', 'monitoring'] as const, {
+    required_error: 'Kategori seçilmelidir',
+  }),
   dueDate: z.string()
     .min(1, 'Son tarih seçilmelidir'),
   company: z.string()
@@ -22,7 +25,6 @@ export const workOrderSchema = z.object({
     .optional()
     .or(z.literal('')),
   phone: z.string()
-    .min(10, 'Telefon numarası en az 10 karakter olmalıdır')
     .optional()
     .or(z.literal('')),
   mobile: z.string()
@@ -33,9 +35,12 @@ export const workOrderSchema = z.object({
     .min(10, 'Servis adresi en az 10 karakter olmalıdır')
     .max(500, 'Servis adresi en fazla 500 karakter olabilir'),
   billingAddress: z.string()
-    .min(10, 'Fatura adresi en az 10 karakter olmalıdır')
-    .max(500, 'Fatura adresi en fazla 500 karakter olabilir'),
+    .optional()
+    .or(z.literal('')),
   preferredDate1: z.string()
-    .min(1, 'Tercih edilen tarih seçilmelidir'),
-  assignedTo: z.string().min(1, 'Atanacak kullanıcı seçimi zorunludur'),
+    .optional()
+    .or(z.literal('')),
+  assignedTo: z.string()
+    .optional()
+    .or(z.literal('')),
 }); 
