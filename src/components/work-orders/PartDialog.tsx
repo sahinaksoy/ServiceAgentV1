@@ -10,51 +10,51 @@ import {
   Chip,
   TextField,
 } from '@mui/material';
-import { Service, ServiceCategory, serviceCategoryLabels } from '../../types/service';
-import { mockServices } from '../../mocks/services';
+import { Part, partUnitLabels } from '../../types/part';
+import { mockParts } from '../../mocks/parts';
 
-interface ServiceDialogProps {
+interface PartDialogProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (service: Service) => void;
-  selectedServices: Service[];
+  onSelect: (part: Part) => void;
+  selectedParts: Part[];
 }
 
-const ServiceDialog: React.FC<ServiceDialogProps> = ({
+const PartDialog: React.FC<PartDialogProps> = ({
   open,
   onClose,
   onSelect,
-  selectedServices,
+  selectedParts,
 }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
 
-  const availableServices = mockServices.filter(
-    service => !selectedServices.find(s => s.id === service.id)
+  const availableParts = mockParts.filter(
+    part => !selectedParts.find(p => p.id === part.id)
   );
 
-  const filteredServices = availableServices.filter(service =>
-    service.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredParts = availableParts.filter(part =>
+    part.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Servis Seç</DialogTitle>
+      <DialogTitle>Parça Seç</DialogTitle>
       <DialogContent>
         <TextField
           fullWidth
-          label="Servis Ara"
+          label="Parça Ara"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           sx={{ mb: 2 }}
         />
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {filteredServices.map((service) => (
+          {filteredParts.map((part) => (
             <Chip
-              key={service.id}
+              key={part.id}
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="body2">
-                    {service.name}
+                    {part.name}
                   </Typography>
                   <Typography 
                     variant="caption" 
@@ -66,11 +66,11 @@ const ServiceDialog: React.FC<ServiceDialogProps> = ({
                       borderRadius: 1
                     }}
                   >
-                    {serviceCategoryLabels[service.category as ServiceCategory]}
+                    {partUnitLabels[part.unit]} - {part.price.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
                   </Typography>
                 </Box>
               }
-              onClick={() => onSelect(service)}
+              onClick={() => onSelect(part)}
               sx={{
                 backgroundColor: 'background.paper',
                 border: '1px solid',
@@ -90,4 +90,4 @@ const ServiceDialog: React.FC<ServiceDialogProps> = ({
   );
 };
 
-export default ServiceDialog; 
+export default PartDialog; 

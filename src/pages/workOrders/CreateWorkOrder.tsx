@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { WorkOrderFormData } from '../../types/workOrder';
-import { WorkOrderDialog } from '../../components/workOrders/WorkOrderDialog';
+import { WorkOrderForm } from '../../components/work-orders';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { workOrderAPI } from '../../services/api';
@@ -32,6 +32,10 @@ const CreateWorkOrder = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/work-orders');
+  };
+
   return (
     <Box sx={{ 
       width: '100%',
@@ -41,10 +45,9 @@ const CreateWorkOrder = () => {
       borderRadius: 1,
       boxShadow: 1
     }}>
-      <WorkOrderDialog
-        isPage
+      <WorkOrderForm
         onSubmit={handleCreateWorkOrder}
-        regions={[]}
+        onCancel={handleCancel}
       />
     </Box>
   );

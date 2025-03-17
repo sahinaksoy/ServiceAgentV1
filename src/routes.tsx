@@ -4,6 +4,8 @@ import { CustomerList } from './pages/customers/CustomerList';
 import { CustomerEdit } from './pages/customers/CustomerEdit';
 import Services from './pages/Services';
 import Parts from './pages/Parts';
+import WorkOrderList from './pages/workOrders/WorkOrderList';
+import CreateWorkOrder from './pages/workOrders/CreateWorkOrder';
 
 const routes = [
   {
@@ -29,6 +31,14 @@ const routes = [
   {
     path: '/parts',
     element: <Parts />,
+  },
+  {
+    path: '/work-orders',
+    element: <WorkOrderList />,
+  },
+  {
+    path: '/work-orders/new',
+    element: <CreateWorkOrder />,
   },
   {
     path: '*',

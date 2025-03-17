@@ -21,6 +21,8 @@ export interface WorkOrder {
   preferredDate1: string;
   assignedTo: string;
   services: number[];
+  parts: number[];
+  partQuantities: { [key: number]: number };
   createdAt: string;
   updatedAt: string;
 }
