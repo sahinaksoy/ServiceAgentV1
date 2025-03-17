@@ -34,9 +34,6 @@ export const workOrderSchema = z.object({
   serviceAddress: z.string()
     .min(10, 'Servis adresi en az 10 karakter olmalıdır')
     .max(500, 'Servis adresi en fazla 500 karakter olabilir'),
-  billingAddress: z.string()
-    .optional()
-    .or(z.literal('')),
   preferredDate1: z.string()
     .optional()
     .or(z.literal('')),

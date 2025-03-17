@@ -17,7 +17,6 @@ export interface WorkOrder {
   phone: string;
   mobile: string;
   serviceAddress: string;
-  billingAddress: string;
   preferredDate1: string;
   assignedTo: string;
   services: number[];

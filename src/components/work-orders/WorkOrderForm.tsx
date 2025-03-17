@@ -94,7 +94,6 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
       phone: '',
       mobile: '',
       serviceAddress: '',
-      billingAddress: '',
       preferredDate1: '',
       assignedTo: '',
       services: selectedServices.map(service => service.id),
@@ -177,29 +176,77 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   const renderPartItem = (part: SelectedPart) => {
     if (isMobile) {
       return (
-        <ListItem
+        <Box
           key={part.id}
           sx={{
             bgcolor: 'background.paper',
             borderRadius: 1,
             border: '1px solid',
             borderColor: 'divider',
+            overflow: 'hidden',
             mb: 1,
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            p: 0,
+            '&:hover': {
+              borderColor: 'primary.main',
+              boxShadow: 1,
+            },
           }}
         >
-          <Box sx={{ p: 2, pb: 1 }}>
-            <ListItemText
-              primary={part.name}
-              secondary={`Birim: ${partUnitLabels[part.unit]} | Birim Fiyat: ${part.price.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}`}
-            />
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'flex-start',
+            p: 2,
+            pb: 1,
+            borderBottom: '1px solid',
+            borderColor: 'divider'
+          }}>
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{part.name}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                Birim: {partUnitLabels[part.unit]} | Birim Fiyat: {part.price.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+              </Typography>
+            </Box>
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() => handlePartDelete(part.id)}
+              sx={{ 
+                mt: -0.5, 
+                mr: -0.5,
+                '&:hover': {
+                  bgcolor: 'error.lighter',
+                }
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
           </Box>
-          <Divider />
-          <Box sx={{ p: 2, pt: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ flex: 1 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            p: 2,
+            pt: 1.5,
+            gap: 1.5
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              gap: 1
+            }}>
+              <Typography variant="body2" color="text.secondary">Miktar:</Typography>
+              <Box sx={{ 
+                display: 'flex',
+                alignItems: 'center',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                overflow: 'hidden',
+                flex: 1,
+                maxWidth: 120,
+                '&:hover': {
+                  borderColor: 'primary.main',
+                },
+              }}>
                 <TextField
                   size="small"
                   type="number"
@@ -213,35 +260,38 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                   InputProps={{
                     inputProps: { 
                       min: 1,
-                      style: { textAlign: 'right' }
+                      style: { 
+                        textAlign: 'center',
+                        padding: '4px 0',
+                        width: '100%',
+                      }
                     },
-                    endAdornment: <InputAdornment position="end">{partUnitLabels[part.unit]}</InputAdornment>,
+                    disableUnderline: true,
+                    sx: { 
+                      fontSize: '0.875rem',
+                      '& input': {
+                        p: 0,
+                        height: 24,
+                      }
+                    }
                   }}
-                  fullWidth
+                  variant="standard"
                 />
               </Box>
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => handlePartDelete(part.id)}
-                sx={{ ml: 1 }}
-              >
-                <DeleteIcon />
-              </IconButton>
+              <Typography variant="body2" color="text.secondary">{partUnitLabels[part.unit]}</Typography>
             </Box>
             <Typography 
-              variant="body1" 
+              variant="subtitle2" 
               sx={{ 
-                textAlign: 'right', 
-                fontWeight: 500,
-                mt: 1,
-                color: 'primary.main'
+                fontWeight: 600,
+                color: 'primary.main',
+                textAlign: 'right'
               }}
             >
-              Toplam: {(part.price * part.quantity).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+              {(part.price * part.quantity).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
             </Typography>
           </Box>
-        </ListItem>
+        </Box>
       );
     }
 
@@ -249,52 +299,118 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
       <Box
         key={part.id}
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          p: 2,
           bgcolor: 'background.paper',
           borderRadius: 1,
           border: '1px solid',
           borderColor: 'divider',
+          overflow: 'hidden',
+          '&:hover': {
+            borderColor: 'primary.main',
+            boxShadow: 1,
+          },
         }}
       >
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="body1">{part.name}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Birim: {partUnitLabels[part.unit]} | Birim Fiyat: {part.price.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <TextField
-            size="small"
-            type="number"
-            defaultValue={part.quantity}
-            onChange={(e) => {
-              const newValue = parseInt(e.target.value);
-              if (!isNaN(newValue) && newValue > 0) {
-                handlePartQuantityChange(part.id, newValue);
-              }
-            }}
-            InputProps={{
-              inputProps: { 
-                min: 1,
-                style: { textAlign: 'right' }
-              },
-              endAdornment: <InputAdornment position="end">{partUnitLabels[part.unit]}</InputAdornment>,
-            }}
-            sx={{ width: 120 }}
-          />
-          <Typography variant="body2" sx={{ minWidth: 120, textAlign: 'right' }}>
-            {(part.price * part.quantity).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
-          </Typography>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start',
+          p: 2,
+          pb: 1,
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}>
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{part.name}</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Birim: {partUnitLabels[part.unit]} | Birim Fiyat: {part.price.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+            </Typography>
+          </Box>
           <IconButton
             size="small"
             color="error"
             onClick={() => handlePartDelete(part.id)}
+            sx={{ 
+              mt: -0.5, 
+              mr: -0.5,
+              '&:hover': {
+                bgcolor: 'error.lighter',
+              }
+            }}
           >
-            <DeleteIcon />
+            <DeleteIcon fontSize="small" />
           </IconButton>
+        </Box>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          p: 2,
+          pt: 1.5,
+          gap: 2 
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            gap: 1,
+            flex: 1
+          }}>
+            <Typography variant="body2" color="text.secondary">Miktar:</Typography>
+            <Box sx={{ 
+              display: 'flex',
+              alignItems: 'center',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              overflow: 'hidden',
+              width: 120,
+              '&:hover': {
+                borderColor: 'primary.main',
+              },
+            }}>
+              <TextField
+                size="small"
+                type="number"
+                defaultValue={part.quantity}
+                onChange={(e) => {
+                  const newValue = parseInt(e.target.value);
+                  if (!isNaN(newValue) && newValue > 0) {
+                    handlePartQuantityChange(part.id, newValue);
+                  }
+                }}
+                InputProps={{
+                  inputProps: { 
+                    min: 1,
+                    style: { 
+                      textAlign: 'center',
+                      padding: '4px 0',
+                      width: '100%',
+                    }
+                  },
+                  disableUnderline: true,
+                  sx: { 
+                    fontSize: '0.875rem',
+                    '& input': {
+                      p: 0,
+                      height: 24,
+                    }
+                  }
+                }}
+                variant="standard"
+              />
+            </Box>
+            <Typography variant="body2" color="text.secondary">{partUnitLabels[part.unit]}</Typography>
+          </Box>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 600,
+              color: 'primary.main',
+              minWidth: 100,
+              textAlign: 'right'
+            }}
+          >
+            {(part.price * part.quantity).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+          </Typography>
         </Box>
       </Box>
     );
@@ -440,9 +556,9 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
             />
           </Grid>
 
-          {/* İletişim Bilgileri */}
+          {/* Müşteri Bilgileri */}
           <Grid item xs={12}>
-            <Typography variant="subtitle1" gutterBottom>İletişim Bilgileri</Typography>
+            <Typography variant="subtitle1" gutterBottom>Müşteri Bilgileri</Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Controller
@@ -513,11 +629,6 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
               )}
             />
           </Grid>
-
-          {/* Adres Bilgileri */}
-          <Grid item xs={12}>
-            <Typography variant="subtitle1" gutterBottom>Adres Bilgileri</Typography>
-          </Grid>
           <Grid item xs={12}>
             <Controller
               name="serviceAddress"
@@ -531,23 +642,6 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                   rows={3}
                   error={!!errors.serviceAddress}
                   helperText={errors.serviceAddress?.message}
-                />
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Controller
-              name="billingAddress"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Fatura Adresi"
-                  fullWidth
-                  multiline
-                  rows={3}
-                  error={!!errors.billingAddress}
-                  helperText={errors.billingAddress?.message}
                 />
               )}
             />
