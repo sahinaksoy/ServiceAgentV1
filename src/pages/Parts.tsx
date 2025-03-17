@@ -1,15 +1,89 @@
-import React, { useEffect } from 'react';
-import { Box, Typography, Paper, useTheme, useMediaQuery } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { 
+  Box, 
+  Typography, 
+  Paper, 
+  useTheme, 
+  useMediaQuery,
+  Button,
+  IconButton,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { usePageTitle } from '../contexts/PageTitleContext';
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  SearchPanel,
+} from 'devextreme-react/data-grid';
+import { Part, partUnitLabels, partStatusLabels } from '../types/part';
+import { mockParts } from '../mocks/parts';
+import PartDialog from '../components/parts/PartDialog';
 
 const Parts: React.FC = () => {
   const { setTitle } = usePageTitle();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [parts, setParts] = useState<Part[]>(mockParts);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPart, setSelectedPart] = useState<Part | undefined>();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     setTitle('Parçalar');
   }, [setTitle]);
+
+  const handleAdd = () => {
+    setSelectedPart(undefined);
+    setDialogOpen(true);
+  };
+
+  const handleEdit = (part: Part) => {
+    setSelectedPart(part);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = (part: Part) => {
+    setSelectedPart(part);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleSubmit = (partData: Omit<Part, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (selectedPart) {
+      // Güncelleme
+      setParts(parts.map(part =>
+        part.id === selectedPart.id
+          ? {
+              ...part,
+              ...partData,
+              updatedAt: new Date().toISOString(),
+            }
+          : part
+      ));
+    } else {
+      // Yeni ekleme
+      const newPart: Part = {
+        ...partData,
+        id: Math.max(...parts.map(p => p.id)) + 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setParts([...parts, newPart]);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (selectedPart) {
+      setParts(parts.filter(part => part.id !== selectedPart.id));
+      setDeleteDialogOpen(false);
+      setSelectedPart(undefined);
+    }
+  };
 
   return (
     <Box sx={{ 
@@ -26,26 +100,136 @@ const Parts: React.FC = () => {
           borderRadius: { xs: 0, sm: 1 }
         }}
       >
-        <Typography 
-          variant="h4" 
-          gutterBottom
-          sx={{ 
-            fontSize: { xs: '1.5rem', sm: '2rem' },
-            mb: 2
-          }}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontSize: { xs: '1.5rem', sm: '2rem' }
+            }}
+          >
+            Parçalar
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAdd}
+          >
+            Yeni Parça
+          </Button>
+        </Box>
+        
+        <DataGrid
+          dataSource={parts}
+          showBorders={true}
+          columnAutoWidth={true}
+          height="calc(100% - 60px)"
         >
-          Parçalar
-        </Typography>
-        <Typography 
-          variant="body1"
-          sx={{ 
-            color: 'text.secondary',
-            fontSize: { xs: '0.875rem', sm: '1rem' }
-          }}
-        >
-          Bu sayfada parçalarınızı görüntüleyebilir ve yönetebilirsiniz.
-        </Typography>
+          <Paging defaultPageSize={10} />
+          <FilterRow visible={true} />
+          <SearchPanel visible={true} />
+
+          <Column dataField="id" caption="ID" allowEditing={false} />
+          <Column dataField="name" caption="Parça Adı" />
+          <Column 
+            dataField="unit" 
+            caption="Birim"
+            lookup={{
+              dataSource: Object.entries(partUnitLabels).map(([value, text]) => ({
+                value,
+                text
+              })),
+              valueExpr: 'value',
+              displayExpr: 'text'
+            }}
+          />
+          <Column 
+            dataField="price" 
+            caption="Fiyat"
+            dataType="number"
+            format="#,##0.00 ₺"
+          />
+          <Column 
+            dataField="status" 
+            caption="Durum"
+            lookup={{
+              dataSource: Object.entries(partStatusLabels).map(([value, text]) => ({
+                value,
+                text
+              })),
+              valueExpr: 'value',
+              displayExpr: 'text'
+            }}
+          />
+          <Column 
+            dataField="createdAt" 
+            caption="Oluşturulma Tarihi" 
+            allowEditing={false}
+            dataType="datetime"
+            format="dd.MM.yyyy HH:mm"
+          />
+          <Column 
+            dataField="updatedAt" 
+            caption="Güncellenme Tarihi" 
+            allowEditing={false}
+            dataType="datetime"
+            format="dd.MM.yyyy HH:mm"
+          />
+          <Column
+            caption="İşlemler"
+            width={120}
+            cellRender={(cellElement: any) => {
+              const part = cellElement.data;
+              return (
+                <Box>
+                  <Tooltip title="Düzenle">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEdit(part)}
+                      color="primary"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Sil">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleDelete(part)}
+                      color="error"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              );
+            }}
+          />
+        </DataGrid>
       </Paper>
+
+      <PartDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSubmit={handleSubmit}
+        initialData={selectedPart}
+      />
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Parça Sil</DialogTitle>
+        <DialogContent>
+          <Typography>
+            "{selectedPart?.name}" parçasını silmek istediğinizden emin misiniz?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>İptal</Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+            Sil
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
