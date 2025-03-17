@@ -66,12 +66,17 @@ const MENU_ITEMS: MenuItem[] = [
 
 const MainLayoutContent = ({ children }: MainLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopOpen, setDesktopOpen] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { title } = usePageTitle();
 
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+    if (isMobile) {
+      setMobileOpen(!mobileOpen);
+    } else {
+      setDesktopOpen(!desktopOpen);
+    }
   };
 
   return (
@@ -83,8 +88,12 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
       <AppBar
         position="fixed"
         sx={{
-          width: { xs: '100%', sm: `calc(100% - ${DRAWER_WIDTH}px)` },
-          ml: { sm: `${DRAWER_WIDTH}px` },
+          width: { xs: '100%', sm: `calc(100% - ${desktopOpen ? DRAWER_WIDTH : 0}px)` },
+          ml: { sm: `${desktopOpen ? DRAWER_WIDTH : 0}px` },
+          transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
         }}
       >
         <Toolbar>
@@ -93,9 +102,9 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2 }}
           >
-            <MenuIcon />
+            {desktopOpen ? <ChevronLeftIcon /> : <MenuIcon />}
           </IconButton>
           <Typography variant="h6" noWrap component="div">
             {title}
@@ -106,13 +115,17 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
       <Box
         component="nav"
         sx={{ 
-          width: { sm: DRAWER_WIDTH },
-          flexShrink: { sm: 0 }
+          width: { sm: desktopOpen ? DRAWER_WIDTH : 0 },
+          flexShrink: { sm: 0 },
+          transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
         }}
       >
         <Drawer
-          variant={isMobile ? 'temporary' : 'permanent'}
-          open={mobileOpen}
+          variant={isMobile ? 'temporary' : 'persistent'}
+          open={isMobile ? mobileOpen : desktopOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
             keepMounted: true,
@@ -123,7 +136,12 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
               boxSizing: 'border-box',
               borderRight: (theme) => `1px solid ${theme.palette.divider}`,
               mt: { xs: '56px', sm: '64px' },
-              height: { xs: 'calc(100% - 56px)', sm: 'calc(100% - 64px)' }
+              height: { xs: 'calc(100% - 56px)', sm: 'calc(100% - 64px)' },
+              transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+              }),
+              overflowX: 'hidden',
             },
           }}
         >
@@ -136,10 +154,14 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: '100%',
+          width: { sm: `calc(100% - ${desktopOpen ? DRAWER_WIDTH : 0}px)` },
           height: { xs: 'calc(100vh - 56px)', sm: 'calc(100vh - 64px)' },
           mt: { xs: '56px', sm: '64px' },
           overflow: 'auto',
+          transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
           '&::-webkit-scrollbar': {
             width: '6px',
           },
