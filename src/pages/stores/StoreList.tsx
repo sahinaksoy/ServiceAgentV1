@@ -31,7 +31,8 @@ import {
   Email as EmailIcon,
   Person as PersonIcon,
   Group as GroupIcon,
-  Store as StoreIcon
+  Store as StoreIcon,
+  DevicesOther as DeviceIcon
 } from '@mui/icons-material';
 import { Store, StoreFormData } from '../../types/store';
 import { useStores, useCreateStore, useUpdateStore, useDeleteStore } from '../../hooks/useStores';
@@ -236,10 +237,6 @@ const StoreList = () => {
                     {store.phone}
                   </Typography>
                   <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <EmailIcon fontSize="small" />
-                    {store.email}
-                  </Typography>
-                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <BusinessIcon fontSize="small" />
                     {store.company}
                   </Typography>
@@ -251,10 +248,35 @@ const StoreList = () => {
                     <PhoneIcon fontSize="small" />
                     {store.authorizedPhone}
                   </Typography>
-                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <GroupIcon fontSize="small" />
-                    {store.employeeCount} Çalışan
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                    <DeviceIcon fontSize="small" />
+                    <Stack spacing={0.5}>
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        Cihazlar ({store.devices?.length || 0})
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {store.devices?.map(device => (
+                          <Chip
+                            key={device.id}
+                            label={`${device.name} (${device.type})`}
+                            size="small"
+                            color={device.status === 'active' ? 'success' : device.status === 'maintenance' ? 'warning' : 'error'}
+                            sx={{ mr: 0.5, mb: 0.5 }}
+                          />
+                        ))}
+                      </Box>
+                      {store.devices?.some(device => device.status === 'maintenance') && (
+                        <Typography variant="caption" color="warning.main" sx={{ mt: 0.5 }}>
+                          ⚠️ Bakımda olan cihazlar mevcut
+                        </Typography>
+                      )}
+                      {store.devices?.some(device => device.status === 'inactive') && (
+                        <Typography variant="caption" color="error.main" sx={{ mt: 0.5 }}>
+                          ⚠️ Pasif durumda olan cihazlar mevcut
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Box>
                 </Stack>
 
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
