@@ -176,6 +176,10 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
     return selectedParts.reduce((total, part) => total + (part.price * part.quantity), 0);
   };
 
+  const calculateTotalDuration = () => {
+    return selectedServices.reduce((total, service) => total + service.duration, 0);
+  };
+
   const handleFormSubmit = async (data: WorkOrderFormData) => {
     try {
       console.log('Form verileri:', data);
@@ -235,7 +239,8 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
           updatedAt: service.updatedAt
         })),
         parts: selectedParts,
-        totalAmount: calculateTotalPartsCost()
+        totalAmount: calculateTotalPartsCost(),
+        totalDuration: calculateTotalDuration()
       };
 
       console.log('Oluşturulan iş emri:', workOrder);
@@ -973,6 +978,12 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                     ) : (
                       selectedServices.map(renderServiceItem)
                     )}
+                    <Divider />
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1 }}>
+                      <Typography variant="subtitle1">
+                        Toplam Süre: {calculateTotalDuration()} Saat
+                      </Typography>
+                    </Box>
                   </Stack>
                 ) : (
                   <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 4 }}>

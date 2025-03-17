@@ -295,204 +295,268 @@ let stores: Store[] = [
 
 let workOrders: WorkOrder[] = [
   {
-    id: '1',
+    id: 1,
+    summary: 'Klima bakım ve onarım',
+    priority: 'high',
     type: 'emergency',
     category: 'mechanical',
-    priority: 'high',
-    status: 'pool',
-    summary: 'Soğuk oda derece yüksek sorunu',
+    status: 'pending',
     dueDate: dayjs().add(1, 'day').toISOString(),
-    store: '4001 MMM FUAYE ISTANBUL',
-    contact: 'Mağaza Müdürü',
-    email: 'fuaye@migros.com.tr',
-    phone: '5551234567',
-    mobile: '5551234567',
-    serviceAddress: 'MMM Fuaye İstanbul',
-    billingAddress: 'MMM Fuaye İstanbul',
-    preferredDate1: dayjs().toISOString(),
-    assignedTo: '',
     createdAt: dayjs().subtract(2, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(2, 'hour').toISOString()
+    updatedAt: dayjs().subtract(2, 'hour').toISOString(),
+    company: {
+      id: '3',
+      name: 'Ataşehir Makro Migros',
+      contactPerson: 'Ali Yılmaz',
+      email: 'atasehir@migros.com.tr',
+      mobile: '5553456789',
+      address: 'Ataşehir Bulvarı, Ataşehir, İstanbul'
+    },
+    assignedTo: {
+      id: '1',
+      firstName: 'Ahmet',
+      lastName: 'Yılmaz',
+      email: 'ahmet.yilmaz@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 1,
+        name: 'Klima Genel Kontrol',
+        description: 'Klima sisteminin genel kontrolü ve temizliği',
+        duration: 60,
+        price: 750
+      },
+      {
+        id: 2,
+        name: 'Kompresör Bakımı',
+        description: 'Klima kompresörünün bakımı ve yağ kontrolü',
+        duration: 90,
+        price: 1200
+      }
+    ],
+    parts: [
+      {
+        id: 1,
+        name: 'Klima Filtresi',
+        description: 'Yüksek performanslı hava filtresi',
+        quantity: 2,
+        unit: 'adet',
+        unitPrice: 250
+      },
+      {
+        id: 2,
+        name: 'Kompresör Yağı',
+        description: 'Özel klima kompresör yağı',
+        quantity: 1,
+        unit: 'litre',
+        unitPrice: 300
+      }
+    ],
+    totalAmount: 2750,
+    totalDuration: 150
   },
   {
-    id: '2',
-    type: 'maintenance',
-    category: 'mechanical',
+    id: 2,
+    summary: 'Elektrik tesisatı yenileme',
     priority: 'medium',
-    status: 'inProgress',
-    summary: 'Şarküteri odası otomatik çalışmıyor',
-    dueDate: dayjs().add(2, 'day').toISOString(),
-    store: 'Dudullu Toptan',
-    contact: 'Mağaza Yetkilisi',
-    email: 'dudullu@migros.com.tr',
-    phone: '5552345678',
-    mobile: '5552345678',
-    serviceAddress: 'Dudullu Toptan Mağaza',
-    billingAddress: 'Dudullu Toptan Mağaza',
-    preferredDate1: dayjs().toISOString(),
-    assignedTo: '1',
+    type: 'renovation',
+    category: 'electrical',
+    status: 'in_progress',
+    dueDate: dayjs().add(5, 'day').toISOString(),
     createdAt: dayjs().subtract(1, 'day').toISOString(),
-    updatedAt: dayjs().subtract(12, 'hour').toISOString()
+    updatedAt: dayjs().subtract(12, 'hour').toISOString(),
+    company: {
+      id: '4',
+      name: 'Levent 5M Migros',
+      contactPerson: 'Mehmet Demir',
+      email: 'levent@migros.com.tr',
+      mobile: '5557891234',
+      address: 'Levent Mah. Beşiktaş, İstanbul'
+    },
+    assignedTo: {
+      id: '2',
+      firstName: 'Ayşe',
+      lastName: 'Demir',
+      email: 'ayse.demir@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 3,
+        name: 'Kablo Döşeme',
+        description: 'Yeni elektrik kablolarının döşenmesi',
+        duration: 240,
+        price: 3500
+      },
+      {
+        id: 4,
+        name: 'Pano Montajı',
+        description: 'Yeni elektrik panosunun montajı',
+        duration: 120,
+        price: 2000
+      }
+    ],
+    parts: [
+      {
+        id: 3,
+        name: 'NYM Kablo',
+        description: '3x2.5 NYM Kablo',
+        quantity: 100,
+        unit: 'metre',
+        unitPrice: 15
+      },
+      {
+        id: 4,
+        name: 'Elektrik Panosu',
+        description: '24 Sigortalı Elektrik Panosu',
+        quantity: 1,
+        unit: 'adet',
+        unitPrice: 1800
+      },
+      {
+        id: 5,
+        name: 'Sigorta',
+        description: '16A Otomatik Sigorta',
+        quantity: 12,
+        unit: 'adet',
+        unitPrice: 45
+      }
+    ],
+    totalAmount: 8840,
+    totalDuration: 360
   },
   {
-    id: '3',
-    type: 'emergency',
-    category: 'electrical',
-    priority: 'high',
-    status: 'waitingForCompletion',
-    summary: 'Ada hizmet bağlantı sorunu ve sigorta problemi',
-    dueDate: dayjs().add(1, 'day').toISOString(),
-    store: 'Caddebostan Plajyolu Macro',
-    contact: 'Teknik Sorumlu',
-    email: 'caddebostan@migros.com.tr',
-    phone: '5553456789',
-    mobile: '5553456789',
-    serviceAddress: 'Caddebostan Plajyolu Macro',
-    billingAddress: 'Caddebostan Plajyolu Macro',
-    preferredDate1: dayjs().toISOString(),
-    assignedTo: '2',
-    createdAt: dayjs().subtract(6, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(1, 'hour').toISOString()
-  },
-  {
-    id: '4',
+    id: 3,
+    summary: 'Periyodik soğutucu bakımı',
+    priority: 'low',
     type: 'maintenance',
     category: 'mechanical',
+    status: 'completed',
+    dueDate: dayjs().subtract(1, 'day').toISOString(),
+    createdAt: dayjs().subtract(3, 'day').toISOString(),
+    updatedAt: dayjs().subtract(1, 'day').toISOString(),
+    company: {
+      id: '5',
+      name: 'Beylikdüzü MM Migros',
+      contactPerson: 'Fatma Şahin',
+      email: 'beylikduzu@migros.com.tr',
+      mobile: '5552345678',
+      address: 'Beylikdüzü Mah. Beylikdüzü, İstanbul'
+    },
+    assignedTo: {
+      id: '1',
+      firstName: 'Ahmet',
+      lastName: 'Yılmaz',
+      email: 'ahmet.yilmaz@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 5,
+        name: 'Soğutucu Bakımı',
+        description: 'Periyodik soğutucu bakımı ve temizlik',
+        duration: 120,
+        price: 1500
+      }
+    ],
+    parts: [],
+    totalAmount: 1500,
+    totalDuration: 120
+  },
+  {
+    id: 4,
+    summary: 'Acil aydınlatma arızası',
+    priority: 'high',
+    type: 'emergency',
+    category: 'electrical',
+    status: 'cancelled',
+    dueDate: dayjs().subtract(2, 'day').toISOString(),
+    createdAt: dayjs().subtract(2, 'day').toISOString(),
+    updatedAt: dayjs().subtract(2, 'day').toISOString(),
+    company: {
+      id: '6',
+      name: 'Bakırköy 3M Migros',
+      contactPerson: 'Hasan Kaya',
+      email: 'bakirkoy@migros.com.tr',
+      mobile: '5558765432',
+      address: 'Bakırköy Mah. Bakırköy, İstanbul'
+    },
+    assignedTo: null,
+    services: [],
+    parts: [],
+    totalAmount: 0,
+    totalDuration: 0
+  },
+  {
+    id: 5,
+    summary: 'Yeni soğutma sistemi kurulumu',
     priority: 'medium',
-    status: 'pool',
-    summary: 'Dolap fanlarında paslanma ve temizlik ihtiyacı',
-    dueDate: dayjs().add(3, 'day').toISOString(),
-    store: 'MM Sebze Meyve',
-    contact: 'Reyon Sorumlusu',
-    email: 'mmsebze@migros.com.tr',
-    phone: '5554567890',
-    mobile: '5554567890',
-    serviceAddress: 'MM Sebze Meyve Mağazası',
-    billingAddress: 'MM Sebze Meyve Mağazası',
-    preferredDate1: dayjs().add(1, 'day').toISOString(),
-    assignedTo: '',
+    type: 'investment',
+    category: 'mechanical',
+    status: 'pending',
+    dueDate: dayjs().add(10, 'day').toISOString(),
     createdAt: dayjs().subtract(1, 'day').toISOString(),
-    updatedAt: dayjs().subtract(1, 'day').toISOString()
-  },
-  {
-    id: '5',
-    type: 'emergency',
-    category: 'electrical',
-    priority: 'high',
-    status: 'inProgress',
-    summary: 'Merkezi sistem bağlantı ve derece problemi',
-    dueDate: dayjs().add(1, 'day').toISOString(),
-    store: 'Göztepe MM',
-    contact: 'Teknik Ekip',
-    email: 'goztepe@migros.com.tr',
-    phone: '5555678901',
-    mobile: '5555678901',
-    serviceAddress: 'Göztepe MM Mağaza',
-    billingAddress: 'Göztepe MM Mağaza',
-    preferredDate1: dayjs().toISOString(),
-    assignedTo: '1',
-    createdAt: dayjs().subtract(4, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(2, 'hour').toISOString()
-  },
-  {
-    id: '6',
-    type: 'emergency',
-    category: 'mechanical',
-    priority: 'high',
-    status: 'pool',
-    summary: 'Unlu mamüller soğuk hava deposu buzlanma ve su akıtma',
-    dueDate: dayjs().add(1, 'day').toISOString(),
-    store: 'MM Unlu Mamüller',
-    contact: 'Mağaza Müdürü',
-    email: 'mmunlu@migros.com.tr',
-    phone: '5556789012',
-    mobile: '5556789012',
-    serviceAddress: 'MM Unlu Mamüller Mağaza',
-    billingAddress: 'MM Unlu Mamüller Mağaza',
-    preferredDate1: dayjs().toISOString(),
-    assignedTo: '',
-    createdAt: dayjs().subtract(8, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(8, 'hour').toISOString()
-  },
-  {
-    id: '7',
-    type: 'maintenance',
-    category: 'electrical',
-    priority: 'medium',
-    status: 'pool',
-    summary: 'QR kod eksikliği ve sistem izleme problemi',
-    dueDate: dayjs().add(2, 'day').toISOString(),
-    store: 'MM Kasap',
-    contact: 'Reyon Sorumlusu',
-    email: 'mmkasap@migros.com.tr',
-    phone: '5557890123',
-    mobile: '5557890123',
-    serviceAddress: 'MM Kasap Reyonu',
-    billingAddress: 'MM Kasap Reyonu',
-    preferredDate1: dayjs().add(1, 'day').toISOString(),
-    assignedTo: '',
-    createdAt: dayjs().subtract(1, 'day').toISOString(),
-    updatedAt: dayjs().subtract(1, 'day').toISOString()
-  },
-  {
-    id: '8',
-    type: 'emergency',
-    category: 'mechanical',
-    priority: 'high',
-    status: 'waitingForAssignment',
-    summary: 'Sütlük dolabı derece yüksek',
-    dueDate: dayjs().add(1, 'day').toISOString(),
-    store: 'Mjet Ziverbey',
-    contact: 'Mağaza Müdürü',
-    email: 'ziverbey@migros.com.tr',
-    phone: '5551112233',
-    mobile: '5551112233',
-    serviceAddress: 'Mjet Ziverbey Mağaza',
-    billingAddress: 'Mjet Ziverbey Mağaza',
-    preferredDate1: dayjs().toISOString(),
-    assignedTo: '2',
-    createdAt: dayjs().subtract(3, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(3, 'hour').toISOString()
-  },
-  {
-    id: '9',
-    type: 'emergency',
-    category: 'electrical',
-    priority: 'high',
-    status: 'waitingForAssignment',
-    summary: 'Merkezi sistem sigortası atıyor',
-    dueDate: dayjs().add(1, 'day').toISOString(),
-    store: 'Mazharbey M',
-    contact: 'Teknik Sorumlu',
-    email: 'mazharbey@migros.com.tr',
-    phone: '5552223344',
-    mobile: '5552223344',
-    serviceAddress: 'Mazharbey M Mağaza',
-    billingAddress: 'Mazharbey M Mağaza',
-    preferredDate1: dayjs().toISOString(),
-    assignedTo: '1',
-    createdAt: dayjs().subtract(5, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(5, 'hour').toISOString()
-  },
-  {
-    id: '10',
-    type: 'maintenance',
-    category: 'mechanical',
-    priority: 'medium',
-    status: 'waitingForAssignment',
-    summary: 'Unlu mamüller oda kapı switch arızası',
-    dueDate: dayjs().add(2, 'day').toISOString(),
-    store: 'MM Kozzy',
-    contact: 'Reyon Sorumlusu',
-    email: 'kozzy@migros.com.tr',
-    phone: '5553334455',
-    mobile: '5553334455',
-    serviceAddress: 'MM Kozzy Mağaza',
-    billingAddress: 'MM Kozzy Mağaza',
-    preferredDate1: dayjs().add(1, 'day').toISOString(),
-    assignedTo: '2',
-    createdAt: dayjs().subtract(7, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(7, 'hour').toISOString()
+    updatedAt: dayjs().subtract(1, 'day').toISOString(),
+    company: {
+      id: '7',
+      name: 'Maltepe Makro Migros',
+      contactPerson: 'Zeynep Aydın',
+      email: 'maltepe@migros.com.tr',
+      mobile: '5554567890',
+      address: 'Maltepe Mah. Maltepe, İstanbul'
+    },
+    assignedTo: {
+      id: '2',
+      firstName: 'Ayşe',
+      lastName: 'Demir',
+      email: 'ayse.demir@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 6,
+        name: 'Sistem Kurulumu',
+        description: 'Yeni soğutma sistemi kurulumu',
+        duration: 480,
+        price: 8500
+      },
+      {
+        id: 7,
+        name: 'Test ve Devreye Alma',
+        description: 'Sistemin test edilmesi ve devreye alınması',
+        duration: 240,
+        price: 3500
+      }
+    ],
+    parts: [
+      {
+        id: 6,
+        name: 'Soğutma Ünitesi',
+        description: 'Endüstriyel tip soğutma ünitesi',
+        quantity: 1,
+        unit: 'adet',
+        unitPrice: 25000
+      },
+      {
+        id: 7,
+        name: 'Bakır Boru Seti',
+        description: 'Soğutma sistemi bakır boru seti',
+        quantity: 1,
+        unit: 'set',
+        unitPrice: 4500
+      },
+      {
+        id: 8,
+        name: 'İzolasyon Malzemesi',
+        description: 'Boru izolasyon malzemesi',
+        quantity: 50,
+        unit: 'metre',
+        unitPrice: 35
+      }
+    ],
+    totalAmount: 43250,
+    totalDuration: 720
   }
 ];
 
@@ -638,10 +702,40 @@ export const handlers = [
 
   http.post('/api/work-orders', async ({ request }) => {
     const workOrderData = (await request.json()) as WorkOrderFormData;
+    const selectedUser = users.find(user => user.id === workOrderData.assignedTo);
+    const selectedCustomer = customers.find(customer => customer.id === workOrderData.company);
+
+    if (!selectedCustomer || !selectedUser) {
+      return new HttpResponse(null, { status: 400 });
+    }
+
     const newWorkOrder: WorkOrder = {
-      ...workOrderData,
-      id: Math.random().toString(36).substr(2, 9),
+      id: Date.now(),
+      summary: workOrderData.summary,
+      priority: workOrderData.priority,
+      type: workOrderData.type,
+      category: workOrderData.category,
       status: 'pending',
+      dueDate: workOrderData.dueDate,
+      company: {
+        id: selectedCustomer.id,
+        name: selectedCustomer.name,
+        contactPerson: workOrderData.contact,
+        email: workOrderData.email,
+        mobile: workOrderData.mobile,
+        address: workOrderData.serviceAddress
+      },
+      assignedTo: {
+        id: selectedUser.id,
+        firstName: selectedUser.firstName,
+        lastName: selectedUser.lastName,
+        email: selectedUser.email,
+        status: selectedUser.status
+      },
+      services: [],
+      parts: [],
+      totalAmount: 0,
+      totalDuration: 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -652,15 +746,42 @@ export const handlers = [
   http.put('/api/work-orders/:id', async ({ params, request }) => {
     const { id } = params;
     const workOrderData = (await request.json()) as WorkOrderFormData;
-    const workOrderIndex = workOrders.findIndex(wo => wo.id === id);
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === Number(id));
 
     if (workOrderIndex === -1) {
       return new HttpResponse(null, { status: 404 });
     }
 
+    const selectedUser = users.find(user => user.id === workOrderData.assignedTo);
+    const selectedCustomer = customers.find(customer => customer.id === workOrderData.company);
+
+    if (!selectedCustomer || !selectedUser) {
+      return new HttpResponse(null, { status: 400 });
+    }
+
     const updatedWorkOrder: WorkOrder = {
       ...workOrders[workOrderIndex],
-      ...workOrderData,
+      id: Number(id),
+      summary: workOrderData.summary,
+      priority: workOrderData.priority,
+      type: workOrderData.type,
+      category: workOrderData.category,
+      dueDate: workOrderData.dueDate,
+      company: {
+        id: selectedCustomer.id,
+        name: selectedCustomer.name,
+        contactPerson: workOrderData.contact,
+        email: workOrderData.email,
+        mobile: workOrderData.mobile,
+        address: workOrderData.serviceAddress
+      },
+      assignedTo: {
+        id: selectedUser.id,
+        firstName: selectedUser.firstName,
+        lastName: selectedUser.lastName,
+        email: selectedUser.email,
+        status: selectedUser.status
+      },
       updatedAt: new Date().toISOString(),
     };
 
@@ -670,13 +791,13 @@ export const handlers = [
 
   http.delete('/api/work-orders/:id', ({ params }) => {
     const { id } = params;
-    const workOrderIndex = workOrders.findIndex(wo => wo.id === id);
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === Number(id));
 
     if (workOrderIndex === -1) {
       return new HttpResponse(null, { status: 404 });
     }
 
-    workOrders = workOrders.filter(wo => wo.id !== id);
+    workOrders = workOrders.filter(wo => wo.id !== Number(id));
     return new HttpResponse(null, { status: 204 });
   }),
 ]; 

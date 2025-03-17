@@ -23,16 +23,18 @@ export interface WorkOrderAssignee {
 export interface WorkOrderService {
   id: number;
   name: string;
-  category: string;
+  description: string;
   duration: number;
+  price: number;
 }
 
 export interface WorkOrderPart {
   id: number;
   name: string;
+  description: string;
   unit: string;
-  price: number;
   quantity: number;
+  unitPrice: number;
 }
 
 export interface WorkOrder {
@@ -50,6 +52,7 @@ export interface WorkOrder {
   services: WorkOrderService[];
   parts: WorkOrderPart[];
   totalAmount: number;
+  totalDuration: number;
 }
 
 export interface WorkOrderFormData {
