@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem, Autocomplete, Typography, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem, Autocomplete, Typography, Box, Chip, IconButton } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WorkOrder, WorkOrderFormData } from '../../types/workOrder';
@@ -11,6 +11,10 @@ import 'dayjs/locale/tr';
 import { useGlobalUsers } from '../../hooks/useGlobalUsers';
 import { useGlobalCustomers } from '../../hooks/useGlobalCustomers';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import ServiceSelectionDialog from './ServiceSelectionDialog';
+import { Service } from '../../types/service';
+import { Add as AddIcon } from '@mui/icons-material';
 
 interface WorkOrderDialogProps {
   isPage?: boolean;
@@ -52,6 +56,8 @@ export const WorkOrderDialog = ({
   const { data: users = [], isLoading: isUsersLoading } = useGlobalUsers();
   const { data: customers = [], isLoading: isCustomersLoading } = useGlobalCustomers();
   const activeUsers = users.filter(user => user.status === 'active');
+  const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<Service[]>([]);
 
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<WorkOrderFormData>({
     resolver: zodResolver(workOrderSchema),
@@ -70,6 +76,7 @@ export const WorkOrderDialog = ({
       billingAddress: '',
       preferredDate1: '',
       assignedTo: '',
+      services: [],
     },
   });
 
@@ -97,6 +104,14 @@ export const WorkOrderDialog = ({
     fullWidth: true as const,
     error: !!errors.dueDate,
     helperText: errors.dueDate?.message,
+  };
+
+  const handleServiceSelect = (services: Service[]) => {
+    setSelectedServices(services);
+  };
+
+  const handleServiceDelete = (serviceId: number) => {
+    setSelectedServices(prev => prev.filter(service => service.id !== serviceId));
   };
 
   const formContent = (
@@ -350,57 +365,75 @@ export const WorkOrderDialog = ({
           )}
         />
       </Grid>
+
+      {/* Servisler */}
+      <Grid item xs={12}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Typography variant="subtitle1">Servisler</Typography>
+          <IconButton
+            color="primary"
+            onClick={() => setServiceDialogOpen(true)}
+            size="small"
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          {selectedServices.map(service => (
+            <Chip
+              key={service.id}
+              label={`${service.name} (${service.duration} dk)`}
+              onDelete={() => handleServiceDelete(service.id)}
+              sx={{ m: 0.5 }}
+            />
+          ))}
+        </Box>
+      </Grid>
     </Grid>
   );
 
-  return isPage ? (
-    <Box sx={{ p: 2 }}>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        {formContent}
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-            disabled={isSubmitting}
-          >
-            Kaydet
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/work-orders')}
-          >
-            İptal
-          </Button>
-        </Box>
+  const handleFormSubmit = async (data: WorkOrderFormData) => {
+    const formData = {
+      ...data,
+      services: selectedServices.map(service => service.id),
+    };
+    await onSubmit(formData);
+  };
+
+  return (
+    <>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
+        {isPage ? (
+          <Box sx={{ p: 3 }}>
+            {formContent}
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button onClick={() => navigate('/work-orders')}>İptal</Button>
+              <Button type="submit" variant="contained" disabled={isSubmitting}>
+                Kaydet
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+            <DialogTitle>{mode === 'add' ? 'Yeni İş Emri' : 'İş Emri Düzenle'}</DialogTitle>
+            <DialogContent>
+              {formContent}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={onClose}>İptal</Button>
+              <Button type="submit" variant="contained" disabled={isSubmitting}>
+                Kaydet
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
       </form>
-    </Box>
-  ) : (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-    >
-      <DialogTitle>
-        {mode === 'edit' ? 'İş Emri Düzenle' : 'Yeni İş Emri'}
-      </DialogTitle>
-      <DialogContent sx={{ p: 2 }}>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          {formContent}
-        </form>
-      </DialogContent>
-      <DialogActions sx={{ p: 2, pt: 0 }}>
-        <Button onClick={onClose}>İptal</Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit(onSubmit)}
-          disabled={isSubmitting}
-        >
-          Kaydet
-        </Button>
-      </DialogActions>
-    </Dialog>
+
+      <ServiceSelectionDialog
+        open={serviceDialogOpen}
+        onClose={() => setServiceDialogOpen(false)}
+        onSelect={handleServiceSelect}
+      />
+    </>
   );
 }; 

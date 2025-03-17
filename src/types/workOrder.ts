@@ -11,7 +11,7 @@ export interface WorkOrder {
   status: WorkOrderStatus;
   summary: string;
   dueDate: string;
-  store: string;
+  company: string;
   contact: string;
   email: string;
   phone: string;
@@ -20,6 +20,7 @@ export interface WorkOrder {
   billingAddress: string;
   preferredDate1: string;
   assignedTo: string;
+  services: number[];
   createdAt: string;
   updatedAt: string;
 }

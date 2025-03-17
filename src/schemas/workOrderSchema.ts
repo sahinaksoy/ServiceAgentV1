@@ -43,4 +43,6 @@ export const workOrderSchema = z.object({
   assignedTo: z.string()
     .optional()
     .or(z.literal('')),
+  services: z.array(z.number())
+    .min(1, 'En az bir servis seçilmelidir'),
 }); 
