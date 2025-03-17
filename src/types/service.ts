@@ -14,8 +14,10 @@ export enum ServiceStatus {
 
 export interface Service {
   id: number;
-  category: ServiceCategory;
   name: string;
+  category: string;
+  description?: string;
+  estimatedDuration: number;
   duration: number; // dakika cinsinden
   status: ServiceStatus;
   createdAt: string;

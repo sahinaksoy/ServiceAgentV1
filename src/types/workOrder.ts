@@ -1,15 +1,62 @@
-export type WorkOrderType = 'emergency' | 'maintenance' | 'renovation' | 'additional' | 'investment';
-export type WorkOrderStatus = 'pool' | 'waitingForAssignment' | 'pending' | 'inProgress' | 'waitingForCompletion' | 'completed' | 'cancelled';
 export type WorkOrderPriority = 'high' | 'medium' | 'low';
-export type WorkOrderCategory = 'mechanical' | 'electrical' | 'sensor' | 'maintenance' | 'temperature' | 'glass' | 'water' | 'monitoring';
+export type WorkOrderType = 'emergency' | 'maintenance' | 'renovation' | 'additional' | 'investment';
+export type WorkOrderCategory = 'mechanical' | 'electrical';
+export type WorkOrderStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
+
+export interface WorkOrderCompany {
+  id: string;
+  name: string;
+  contactPerson: string;
+  email: string;
+  mobile: string;
+  address: string;
+}
+
+export interface WorkOrderAssignee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  status: string;
+}
+
+export interface WorkOrderService {
+  id: number;
+  name: string;
+  category: string;
+  duration: number;
+}
+
+export interface WorkOrderPart {
+  id: number;
+  name: string;
+  unit: string;
+  price: number;
+  quantity: number;
+}
 
 export interface WorkOrder {
-  id: string;
+  id: number;
+  summary: string;
+  priority: WorkOrderPriority;
   type: WorkOrderType;
   category: WorkOrderCategory;
-  priority: WorkOrderPriority;
   status: WorkOrderStatus;
+  dueDate: string;
+  createdAt: string;
+  updatedAt: string;
+  company: WorkOrderCompany;
+  assignedTo: WorkOrderAssignee | null;
+  services: WorkOrderService[];
+  parts: WorkOrderPart[];
+  totalAmount: number;
+}
+
+export interface WorkOrderFormData {
   summary: string;
+  priority: WorkOrderPriority;
+  type: WorkOrderType;
+  category: WorkOrderCategory;
   dueDate: string;
   company: string;
   contact: string;
@@ -20,10 +67,4 @@ export interface WorkOrder {
   preferredDate1: string;
   assignedTo: string;
   services: number[];
-  parts: number[];
-  partQuantities: { [key: number]: number };
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type WorkOrderFormData = Omit<WorkOrder, 'id' | 'status' | 'createdAt' | 'updatedAt'>; 
+} 

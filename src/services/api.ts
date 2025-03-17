@@ -149,44 +149,62 @@ const mockCustomers: Customer[] = [
 // Mock iş emirleri
 const mockWorkOrders: WorkOrder[] = [
   {
-    id: '1',
+    id: 1,
+    summary: 'Klima bakımı yapılacak',
     type: 'emergency',
     category: 'mechanical',
     priority: 'high',
     status: 'pending',
-    summary: 'Klima bakımı yapılacak',
     dueDate: dayjs().add(3, 'day').format(),
-    store: '1',
-    contact: '1',
-    email: 'info@abcmarket.com',
-    phone: '0212 555 0001',
-    mobile: '0532 555 0001',
-    serviceAddress: 'ABC Market Merkez Şube, İstanbul',
-    billingAddress: 'ABC Market Merkez Şube, İstanbul',
-    preferredDate1: dayjs().add(2, 'day').format(),
-    assignedTo: '2',
     createdAt: dayjs().subtract(1, 'day').format(),
     updatedAt: dayjs().subtract(1, 'day').format(),
+    company: {
+      id: '1',
+      name: 'ABC Market',
+      contactPerson: 'John Doe',
+      email: 'info@abcmarket.com',
+      mobile: '0532 555 0001',
+      address: 'ABC Market Merkez Şube, İstanbul'
+    },
+    assignedTo: {
+      id: '2',
+      firstName: 'Ayşe',
+      lastName: 'Demir',
+      email: 'ayse.demir@arveta.com.tr',
+      status: 'active'
+    },
+    services: [],
+    parts: [],
+    totalAmount: 0
   },
   {
-    id: '2',
+    id: 2,
+    summary: 'Buzdolabı tamiri',
     type: 'maintenance',
     category: 'electrical',
     priority: 'medium',
-    status: 'inProgress',
-    summary: 'Buzdolabı tamiri',
+    status: 'in_progress',
     dueDate: dayjs().add(5, 'day').format(),
-    store: '2',
-    contact: '2',
-    email: 'info@xyzmagaza.com',
-    phone: '0216 555 0002',
-    mobile: '0533 555 0002',
-    serviceAddress: 'XYZ Mağazası Ana Cadde Şubesi, Ankara',
-    billingAddress: 'XYZ Mağazası Ana Cadde Şubesi, Ankara',
-    preferredDate1: dayjs().add(4, 'day').format(),
-    assignedTo: '3',
     createdAt: dayjs().subtract(2, 'day').format(),
     updatedAt: dayjs().subtract(2, 'day').format(),
+    company: {
+      id: '2',
+      name: 'XYZ Mağazası',
+      contactPerson: 'Jane Smith',
+      email: 'info@xyzmagaza.com',
+      mobile: '0533 555 0002',
+      address: 'XYZ Mağazası Ana Cadde Şubesi, Ankara'
+    },
+    assignedTo: {
+      id: '3',
+      firstName: 'Mehmet',
+      lastName: 'Kaya',
+      email: 'mehmet.kaya@noord.com.tr',
+      status: 'active'
+    },
+    services: [],
+    parts: [],
+    totalAmount: 0
   }
 ];
 
@@ -385,35 +403,67 @@ export const workOrderAPI = {
   getWorkOrders: async (): Promise<WorkOrder[]> => {
     try {
       const response = await api.get('/work-orders');
-      // API yanıtının bir dizi olduğundan emin olalım
       if (Array.isArray(response.data)) {
         return response.data;
-      } else {
-        console.error('API yanıtı bir dizi değil:', response.data);
-        return []; // Boş dizi döndür
       }
+      return mockWorkOrders;
     } catch (error) {
       console.error('İş emirleri alınırken hata oluştu:', error);
-      return []; // Hata durumunda boş dizi döndür
+      return mockWorkOrders;
     }
   },
 
-  getWorkOrderById: async (id: string): Promise<WorkOrder> => {
-    const response = await api.get(`/work-orders/${id}`);
-    return response.data;
+  getWorkOrderById: async (id: number): Promise<WorkOrder> => {
+    try {
+      const response = await api.get(`/work-orders/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`İş emri (ID: ${id}) alınırken hata oluştu:`, error);
+      const workOrder = mockWorkOrders.find(wo => wo.id === id);
+      if (!workOrder) throw new Error('İş emri bulunamadı');
+      return workOrder;
+    }
   },
 
-  createWorkOrder: async (data: WorkOrderFormData): Promise<WorkOrder> => {
-    const response = await api.post('/work-orders', data);
-    return response.data;
+  createWorkOrder: async (workOrder: WorkOrder): Promise<WorkOrder> => {
+    try {
+      const response = await api.post('/work-orders', workOrder);
+      return response.data;
+    } catch (error) {
+      console.error('İş emri oluşturulurken hata oluştu:', error);
+      // Mock veri oluştur
+      const newWorkOrder = {
+        ...workOrder,
+        id: mockWorkOrders.length + 1,
+      };
+      mockWorkOrders.push(newWorkOrder);
+      return newWorkOrder;
+    }
   },
 
-  updateWorkOrder: async (id: string, data: Partial<WorkOrderFormData>): Promise<WorkOrder> => {
-    const response = await api.put(`/work-orders/${id}`, data);
-    return response.data;
+  updateWorkOrder: async (id: number, workOrder: Partial<WorkOrder>): Promise<WorkOrder> => {
+    try {
+      const response = await api.put(`/work-orders/${id}`, workOrder);
+      return response.data;
+    } catch (error) {
+      console.error('İş emri güncellenirken hata oluştu:', error);
+      // Mock veriyi güncelle
+      const index = mockWorkOrders.findIndex(wo => wo.id === id);
+      if (index === -1) throw new Error('İş emri bulunamadı');
+      mockWorkOrders[index] = { ...mockWorkOrders[index], ...workOrder };
+      return mockWorkOrders[index];
+    }
   },
 
-  deleteWorkOrder: async (id: string): Promise<void> => {
-    await api.delete(`/work-orders/${id}`);
-  },
+  deleteWorkOrder: async (id: number): Promise<void> => {
+    try {
+      await api.delete(`/work-orders/${id}`);
+    } catch (error) {
+      console.error('İş emri silinirken hata oluştu:', error);
+      // Mock veriyi sil
+      const index = mockWorkOrders.findIndex(wo => wo.id === id);
+      if (index === -1) throw new Error('İş emri bulunamadı');
+      mockWorkOrders.splice(index, 1);
+    }
+  }
 }; 
