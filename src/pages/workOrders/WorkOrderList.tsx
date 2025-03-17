@@ -34,7 +34,17 @@ import {
   TableContainer,
   TableRow,
   Paper as MuiPaper,
-  Link
+  Link,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  ListItemButton,
+  Radio,
+  CircularProgress,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -58,10 +68,12 @@ import {
   Build as PartIcon,
   Category as CategoryIcon,
   Flag as TypeIcon,
-  OpenInNew as OpenInNewIcon
+  OpenInNew as OpenInNewIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { WorkOrder } from '../../types/workOrder';
+import { User } from '../../types/user';
 import { useGlobalUsers } from '../../hooks/useGlobalUsers';
 import { useGlobalCustomers } from '../../hooks/useGlobalCustomers';
 import { useGlobalStores } from '../../hooks/useGlobalStores';
@@ -70,6 +82,7 @@ import { workOrderAPI } from '../../services/api';
 import dayjs from 'dayjs';
 import { usePageTitle } from '../../contexts/PageTitleContext';
 import React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 const priorityLabels = {
   high: 'Yüksek',
@@ -139,11 +152,18 @@ const WorkOrderList = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});
   const [sortBy, setSortBy] = useState<SortOption>('dueDate');
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [assigningWorkOrder, setAssigningWorkOrder] = useState<WorkOrder | null>(null);
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: workOrders = [], isLoading } = useQuery({
     queryKey: ['workOrders'],
     queryFn: workOrderAPI.getWorkOrders,
   });
+
+  const queryClient = useQueryClient();
 
   React.useEffect(() => {
     setTitle('İş Emirlerim');
@@ -251,6 +271,59 @@ const WorkOrderList = () => {
   const getGoogleMapsUrl = (address: string) => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
   };
+
+  const handleAssignmentOpen = (workOrderId: string) => {
+    handleCardMenuClose(workOrderId);
+    const workOrder = workOrders.find(wo => wo.id.toString() === workOrderId);
+    if (workOrder) {
+      setAssigningWorkOrder(workOrder);
+      setSelectedUserId(workOrder.assignedTo?.id || null);
+      setAssignmentDialogOpen(true);
+    }
+  };
+
+  const handleAssignmentClose = () => {
+    setAssignmentDialogOpen(false);
+    setAssigningWorkOrder(null);
+    setSelectedUserId(null);
+  };
+
+  const handleAssignmentSave = async () => {
+    if (!assigningWorkOrder || !selectedUserId) return;
+
+    setIsAssigning(true);
+    try {
+      const selectedUser = users.find(u => u.id === selectedUserId);
+      if (!selectedUser) return;
+
+      const updatedWorkOrder = {
+        ...assigningWorkOrder,
+        assignedTo: selectedUser,
+        status: assigningWorkOrder.status === 'pending' ? 'in_progress' : assigningWorkOrder.status
+      };
+
+      const result = await workOrderAPI.updateWorkOrder(updatedWorkOrder);
+      
+      // Invalidate and refetch work orders
+      await queryClient.invalidateQueries({ queryKey: ['workOrders'] });
+      
+      handleAssignmentClose();
+    } catch (error) {
+      console.error('Atama yapılırken bir hata oluştu:', error);
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
+  const filteredUsers = users.filter((user: User) => {
+    const searchText = searchQuery.toLowerCase();
+    return (
+      user.firstName.toLowerCase().includes(searchText) ||
+      user.lastName.toLowerCase().includes(searchText) ||
+      user.company?.name?.toLowerCase().includes(searchText) ||
+      user.region?.toLowerCase().includes(searchText)
+    );
+  });
 
   return (
     <Box sx={{ position: 'relative', minHeight: '100%' }}>
@@ -497,7 +570,7 @@ const WorkOrderList = () => {
                             <EditIcon fontSize="small" sx={{ mr: 1 }} />
                             Düzenle
                           </MenuItem>
-                          <MenuItem onClick={() => handleCardMenuClose(workOrder.id.toString())}>
+                          <MenuItem onClick={() => handleAssignmentOpen(workOrder.id.toString())}>
                             <AssignmentIndIcon fontSize="small" sx={{ mr: 1 }} />
                             Atama Yap
                           </MenuItem>
@@ -866,6 +939,166 @@ const WorkOrderList = () => {
             </DialogContent>
           </>
         )}
+      </Dialog>
+
+      {/* Atama Dialog */}
+      <Dialog
+        open={assignmentDialogOpen}
+        onClose={handleAssignmentClose}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography variant="h6" component="span">
+            İş Emri Atama
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            {/* İş Emri Bilgileri */}
+            {assigningWorkOrder && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  İş Emri Bilgileri
+                </Typography>
+                <Stack spacing={1}>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Firma:
+                    </Typography>
+                    <Typography variant="body2">
+                      {assigningWorkOrder.company.name}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Tip:
+                    </Typography>
+                    <Typography variant="body2">
+                      {typeLabels[assigningWorkOrder.type]}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Öncelik:
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      {priorityIcons[assigningWorkOrder.priority]}
+                      <Typography variant="body2">
+                        {priorityLabels[assigningWorkOrder.priority]}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Stack>
+              </Box>
+            )}
+
+            <Divider />
+
+            {/* Kullanıcı Listesi */}
+            <Box>
+              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                Atanacak Kullanıcı
+              </Typography>
+              
+              {/* Arama Alanı */}
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="İsim, şirket veya bölge ile ara..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{ mb: 2 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" color="action" />
+                    </InputAdornment>
+                  )
+                }}
+              />
+
+              <List sx={{ 
+                bgcolor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                maxHeight: 400,
+                overflow: 'auto'
+              }}>
+                {filteredUsers.length === 0 ? (
+                  <ListItem>
+                    <ListItemText
+                      primary="Sonuç bulunamadı"
+                      primaryTypographyProps={{
+                        color: 'text.secondary',
+                        textAlign: 'center'
+                      }}
+                    />
+                  </ListItem>
+                ) : (
+                  filteredUsers.map((user: User) => (
+                    <ListItem
+                      key={user.id}
+                      disablePadding
+                      secondaryAction={
+                        <Radio
+                          checked={selectedUserId === user.id}
+                          onChange={() => setSelectedUserId(user.id)}
+                        />
+                      }
+                    >
+                      <ListItemButton onClick={() => setSelectedUserId(user.id)}>
+                        <ListItemAvatar>
+                          <Avatar sx={{ bgcolor: 'primary.main' }}>
+                            {user.firstName.charAt(0)}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={`${user.firstName} ${user.lastName}`}
+                          secondary={
+                            <Stack direction="row" spacing={1} alignItems="center">
+                              <Typography variant="body2" component="span" color="text.secondary">
+                                {user.company?.name || 'Şirket bilgisi yok'}
+                              </Typography>
+                              {user.region && (
+                                <>
+                                  <Typography variant="body2" component="span" color="text.secondary">•</Typography>
+                                  <Typography variant="body2" component="span" color="text.secondary">
+                                    {user.region}
+                                  </Typography>
+                                </>
+                              )}
+                            </Stack>
+                          }
+                          primaryTypographyProps={{
+                            fontWeight: selectedUserId === user.id ? 'bold' : 'normal'
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  ))
+                )}
+              </List>
+            </Box>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ p: 2.5, gap: 1 }}>
+          <Button 
+            onClick={handleAssignmentClose}
+            color="inherit"
+          >
+            İptal
+          </Button>
+          <Button
+            onClick={handleAssignmentSave}
+            variant="contained"
+            disabled={!selectedUserId || isAssigning}
+            startIcon={isAssigning ? <CircularProgress size={20} /> : null}
+          >
+            {isAssigning ? 'Atanıyor...' : 'Kaydet'}
+          </Button>
+        </DialogActions>
       </Dialog>
 
       <Fab
