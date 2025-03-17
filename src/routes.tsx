@@ -2,6 +2,8 @@ import { Navigate, useRoutes } from 'react-router-dom';
 import { Home } from './pages/home/Home';
 import { CustomerList } from './pages/customers/CustomerList';
 import { CustomerEdit } from './pages/customers/CustomerEdit';
+import Services from './pages/Services';
+import Parts from './pages/Parts';
 
 const routes = [
   {
@@ -19,6 +21,14 @@ const routes = [
   {
     path: '/customers/new',
     element: <CustomerEdit />,
+  },
+  {
+    path: '/services',
+    element: <Services />,
+  },
+  {
+    path: '/parts',
+    element: <Parts />,
   },
   {
     path: '*',

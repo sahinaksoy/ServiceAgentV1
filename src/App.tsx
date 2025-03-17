@@ -10,6 +10,8 @@ import StoreList from './pages/stores/StoreList';
 import WorkOrderList from './pages/workOrders/WorkOrderList';
 import Settings from './pages/Settings';
 import CreateWorkOrder from './pages/workOrders/CreateWorkOrder';
+import Services from './pages/Services';
+import Parts from './pages/Parts';
 import { PageTitleProvider } from './contexts/PageTitleContext';
 
 // DevExtreme CSS imports
@@ -42,6 +44,8 @@ function App() {
                 <Route path="/users" element={<UserList />} />
                 <Route path="/stores" element={<StoreList />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/parts" element={<Parts />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </MainLayout>
