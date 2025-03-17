@@ -12,7 +12,14 @@ export const userSchema = z.object({
     .email('Geçerli bir e-posta adresi giriniz'),
   phone: z.string()
     .regex(/^(\+90|0)?[0-9]{10}$/, 'Geçerli bir telefon numarası giriniz'),
-  roles: z.array(z.enum(['admin', 'manager', 'user'] as const))
+  roles: z.array(z.enum([
+    'meser_employee',
+    'meser_team_lead',
+    'monitoring_unit',
+    'contractor_manager',
+    'contractor_employee',
+    'director'
+  ] as const))
     .min(1, 'En az bir rol seçilmelidir'),
   status: z.enum(['active', 'inactive', 'pending'] as const),
   region: z.string()

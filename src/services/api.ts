@@ -197,8 +197,8 @@ const mockUsers: User[] = [
     firstName: 'Ahmet',
     lastName: 'Yılmaz',
     email: 'ahmet.yilmaz@meser.com.tr',
-    phone: '0532 123 4567',
-    roles: ['user'],
+    phone: '5551234567',
+    roles: ['director'],
     status: 'active',
     region: 'Kadıköy',
     company: 'Meser',
@@ -209,12 +209,12 @@ const mockUsers: User[] = [
     id: '2',
     firstName: 'Ayşe',
     lastName: 'Demir',
-    email: 'ayse.demir@arveta.com.tr',
-    phone: '0533 765 4321',
-    roles: ['user'],
+    email: 'ayse.demir@meser.com.tr',
+    phone: '5559876543',
+    roles: ['team_lead'],
     status: 'active',
     region: 'Beşiktaş',
-    company: 'Arveta',
+    company: 'Meser',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -223,11 +223,213 @@ const mockUsers: User[] = [
     firstName: 'Mehmet',
     lastName: 'Kaya',
     email: 'mehmet.kaya@noord.com.tr',
-    phone: '0532 987 6543',
-    roles: ['user'],
+    phone: '5554567890',
+    roles: ['contractor_manager'],
     status: 'active',
     region: 'Şişli',
     company: 'Noord',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    firstName: 'Zeynep',
+    lastName: 'Şahin',
+    email: 'zeynep.sahin@meser.com.tr',
+    phone: '5553334444',
+    roles: ['monitoring_unit'],
+    status: 'active',
+    region: 'Kadıköy',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    firstName: 'Can',
+    lastName: 'Öztürk',
+    email: 'can.ozturk@meser.com.tr',
+    phone: '5552223333',
+    roles: ['field_employee'],
+    status: 'active',
+    region: 'Beşiktaş',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    firstName: 'Elif',
+    lastName: 'Yıldız',
+    email: 'elif.yildiz@noord.com.tr',
+    phone: '5551112222',
+    roles: ['contractor_employee'],
+    status: 'active',
+    region: 'Şişli',
+    company: 'Noord',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '7',
+    firstName: 'Murat',
+    lastName: 'Aydın',
+    email: 'murat.aydin@meser.com.tr',
+    phone: '5557778888',
+    roles: ['field_employee', 'engineer'],
+    status: 'active',
+    region: 'Kadıköy',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '8',
+    firstName: 'Selin',
+    lastName: 'Arslan',
+    email: 'selin.arslan@noord.com.tr',
+    phone: '5559990000',
+    roles: ['contractor_employee', 'engineer'],
+    status: 'active',
+    region: 'Beşiktaş',
+    company: 'Noord',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '9',
+    firstName: 'Burak',
+    lastName: 'Yılmaz',
+    email: 'burak.yilmaz@meser.com.tr',
+    phone: '5553332211',
+    roles: ['manager'],
+    status: 'active',
+    region: 'Şişli',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+];
+
+// Mock mağazalar
+const mockStores: Store[] = [
+  {
+    id: '1',
+    name: 'Bostancı 3M Migros',
+    address: 'Bostancı Mah. Kadıköy, İstanbul',
+    phone: '0216 555 1234',
+    email: 'bostanci@migros.com.tr',
+    region: 'Kadıköy',
+    company: 'Migros',
+    status: 'active',
+    authorizedName: 'Ali Yıldırım',
+    authorizedPhone: '0532 111 1111',
+    employeeCount: 45,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    name: 'Moda MM Migros',
+    address: 'Moda Cad. Kadıköy, İstanbul',
+    phone: '0216 555 2345',
+    email: 'moda@migros.com.tr',
+    region: 'Kadıköy',
+    company: 'Migros',
+    status: 'active',
+    authorizedName: 'Ayşe Çelik',
+    authorizedPhone: '0532 222 2222',
+    employeeCount: 30,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    name: 'Ataşehir Makro Migros',
+    address: 'Ataşehir Bulvarı, Ataşehir, İstanbul',
+    phone: '0216 555 3456',
+    email: 'atasehir@migros.com.tr',
+    region: 'Ataşehir',
+    company: 'Migros',
+    status: 'maintenance',
+    authorizedName: 'Mehmet Demir',
+    authorizedPhone: '0532 333 3333',
+    employeeCount: 60,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    name: 'Levent 5M Migros',
+    address: 'Levent Mah. Beşiktaş, İstanbul',
+    phone: '0212 555 4567',
+    email: 'levent@migros.com.tr',
+    region: 'Beşiktaş',
+    company: 'Migros',
+    status: 'active',
+    authorizedName: 'Zeynep Kaya',
+    authorizedPhone: '0532 444 4444',
+    employeeCount: 75,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    name: 'Beylikdüzü MM Migros',
+    address: 'Beylikdüzü Mah. Beylikdüzü, İstanbul',
+    phone: '0212 555 5678',
+    email: 'beylikduzu@migros.com.tr',
+    region: 'Beylikdüzü',
+    company: 'Migros',
+    status: 'inactive',
+    authorizedName: 'Can Yılmaz',
+    authorizedPhone: '0532 555 5555',
+    employeeCount: 25,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    name: 'Bakırköy 3M Migros',
+    address: 'Bakırköy Mah. Bakırköy, İstanbul',
+    phone: '0212 555 6789',
+    email: 'bakirkoy@migros.com.tr',
+    region: 'Bakırköy',
+    company: 'Migros',
+    status: 'active',
+    authorizedName: 'Selin Öztürk',
+    authorizedPhone: '0532 666 6666',
+    employeeCount: 40,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '7',
+    name: 'Maltepe Makro Migros',
+    address: 'Maltepe Mah. Maltepe, İstanbul',
+    phone: '0216 555 7890',
+    email: 'maltepe@migros.com.tr',
+    region: 'Maltepe',
+    company: 'Migros',
+    status: 'active',
+    authorizedName: 'Burak Aydın',
+    authorizedPhone: '0532 777 7777',
+    employeeCount: 55,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '8',
+    name: 'Üsküdar MM Migros',
+    address: 'Üsküdar Mah. Üsküdar, İstanbul',
+    phone: '0216 555 8901',
+    email: 'uskudar@migros.com.tr',
+    region: 'Üsküdar',
+    company: 'Migros',
+    status: 'maintenance',
+    authorizedName: 'Elif Şahin',
+    authorizedPhone: '0532 888 8888',
+    employeeCount: 35,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
@@ -341,43 +543,46 @@ export const userAPI = {
 
 export const storeAPI = {
   getStores: async (): Promise<Store[]> => {
-    try {
-      const response = await api.get('/stores');
-      // API yanıtının bir dizi olduğundan emin olalım
-      if (Array.isArray(response.data)) {
-        return response.data;
-      } else {
-        console.error('API yanıtı bir dizi değil:', response.data);
-        return []; // Boş dizi döndür
-      }
-    } catch (error) {
-      console.error('Mağazalar alınırken hata oluştu:', error);
-      return []; // Hata durumunda boş dizi döndür
-    }
+    // Simüle edilmiş API gecikmesi
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return mockStores;
   },
 
   getStoreById: async (id: string): Promise<Store | undefined> => {
-    try {
-      const response = await api.get(`/stores/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Mağaza (ID: ${id}) alınırken hata oluştu:`, error);
-      return undefined;
-    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return mockStores.find(store => store.id === id);
   },
 
   createStore: async (data: StoreFormData): Promise<Store> => {
-    const response = await api.post('/stores', data);
-    return response.data;
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const newStore: Store = {
+      id: String(mockStores.length + 1),
+      ...data,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    mockStores.push(newStore);
+    return newStore;
   },
 
   updateStore: async (id: string, data: Partial<StoreFormData>): Promise<Store> => {
-    const response = await api.put(`/stores/${id}`, data);
-    return response.data;
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const index = mockStores.findIndex(store => store.id === id);
+    if (index === -1) throw new Error('Mağaza bulunamadı');
+    
+    mockStores[index] = {
+      ...mockStores[index],
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+    return mockStores[index];
   },
 
   deleteStore: async (id: string): Promise<void> => {
-    await api.delete(`/stores/${id}`);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const index = mockStores.findIndex(store => store.id === id);
+    if (index === -1) throw new Error('Mağaza bulunamadı');
+    mockStores.splice(index, 1);
   },
 };
 

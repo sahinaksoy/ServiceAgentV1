@@ -1,20 +1,36 @@
 import { useState, useCallback } from 'react';
-import { Box, Paper, Typography, IconButton, useTheme, useMediaQuery } from '@mui/material';
-import DataGrid, {
-  Column,
-  Paging,
-  Pager,
-  FilterRow,
-  HeaderFilter,
-  ColumnChooser,
-  StateStoring,
-  Export,
-  Selection,
-  Scrolling,
-  LoadPanel
-} from 'devextreme-react/data-grid';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon } from '@mui/icons-material';
-import { User } from '../../types/user';
+import { 
+  Box, 
+  Paper, 
+  Typography, 
+  IconButton, 
+  useTheme, 
+  useMediaQuery,
+  Grid,
+  Card,
+  Stack,
+  Avatar,
+  Chip,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+  Fab
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Visibility as ViewIcon,
+  Search as SearchIcon,
+  Phone as PhoneIcon,
+  LocationOn as LocationIcon,
+  Business as BusinessIcon
+} from '@mui/icons-material';
+import { User, roleLabels, UserRole } from '../../types/user';
 import { UserDialog } from '../../components/users/UserDialog';
 import { UserDetailDialog } from '../../components/users/UserDetailDialog';
 import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog';
@@ -30,8 +46,11 @@ const UserList = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [selectedCompany, setSelectedCompany] = useState<string>('');
 
-  const { data: users, isLoading, error, refetch } = useUsers();
+  const { data: users = [], isLoading, error } = useUsers();
   const deleteUserMutation = useDeleteUser();
   const { setTitle } = usePageTitle();
 
@@ -77,75 +96,172 @@ const UserList = () => {
     setSelectedUser(null);
   }, []);
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleRoleChange = (event: SelectChangeEvent<string>) => {
+    setSelectedRole(event.target.value);
+  };
+
+  const handleCompanyChange = (event: SelectChangeEvent<string>) => {
+    setSelectedCompany(event.target.value);
+  };
+
+  // Filtre fonksiyonları
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = searchQuery === '' || 
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.phone.includes(searchQuery) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesRole = selectedRole === '' || user.roles.includes(selectedRole as UserRole);
+    const matchesCompany = selectedCompany === '' || user.company === selectedCompany;
+
+    return matchesSearch && matchesRole && matchesCompany;
+  });
+
+  // Benzersiz şirketleri al
+  const companies = Array.from(new Set(users.map(user => user.company)));
+
   if (error) {
     return <Typography color="error">Bir hata oluştu: {error.message}</Typography>;
   }
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h5">Kullanıcı Yönetimi</Typography>
-        <IconButton color="primary" onClick={handleAdd}>
-          <AddIcon />
-        </IconButton>
-      </Box>
-
-      <Paper sx={{ flexGrow: 1, overflow: 'hidden' }}>
-        <DataGrid
-          dataSource={users || []}
-          showBorders
-          rowAlternationEnabled
-          columnAutoWidth
-          wordWrapEnabled
-          height="100%"
-          remoteOperations={false}
-          noDataText="Kullanıcı bulunamadı"
-          repaintChangesOnly={true}
-        >
-          <LoadPanel enabled={isLoading} />
-          <Scrolling mode="virtual" rowRenderingMode="virtual" />
-          <StateStoring enabled type="localStorage" storageKey="userListGridState" />
-          <Selection mode="single" />
-          <FilterRow visible />
-          <HeaderFilter visible />
-          <ColumnChooser enabled />
-          <Export enabled />
-          
-          <Column dataField="firstName" caption="Ad" />
-          <Column dataField="lastName" caption="Soyad" />
-          <Column dataField="email" caption="E-posta" visible={!isMobile} />
-          <Column dataField="phone" caption="Telefon" visible={!isMobile} />
-          <Column dataField="region" caption="Bölge" />
-          <Column dataField="company" caption="Şirket" />
-          <Column dataField="status" caption="Durum" />
-          <Column
-            caption="İşlemler"
-            width={120}
-            alignment="center"
-            cellRender={(cell: any) => (
-              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                <IconButton size="small" onClick={() => handleView(cell.data)}>
-                  <ViewIcon fontSize="small" />
-                </IconButton>
-                <IconButton size="small" onClick={() => handleEdit(cell.data)}>
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton size="small" color="error" onClick={() => handleDelete(cell.data)}>
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            )}
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* Filtreler */}
+      <Paper sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ flex: 1 }}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Ad, soyad veya telefon ile ara..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
           />
-
-          <Paging defaultPageSize={10} />
-          <Pager
-            showPageSizeSelector
-            allowedPageSizes={[10, 20, 50]}
-            showInfo
-            showNavigationButtons
-          />
-        </DataGrid>
+          <FormControl size="small" sx={{ minWidth: 200 }}>
+            <InputLabel>Rol</InputLabel>
+            <Select
+              value={selectedRole}
+              label="Rol"
+              onChange={handleRoleChange}
+            >
+              <MenuItem value="">Tümü</MenuItem>
+              {Object.entries(roleLabels).map(([value, label]) => (
+                <MenuItem key={value} value={value}>{label}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 200 }}>
+            <InputLabel>Şirket</InputLabel>
+            <Select
+              value={selectedCompany}
+              label="Şirket"
+              onChange={handleCompanyChange}
+            >
+              <MenuItem value="">Tümü</MenuItem>
+              {companies.map(company => (
+                <MenuItem key={company} value={company}>{company}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
       </Paper>
+
+      {/* Kullanıcı Kartları */}
+      <Grid container spacing={2}>
+        {filteredUsers.map(user => (
+          <Grid item xs={12} sm={6} md={4} key={user.id}>
+            <Card sx={{
+              p: 2,
+              height: '100%',
+              transition: '0.3s',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: 4
+              }
+            }}>
+              <Stack spacing={2}>
+                {/* Avatar ve İsim */}
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
+                    {user.firstName[0]}{user.lastName[0]}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
+                    <Typography variant="body2" color="text.secondary">{user.company}</Typography>
+                  </Box>
+                </Stack>
+
+                {/* Roller */}
+                <Box>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                    {user.roles.map(role => (
+                      <Chip
+                        key={role}
+                        label={roleLabels[role]}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+
+                {/* İletişim Bilgileri */}
+                <Stack spacing={1}>
+                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <LocationIcon fontSize="small" />
+                    {user.region}
+                  </Typography>
+                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <PhoneIcon fontSize="small" />
+                    {user.phone}
+                  </Typography>
+                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <BusinessIcon fontSize="small" />
+                    {user.company}
+                  </Typography>
+                </Stack>
+
+                {/* İşlem Butonları */}
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                  <IconButton size="small" onClick={() => handleView(user)}>
+                    <ViewIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton size="small" onClick={() => handleEdit(user)}>
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton size="small" color="error" onClick={() => handleDelete(user)}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              </Stack>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Floating Action Button */}
+      <Fab
+        color="primary"
+        onClick={handleAdd}
+        sx={{
+          position: 'fixed',
+          bottom: 16,
+          right: 16
+        }}
+      >
+        <AddIcon />
+      </Fab>
 
       <UserDialog
         open={isAddDialogOpen}

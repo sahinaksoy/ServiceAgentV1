@@ -1,7 +1,7 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem, Autocomplete, Chip } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { User, UserFormData, UserRole, UserStatus } from '../../types/user';
+import { User, UserFormData, UserRole, UserStatus, roleLabels } from '../../types/user';
 import { userSchema } from '../../schemas/userSchema';
 import { useCreateUser, useUpdateUser } from '../../hooks/useUsers';
 
@@ -12,7 +12,11 @@ interface UserDialogProps {
   user?: User;
 }
 
-const roles: UserRole[] = ['admin', 'manager', 'user'];
+const roles = Object.entries(roleLabels).map(([value, label]) => ({
+  value: value as UserRole,
+  label
+}));
+
 const statuses: UserStatus[] = ['active', 'inactive', 'pending'];
 const regions = ['Kadıköy', 'Beşiktaş', 'Şişli']; // API'den gelebilir
 const companies = ['Meser', 'Arveta', 'Noord']; // API'den gelebilir
@@ -146,7 +150,7 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
                     {...field}
                     multiple
                     options={roles}
-                    getOptionLabel={(option) => option}
+                    getOptionLabel={(option) => option.label}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -159,14 +163,15 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
                       value.map((option, index) => (
                         <Chip
                           {...getTagProps({ index })}
-                          key={option}
-                          label={option}
+                          key={option.value}
+                          label={option.label}
                           color="primary"
                           variant="outlined"
                         />
                       ))
                     }
-                    onChange={(_, value) => field.onChange(value)}
+                    onChange={(_, value) => field.onChange(value.map(v => v.value))}
+                    value={field.value.map(role => roles.find(r => r.value === role) || { value: role, label: role })}
                   />
                 )}
               />

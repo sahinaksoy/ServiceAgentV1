@@ -9,7 +9,8 @@ export interface Store {
   region: string;
   company: string;
   status: StoreStatus;
-  manager: string;
+  authorizedName: string;
+  authorizedPhone: string;
   employeeCount: number;
   createdAt: string;
   updatedAt: string;
@@ -23,6 +24,7 @@ export interface StoreFormData {
   region: string;
   company: string;
   status: StoreStatus;
-  manager: string;
+  authorizedName: string;
+  authorizedPhone: string;
   employeeCount: number;
 } 
