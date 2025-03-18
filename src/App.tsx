@@ -14,6 +14,7 @@ import CreateWorkOrder from './pages/workOrders/CreateWorkOrder';
 import Services from './pages/Services';
 import Parts from './pages/Parts';
 import { PageTitleProvider } from './contexts/PageTitleContext';
+import WorkOrderDetail from './pages/WorkOrderDetail';
 
 // DevExtreme CSS imports
 import 'devextreme/dist/css/dx.light.css';
@@ -52,6 +53,7 @@ function App() {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/parts" element={<Parts />} />
+                  <Route path="/work-orders/:id/edit" element={<WorkOrderDetail />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </MainLayout>
