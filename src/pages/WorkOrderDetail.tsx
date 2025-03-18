@@ -122,6 +122,146 @@ const serviceStatusOptions = [
   { value: 'pending', label: 'Beklemede', color: 'info' },
 ] as const;
 
+// Kart bileşeni için ortak stiller
+const CardContainer = ({ children, icon, title, action }: any) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
+  return (
+    <Card 
+      variant="outlined" 
+      sx={{
+        height: '100%',
+        borderRadius: 2,
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          borderColor: 'primary.main',
+        }
+      }}
+    >
+      <CardHeader
+        avatar={
+          <Box 
+            sx={{ 
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              p: 1,
+              borderRadius: 1,
+              color: 'primary.main'
+            }}
+          >
+            {icon}
+          </Box>
+        }
+        title={
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between'
+          }}>
+            <Typography variant="h6" sx={{ fontSize: isMobile ? 16 : 18 }}>
+              {title}
+            </Typography>
+            {action}
+          </Box>
+        }
+        sx={{ pb: 0 }}
+      />
+      <CardContent sx={{ pt: 2 }}>
+        {children}
+      </CardContent>
+    </Card>
+  );
+};
+
+// Durum çipi için özel bileşen
+const StatusChip = ({ status }: { status: WorkOrderStatus }) => (
+  <Chip
+    label={statusLabels[status]}
+    color={statusColors[status]}
+    size="small"
+    sx={{
+      borderRadius: 1,
+      fontWeight: 500,
+      px: 1,
+      '& .MuiChip-label': {
+        px: 1,
+      }
+    }}
+  />
+);
+
+// Liste öğesi için özel bileşen
+const InfoListItem = ({ icon, value }: { icon: React.ReactNode, value: string }) => (
+  <ListItem 
+    disablePadding 
+    sx={{ 
+      mb: 1,
+      '&:last-child': {
+        mb: 0
+      }
+    }}
+  >
+    <ListItemIcon sx={{ minWidth: 36 }}>
+      {icon}
+    </ListItemIcon>
+    <ListItemText 
+      primary={
+        <Typography variant="body1">
+          {value}
+        </Typography>
+      }
+    />
+  </ListItem>
+);
+
+// Ana başlık bileşeni
+const PageHeader = ({ workOrder }: { workOrder: WorkOrder }) => (
+  <Box 
+    sx={{ 
+      mb: 3,
+      p: 2,
+      bgcolor: 'background.paper',
+      borderRadius: 2,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    }}
+  >
+    <Box sx={{ 
+      display: 'flex', 
+      alignItems: 'center',
+      gap: 2,
+      mb: 1
+    }}>
+      <Avatar 
+        sx={{ 
+          bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+          color: 'primary.main',
+          width: 48,
+          height: 48
+        }}
+      >
+        <BusinessIcon />
+      </Avatar>
+      <Box sx={{ flex: 1 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          gap: 2,
+          mb: 0.5
+        }}>
+          <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
+            {workOrder.company.name}
+          </Typography>
+          <StatusChip status={workOrder.status as WorkOrderStatus} />
+        </Box>
+        <Typography variant="body1" color="text.secondary">
+          {workOrder.summary}
+        </Typography>
+      </Box>
+    </Box>
+  </Box>
+);
+
 const WorkOrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { setTitle } = usePageTitle();
@@ -168,6 +308,42 @@ const WorkOrderDetail: React.FC = () => {
   const signatureRef = useRef<SignaturePadType>(null);
   const [signature, setSignature] = useState<string>('');
   const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+
+  // Ortak stil tanımlamaları
+  const commonStyles = {
+    card: {
+      borderRadius: 2,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+      }
+    },
+    cardHeader: {
+      pb: 0,
+      pt: isMobile ? 1 : 2,
+      '& .MuiCardHeader-avatar': {
+        bgcolor: 'primary.main',
+        borderRadius: 1,
+      }
+    },
+    listItem: {
+      px: 0,
+      py: isMobile ? 0.5 : 1,
+      '& .MuiListItemIcon-root': {
+        minWidth: 36,
+      }
+    },
+    chip: {
+      borderRadius: 1,
+      fontWeight: 500,
+    },
+    actionButton: {
+      textTransform: 'none',
+      borderRadius: 1,
+      px: 2,
+    }
+  };
 
   React.useEffect(() => {
     setTitle('İş Emri Detayı');
@@ -455,683 +631,610 @@ const WorkOrderDetail: React.FC = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', p: isMobile ? 0.5 : 1 }}>
-      <Card elevation={3} sx={{ m: 0 }}>
-        <CardHeader
-          avatar={
-            <Avatar sx={{ bgcolor: 'primary.main' }}>
-              <BusinessIcon />
-            </Avatar>
-          }
-          title={
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: isMobile ? 'column' : 'row',
-              gap: 1,
-              alignItems: isMobile ? 'flex-start' : 'center', 
-            }}>
-              <Typography variant={isMobile ? "h6" : "h5"} component="h1">
-                {localWorkOrder.company.name}
-              </Typography>
-              <Chip
-                label={statusLabels[localWorkOrder.status as WorkOrderStatus]}
-                color={statusColors[localWorkOrder.status as WorkOrderStatus]}
-                sx={{ 
-                  fontWeight: 'medium',
-                  ml: isMobile ? 0 : 2
-                }}
+    <Box sx={{ maxWidth: 1200, mx: 'auto', p: isMobile ? 1 : 3 }}>
+      <PageHeader workOrder={localWorkOrder} />
+      <Grid container spacing={isMobile ? 1 : 3}>
+        {/* Firma Bilgileri */}
+        <Grid item xs={12} md={6}>
+          <CardContainer
+            icon={<PersonIcon />}
+            title="Firma Bilgileri"
+          >
+            <List disablePadding>
+              <InfoListItem
+                icon={<PersonIcon color="action" fontSize="small" />}
+                value={localWorkOrder.company.contactPerson}
               />
-            </Box>
-          }
-          subheader={
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              {localWorkOrder.summary}
-            </Typography>
-          }
-        />
-        <CardContent sx={{ p: isMobile ? 0.5 : 2 }}>
-          <Grid container spacing={isMobile ? 0.5 : 3}>
-            {/* Temel Bilgiler */}
-            <Grid item xs={12} md={6}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
-                <CardHeader
-                  avatar={<PersonIcon color="primary" />}
-                  title="Firma Bilgileri"
-                  sx={{ pb: 0, pt: isMobile ? 1 : 2 }}
-                />
-                <CardContent sx={{ pt: 0.5, pb: isMobile ? 0.5 : 1 }}>
-                  <List disablePadding>
-                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <PersonIcon color="action" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="body2" color="text.secondary">İletişim Kişisi</Typography>}
-                        secondary={<Typography variant="body1">{localWorkOrder.company.contactPerson}</Typography>}
-                      />
-                    </ListItem>
-                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <EmailIcon color="action" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="body2" color="text.secondary">E-posta</Typography>}
-                        secondary={<Typography variant="body1">{localWorkOrder.company.email}</Typography>}
-                      />
-                    </ListItem>
-                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <PhoneIcon color="action" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="body2" color="text.secondary">Telefon</Typography>}
-                        secondary={<Typography variant="body1">{localWorkOrder.company.mobile}</Typography>}
-                      />
-                    </ListItem>
-                    <ListItem disablePadding>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <LocationIcon color="action" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="body2" color="text.secondary">Adres</Typography>}
-                        secondary={<Typography variant="body1">{localWorkOrder.company.address}</Typography>}
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
+              <InfoListItem
+                icon={<EmailIcon color="action" fontSize="small" />}
+                value={localWorkOrder.company.email}
+              />
+              <InfoListItem
+                icon={<PhoneIcon color="action" fontSize="small" />}
+                value={localWorkOrder.company.mobile}
+              />
+              <InfoListItem
+                icon={<LocationIcon color="action" fontSize="small" />}
+                value={localWorkOrder.company.address}
+              />
+            </List>
+          </CardContainer>
+        </Grid>
 
-            {/* İş Emri Detayları */}
-            <Grid item xs={12} md={6}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
-                <CardHeader
-                  avatar={<CategoryIcon color="primary" />}
-                  title="İş Emri Detayları"
-                  sx={{ pb: 0, pt: isMobile ? 1 : 2 }}
-                />
-                <CardContent sx={{ pt: 0.5, pb: isMobile ? 0.5 : 1 }}>
-                  <List disablePadding>
-                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <FlagIcon color="action" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="body2" color="text.secondary">Tip</Typography>}
-                        secondary={<Typography variant="body1">{typeLabels[localWorkOrder.type as WorkOrderType]}</Typography>}
-                      />
-                    </ListItem>
-                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <CategoryIcon color="action" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="body2" color="text.secondary">Kategori</Typography>}
-                        secondary={<Typography variant="body1">{categoryLabels[localWorkOrder.category as WorkOrderCategory]}</Typography>}
-                      />
-                    </ListItem>
-                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <PriorityIcon color="action" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="body2" color="text.secondary">Öncelik</Typography>}
-                        secondary={<Typography variant="body1">{priorityLabels[localWorkOrder.priority as WorkOrderPriority]}</Typography>}
-                      />
-                    </ListItem>
-                    <ListItem disablePadding>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <ScheduleIcon color="action" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={<Typography variant="body2" color="text.secondary">Son Tarih</Typography>}
-                        secondary={<Typography variant="body1">{dayjs(localWorkOrder.dueDate).format('DD.MM.YYYY HH:mm')}</Typography>}
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
+        {/* İş Emri Detayları */}
+        <Grid item xs={12} md={6}>
+          <CardContainer
+            icon={<CategoryIcon />}
+            title="İş Emri Detayları"
+          >
+            <List disablePadding>
+              <InfoListItem
+                icon={<FlagIcon color="action" fontSize="small" />}
+                value={typeLabels[localWorkOrder.type as WorkOrderType]}
+              />
+              <InfoListItem
+                icon={<CategoryIcon color="action" fontSize="small" />}
+                value={categoryLabels[localWorkOrder.category as WorkOrderCategory]}
+              />
+              <InfoListItem
+                icon={<PriorityIcon color="action" fontSize="small" />}
+                value={priorityLabels[localWorkOrder.priority as WorkOrderPriority]}
+              />
+              <InfoListItem
+                icon={<ScheduleIcon color="action" fontSize="small" />}
+                value={dayjs(localWorkOrder.dueDate).format('DD.MM.YYYY HH:mm')}
+              />
+            </List>
+          </CardContainer>
+        </Grid>
 
-            {/* Atanan Kişi */}
-            <Grid item xs={12}>
-              <Card variant="outlined">
-                <CardHeader
-                  avatar={<PersonIcon color="primary" />}
-                  title="Atanan Teknisyen"
-                  sx={{ pb: 0 }}
-                />
-                <CardContent sx={{ pt: 1 }}>
-                  {localWorkOrder.assignedTo ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Avatar sx={{ bgcolor: 'primary.light' }}>
-                        {localWorkOrder.assignedTo.firstName[0]}
-                      </Avatar>
-                      <Box>
-                        <Typography variant="body1">
-                          {localWorkOrder.assignedTo.firstName} {localWorkOrder.assignedTo.lastName}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {localWorkOrder.assignedTo.email}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ) : (
-                    <Typography color="text.secondary">
-                      Henüz atama yapılmamış
+        {/* Atanan Kişi */}
+        <Grid item xs={12}>
+          <Card variant="outlined">
+            <CardHeader
+              avatar={<PersonIcon color="primary" />}
+              title="Atanan Teknisyen"
+              sx={{ pb: 0 }}
+            />
+            <CardContent sx={{ pt: 1 }}>
+              {localWorkOrder.assignedTo ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Avatar sx={{ bgcolor: 'primary.light' }}>
+                    {localWorkOrder.assignedTo.firstName[0]}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="body1">
+                      {localWorkOrder.assignedTo.firstName} {localWorkOrder.assignedTo.lastName}
                     </Typography>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
+                    <Typography variant="body2" color="text.secondary">
+                      {localWorkOrder.assignedTo.email}
+                    </Typography>
+                  </Box>
+                </Box>
+              ) : (
+                <Typography color="text.secondary">
+                  Henüz atama yapılmamış
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
 
-            {/* Hizmetler */}
-            <Grid item xs={12}>
-              <Card variant="outlined">
-                <CardHeader
-                  avatar={<ServiceIcon color="primary" />}
-                  title={
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                      <Typography variant="h6">Servisler</Typography>
-                      <Button
-                        startIcon={<AddIcon />}
-                        onClick={handleServiceAdd}
-                        color="primary"
-                        variant="outlined"
-                        size="small"
-                        sx={{ textTransform: 'none' }}
-                      >
-                        EKLE
-                      </Button>
-                    </Box>
-                  }
-                />
-                <CardContent>
-                  <Stack spacing={2}>
-                    {localWorkOrder?.services.map((service: WorkOrderService) => (
-                      <Box 
-                        key={service.id}
-                        sx={{
-                          p: 2,
-                          borderRadius: 1,
-                          bgcolor: 'background.paper',
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.05),
-                          }
-                        }}
-                      >
-                        <Box sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
-                          mb: 1.5
-                        }}>
-                          <Box>
-                            <Typography variant="subtitle1" fontWeight="medium">
-                              {service.name}
-                            </Typography>
-                            <Typography 
-                              variant="body2" 
-                              color="text.secondary"
-                              sx={{ mt: 0.5 }}
-                            >
-                              Kategori: {service.description}
-                            </Typography>
-                            <Box sx={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: 2,
-                              mt: 1.5,
-                              color: 'text.secondary',
-                              flexWrap: 'wrap'
-                            }}>
-                              <Box 
-                                sx={{ 
-                                  display: 'flex', 
-                                  alignItems: 'center', 
-                                  gap: 0.5,
-                                  cursor: 'pointer',
-                                  '&:hover': {
-                                    color: 'primary.main',
-                                  }
-                                }}
-                                onClick={() => handleServiceFormOpen(service)}
-                              >
-                                <DescriptionIcon fontSize="small" />
-                                <Typography variant="body2">
-                                  Teknik Servis Formu
-                                </Typography>
-                              </Box>
-                              {service.hasServiceForm ? (
-                                <CheckCircleIcon 
-                                  fontSize="small" 
-                                  sx={{ 
-                                    color: 'success.main'
-                                  }} 
-                                />
-                              ) : (
-                                <RadioButtonUncheckedIcon 
-                                  fontSize="small" 
-                                  sx={{ 
-                                    color: 'action.disabled'
-                                  }} 
-                                />
-                              )}
-                            </Box>
-                          </Box>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handleServiceDelete(service.id)}
-                            color="error"
-                            sx={{
-                              opacity: 0.7,
-                              '&:hover': {
-                                opacity: 1,
-                                bgcolor: 'error.lighter'
-                              }
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                        <Box 
-                          sx={{ 
-                            display: 'flex', 
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            alignItems: { xs: 'flex-start', sm: 'center' },
-                            gap: 1,
-                            mt: 1,
-                            pt: 1.5,
-                            borderTop: '1px solid',
-                            borderColor: 'divider'
-                          }}
-                        >
-                          <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 1,
-                            width: { xs: '100%', sm: 'auto' }
-                          }}>
-                            <Typography variant="body2" color="text.secondary">
-                              Süre:
-                            </Typography>
-                            <TextField
-                              type="number"
-                              size="small"
-                              value={editingServiceId === service.id ? editedDuration : service.duration}
-                              onChange={(e) => {
-                                if (editingServiceId !== service.id) {
-                                  setEditingServiceId(service.id);
-                                }
-                                setEditedDuration(Number(e.target.value));
-                              }}
-                              onBlur={() => {
-                                if (editingServiceId === service.id) {
-                                  handleServiceDurationSave(service.id);
-                                }
-                              }}
-                              inputProps={{ 
-                                min: 0,
-                                style: { 
-                                  width: '60px',
-                                  padding: '4px 8px',
-                                }
-                              }}
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  '& fieldset': {
-                                    borderColor: 'transparent',
-                                  },
-                                  '&:hover fieldset': {
-                                    borderColor: 'primary.main',
-                                  },
-                                  '&.Mui-focused fieldset': {
-                                    borderColor: 'primary.main',
-                                  },
-                                  bgcolor: 'background.paper',
-                                },
-                              }}
-                            />
-                            <Typography variant="body2" color="text.secondary">
-                              Saat
-                            </Typography>
-                          </Box>
-                          <Box sx={{ 
-                            width: { xs: '100%', sm: 'auto' },
-                            mt: { xs: 1, sm: 0 }
-                          }}>
-                            <Select
-                              size="small"
-                              value={service.status || 'pending'}
-                              onChange={(event) => handleServiceStatusChange(service.id, event)}
-                              fullWidth
-                              sx={{
-                                '& .MuiSelect-select': {
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 1,
-                                }
-                              }}
-                            >
-                              {serviceStatusOptions.map((option) => (
-                                <MenuItem 
-                                  key={option.value} 
-                                  value={option.value}
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 1,
-                                  }}
-                                >
-                                  <CheckCircleIcon 
-                                    fontSize="small" 
-                                    sx={{ 
-                                      color: `${option.color}.main`,
-                                    }} 
-                                  />
-                                  {option.label}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </Box>
-                        </Box>
-                      </Box>
-                    ))}
-                  </Stack>
-                  {localWorkOrder?.services.length > 0 && (
-                    <Box sx={{ 
-                      mt: 3, 
-                      pt: 2, 
-                      borderTop: '1px solid',
-                      borderColor: 'divider',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1
-                    }}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Toplam Süre:
-                      </Typography>
-                      <Typography variant="subtitle2" fontWeight="medium">
-                        {calculateTotalDuration()}
-                      </Typography>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Saat
-                      </Typography>
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Parçalar */}
-            <Grid item xs={12}>
-              <Card variant="outlined">
-                <CardHeader
-                  avatar={<PartIcon color="primary" />}
-                  title={
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                      <Typography variant="h6">Parçalar</Typography>
-                      <Button
-                        startIcon={<AddIcon />}
-                        onClick={handlePartAdd}
-                        color="primary"
-                        variant="outlined"
-                        size="small"
-                        sx={{ textTransform: 'none' }}
-                      >
-                        EKLE
-                      </Button>
-                    </Box>
-                  }
-                />
-                <CardContent>
-                  <Stack spacing={2}>
-                    {localWorkOrder.parts.map((part) => (
-                      <Box 
-                        key={part.id}
-                        sx={{
-                          p: 2,
-                          borderRadius: 1,
-                          bgcolor: 'background.paper',
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.05),
-                          }
-                        }}
-                      >
-                        <Box sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
-                          mb: 1.5
-                        }}>
-                          <Box>
-                            <Typography variant="subtitle1" fontWeight="medium">
-                              {part.name}
-                            </Typography>
-                            <Typography 
-                              variant="body2" 
-                              color="text.secondary"
-                              sx={{ mt: 0.5 }}
-                            >
-                              {part.description}
-                            </Typography>
-                          </Box>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handlePartDelete(part.id)}
-                            color="error"
-                            sx={{
-                              opacity: 0.7,
-                              '&:hover': {
-                                opacity: 1,
-                                bgcolor: 'error.lighter'
-                              }
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                        <Box 
-                          sx={{ 
-                            display: 'flex', 
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            alignItems: { xs: 'flex-start', sm: 'center' },
-                            justifyContent: { xs: 'flex-start', sm: 'space-between' },
-                            gap: 1,
-                            mt: 1,
-                            pt: 1.5,
-                            borderTop: '1px solid',
-                            borderColor: 'divider',
-                            width: '100%'
-                          }}
-                        >
-                          <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 1,
-                            width: { xs: '100%', sm: 'auto' }
-                          }}>
-                            
-                            <TextField
-                              type="number"
-                              size="small"
-                              value={editingPartId === part.id ? editedQuantity : part.quantity}
-                              onChange={(e) => {
-                                if (editingPartId !== part.id) {
-                                  setEditingPartId(part.id);
-                                }
-                                setEditedQuantity(Number(e.target.value));
-                              }}
-                              onBlur={() => {
-                                if (editingPartId === part.id) {
-                                  handlePartQuantitySave(part.id);
-                                }
-                              }}
-                              inputProps={{ 
-                                min: 0,
-                                style: { 
-                                  width: '60px',
-                                  padding: '4px 8px',
-                                }
-                              }}
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  '& fieldset': {
-                                    borderColor: 'transparent',
-                                  },
-                                  '&:hover fieldset': {
-                                    borderColor: 'primary.main',
-                                  },
-                                  '&.Mui-focused fieldset': {
-                                    borderColor: 'primary.main',
-                                  },
-                                  bgcolor: 'background.paper',
-                                },
-                              }}
-                            />
-                            <Typography variant="body2" color="text.secondary">
-                              {part.unit}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-                    ))}
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Geçmiş İş Emirleri */}
-            <Grid item xs={12}>
-              <Accordion defaultExpanded={false}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
+        {/* Hizmetler */}
+        <Grid item xs={12}>
+          <CardContainer
+            icon={<ServiceIcon />}
+            title="Servisler"
+            action={
+              <Button
+                startIcon={<AddIcon />}
+                onClick={handleServiceAdd}
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderRadius: 1,
+                  textTransform: 'none',
+                  px: 2
+                }}
+              >
+                Ekle
+              </Button>
+            }
+          >
+            <Stack spacing={2}>
+              {localWorkOrder?.services.map((service: WorkOrderService) => (
+                <Box 
+                  key={service.id}
                   sx={{
-                    backgroundColor: 'background.paper',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider'
+                    p: 2,
+                    borderRadius: 1,
+                    bgcolor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    '&:hover': {
+                      borderColor: theme.palette.primary.main,
+                      bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    }
                   }}
                 >
                   <Box sx={{ 
                     display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 2,
-                    width: '100%'
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    mb: 1.5
                   }}>
-                    <AccessTimeIcon color="primary" />
-                    <Typography variant="h6" sx={{ flex: 1 }}>
-                      Geçmiş İş Emirleri
-                    </Typography>
-                    <Chip 
-                      label={`${localWorkOrder.company.previousWorkOrders?.length || 0} Kayıt`}
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                    />
-                  </Box>
-                </AccordionSummary>
-                <AccordionDetails sx={{ p: 2 }}>
-                  <Stack spacing={2}>
-                    {localWorkOrder.company.previousWorkOrders?.map((workOrder) => (
-                      <Box 
-                        key={workOrder.id}
-                        sx={{
-                          p: 2,
-                          borderRadius: 1,
-                          bgcolor: 'background.paper',
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.05),
-                          }
-                        }}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="medium">
+                        {service.name}
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ mt: 0.5 }}
                       >
-                        <Box sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
-                          mb: 1.5
-                        }}>
-                          <Box>
-                            <Typography variant="subtitle1" fontWeight="medium">
-                              {workOrder.summary}
-                            </Typography>
-                            <Typography 
-                              variant="body2" 
-                              color="text.secondary"
-                              sx={{ mt: 0.5 }}
-                            >
-                              {typeLabels[workOrder.type as WorkOrderType]} - {categoryLabels[workOrder.category as WorkOrderCategory]}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Chip
-                              label={statusLabels[workOrder.status as WorkOrderStatus]}
-                              color={statusColors[workOrder.status as WorkOrderStatus]}
-                              size="small"
-                            />
-                            <IconButton
-                              size="small"
-                              onClick={() => window.location.href = `/work-orders/${workOrder.id}`}
-                              sx={{
-                                color: 'primary.main',
-                                '&:hover': {
-                                  bgcolor: alpha(theme.palette.primary.main, 0.1)
-                                }
-                              }}
-                            >
-                              <ArrowForwardIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        </Box>
+                        Kategori: {service.description}
+                      </Typography>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 2,
+                        mt: 1.5,
+                        color: 'text.secondary',
+                        flexWrap: 'wrap'
+                      }}>
                         <Box 
                           sx={{ 
                             display: 'flex', 
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            alignItems: { xs: 'flex-start', sm: 'center' },
-                            justifyContent: 'space-between',
+                            alignItems: 'center', 
+                            gap: 0.5,
+                            cursor: 'pointer',
+                            '&:hover': {
+                              color: 'primary.main',
+                            }
+                          }}
+                          onClick={() => handleServiceFormOpen(service)}
+                        >
+                          <DescriptionIcon fontSize="small" />
+                          <Typography variant="body2">
+                            Teknik Servis Formu
+                          </Typography>
+                        </Box>
+                        {service.hasServiceForm ? (
+                          <CheckCircleIcon 
+                            fontSize="small" 
+                            sx={{ 
+                              color: 'success.main'
+                            }} 
+                          />
+                        ) : (
+                          <RadioButtonUncheckedIcon 
+                            fontSize="small" 
+                            sx={{ 
+                              color: 'action.disabled'
+                            }} 
+                          />
+                        )}
+                      </Box>
+                    </Box>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleServiceDelete(service.id)}
+                      color="error"
+                      sx={{
+                        opacity: 0.7,
+                        '&:hover': {
+                          opacity: 1,
+                          bgcolor: 'error.lighter'
+                        }
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      gap: 1,
+                      mt: 1,
+                      pt: 1.5,
+                      borderTop: '1px solid',
+                      borderColor: 'divider'
+                    }}
+                  >
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 1,
+                      width: { xs: '100%', sm: 'auto' }
+                    }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Süre:
+                      </Typography>
+                      <TextField
+                        type="number"
+                        size="small"
+                        value={editingServiceId === service.id ? editedDuration : service.duration}
+                        onChange={(e) => {
+                          if (editingServiceId !== service.id) {
+                            setEditingServiceId(service.id);
+                          }
+                          setEditedDuration(Number(e.target.value));
+                        }}
+                        onBlur={() => {
+                          if (editingServiceId === service.id) {
+                            handleServiceDurationSave(service.id);
+                          }
+                        }}
+                        inputProps={{ 
+                          min: 0,
+                          style: { 
+                            width: '60px',
+                            padding: '4px 8px',
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: 'transparent',
+                            },
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                            bgcolor: 'background.paper',
+                          },
+                        }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        Saat
+                      </Typography>
+                    </Box>
+                    <Box sx={{ 
+                      width: { xs: '100%', sm: 'auto' },
+                      mt: { xs: 1, sm: 0 }
+                    }}>
+                      <Select
+                        size="small"
+                        value={service.status || 'pending'}
+                        onChange={(event) => handleServiceStatusChange(service.id, event)}
+                        fullWidth
+                        sx={{
+                          '& .MuiSelect-select': {
+                            display: 'flex',
+                            alignItems: 'center',
                             gap: 1,
-                            mt: 1,
-                            pt: 1.5,
-                            borderTop: '1px solid',
-                            borderColor: 'divider'
+                          }
+                        }}
+                      >
+                        {serviceStatusOptions.map((option) => (
+                          <MenuItem 
+                            key={option.value} 
+                            value={option.value}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                            }}
+                          >
+                            <CheckCircleIcon 
+                              fontSize="small" 
+                              sx={{ 
+                                color: `${option.color}.main`,
+                              }} 
+                            />
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+            </Stack>
+            {localWorkOrder?.services.length > 0 && (
+              <Box sx={{ 
+                mt: 3, 
+                pt: 2, 
+                borderTop: '1px solid',
+                borderColor: 'divider',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1
+              }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Toplam Süre:
+                </Typography>
+                <Typography variant="subtitle2" fontWeight="medium">
+                  {calculateTotalDuration()}
+                </Typography>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Saat
+                </Typography>
+              </Box>
+            )}
+          </CardContainer>
+        </Grid>
+
+        {/* Parçalar */}
+        <Grid item xs={12}>
+          <CardContainer
+            icon={<PartIcon />}
+            title="Parçalar"
+            action={
+              <Button
+                startIcon={<AddIcon />}
+                onClick={handlePartAdd}
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderRadius: 1,
+                  textTransform: 'none',
+                  px: 2
+                }}
+              >
+                Ekle
+              </Button>
+            }
+          >
+            <Stack spacing={2}>
+              {localWorkOrder.parts.map((part) => (
+                <Box 
+                  key={part.id}
+                  sx={{
+                    p: 2,
+                    borderRadius: 1,
+                    bgcolor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    '&:hover': {
+                      borderColor: theme.palette.primary.main,
+                      bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    }
+                  }}
+                >
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    mb: 1.5
+                  }}>
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="medium">
+                        {part.name}
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ mt: 0.5 }}
+                      >
+                        {part.description}
+                      </Typography>
+                    </Box>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handlePartDelete(part.id)}
+                      color="error"
+                      sx={{
+                        opacity: 0.7,
+                        '&:hover': {
+                          opacity: 1,
+                          bgcolor: 'error.lighter'
+                        }
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      justifyContent: { xs: 'flex-start', sm: 'space-between' },
+                      gap: 1,
+                      mt: 1,
+                      pt: 1.5,
+                      borderTop: '1px solid',
+                      borderColor: 'divider',
+                      width: '100%'
+                    }}
+                  >
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 1,
+                      width: { xs: '100%', sm: 'auto' }
+                    }}>
+                      
+                      <TextField
+                        type="number"
+                        size="small"
+                        value={editingPartId === part.id ? editedQuantity : part.quantity}
+                        onChange={(e) => {
+                          if (editingPartId !== part.id) {
+                            setEditingPartId(part.id);
+                          }
+                          setEditedQuantity(Number(e.target.value));
+                        }}
+                        onBlur={() => {
+                          if (editingPartId === part.id) {
+                            handlePartQuantitySave(part.id);
+                          }
+                        }}
+                        inputProps={{ 
+                          min: 0,
+                          style: { 
+                            width: '60px',
+                            padding: '4px 8px',
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: 'transparent',
+                            },
+                            '&:hover fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: 'primary.main',
+                            },
+                            bgcolor: 'background.paper',
+                          },
+                        }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        {part.unit}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+            </Stack>
+          </CardContainer>
+        </Grid>
+
+        {/* Geçmiş İş Emirleri */}
+        <Grid item xs={12}>
+          <Accordion 
+            defaultExpanded={false}
+            sx={{
+              borderRadius: 2,
+              '&:before': {
+                display: 'none',
+              },
+              '& .MuiAccordionSummary-root': {
+                borderRadius: 2,
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                }
+              }
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{
+                backgroundColor: 'background.paper',
+                borderBottom: '1px solid',
+                borderColor: 'divider'
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 2,
+                width: '100%'
+              }}>
+                <AccessTimeIcon color="primary" />
+                <Typography variant="h6" sx={{ flex: 1 }}>
+                  Geçmiş İş Emirleri
+                </Typography>
+                <Chip 
+                  label={`${localWorkOrder.company.previousWorkOrders?.length || 0} Kayıt`}
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                />
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 2 }}>
+              <Stack spacing={2}>
+                {localWorkOrder.company.previousWorkOrders?.map((workOrder) => (
+                  <Box 
+                    key={workOrder.id}
+                    sx={{
+                      p: 2,
+                      borderRadius: 1,
+                      bgcolor: 'background.paper',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      '&:hover': {
+                        borderColor: theme.palette.primary.main,
+                        bgcolor: alpha(theme.palette.primary.main, 0.05),
+                      }
+                    }}
+                  >
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      mb: 1.5
+                    }}>
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight="medium">
+                          {workOrder.summary}
+                        </Typography>
+                        <Typography 
+                          variant="body2" 
+                          color="text.secondary"
+                          sx={{ mt: 0.5 }}
+                        >
+                          {typeLabels[workOrder.type as WorkOrderType]} - {categoryLabels[workOrder.category as WorkOrderCategory]}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Chip
+                          label={statusLabels[workOrder.status as WorkOrderStatus]}
+                          color={statusColors[workOrder.status as WorkOrderStatus]}
+                          size="small"
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={() => window.location.href = `/work-orders/${workOrder.id}`}
+                          sx={{
+                            color: 'primary.main',
+                            '&:hover': {
+                              bgcolor: alpha(theme.palette.primary.main, 0.1)
+                            }
                           }}
                         >
-                          <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 2,
-                            color: 'text.secondary'
-                          }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <AccessTimeIcon fontSize="small" />
-                              <Typography variant="body2">
-                                {dayjs(workOrder.createdAt).format('DD.MM.YYYY')}
-                              </Typography>
-                            </Box>
-                          </Box>
+                          <ArrowForwardIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                    <Box 
+                      sx={{ 
+                        display: 'flex', 
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'center' },
+                        justifyContent: 'space-between',
+                        gap: 1,
+                        mt: 1,
+                        pt: 1.5,
+                        borderTop: '1px solid',
+                        borderColor: 'divider'
+                      }}
+                    >
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 2,
+                        color: 'text.secondary'
+                      }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <AccessTimeIcon fontSize="small" />
+                          <Typography variant="body2">
+                            {dayjs(workOrder.createdAt).format('DD.MM.YYYY')}
+                          </Typography>
                         </Box>
                       </Box>
-                    ))}
-                    {(!localWorkOrder.company.previousWorkOrders || localWorkOrder.company.previousWorkOrders.length === 0) && (
-                      <Typography color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                        Bu müşteriye ait geçmiş iş emri bulunmamaktadır.
-                      </Typography>
-                    )}
-                  </Stack>
-                </AccordionDetails>
-              </Accordion>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+                    </Box>
+                  </Box>
+                ))}
+                {(!localWorkOrder.company.previousWorkOrders || localWorkOrder.company.previousWorkOrders.length === 0) && (
+                  <Typography color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                    Bu müşteriye ait geçmiş iş emri bulunmamaktadır.
+                  </Typography>
+                )}
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
+        </Grid>
+      </Grid>
 
       {/* Servis Seçme Dialog */}
       <ServiceSelectionDialog
