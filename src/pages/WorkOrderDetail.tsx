@@ -65,6 +65,9 @@ import {
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
   ArrowForward as ArrowForwardIcon,
   ExpandMore as ExpandMoreIcon,
+  AttachFile as AttachFileIcon,
+  CloudUpload as CloudUploadIcon,
+  Download as DownloadIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import { usePageTitle } from '../contexts/PageTitleContext';
@@ -192,28 +195,50 @@ const StatusChip = ({ status }: { status: WorkOrderStatus }) => (
 );
 
 // Liste öğesi için özel bileşen
-const InfoListItem = ({ icon, value }: { icon: React.ReactNode, value: string }) => (
-  <ListItem 
-    disablePadding 
-    sx={{ 
-      mb: 1,
-      '&:last-child': {
-        mb: 0
-      }
-    }}
-  >
-    <ListItemIcon sx={{ minWidth: 36 }}>
-      {icon}
-    </ListItemIcon>
-    <ListItemText 
-      primary={
-        <Typography variant="body1">
-          {value}
-        </Typography>
-      }
-    />
-  </ListItem>
-);
+const InfoListItem = ({ icon, value, isAddress = false }: { icon: React.ReactNode, value: string, isAddress?: boolean }) => {
+  const handleAddressClick = () => {
+    if (isAddress) {
+      const encodedAddress = encodeURIComponent(value);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+    }
+  };
+
+  return (
+    <ListItem 
+      disablePadding 
+      sx={{ 
+        mb: 1,
+        '&:last-child': {
+          mb: 0
+        },
+        ...(isAddress && {
+          cursor: 'pointer',
+          '&:hover': {
+            '& .MuiTypography-root': {
+              color: 'primary.main',
+              textDecoration: 'underline'
+            },
+            '& .MuiListItemIcon-root': {
+              color: 'primary.main'
+            }
+          }
+        })
+      }}
+      onClick={handleAddressClick}
+    >
+      <ListItemIcon sx={{ minWidth: 36 }}>
+        {icon}
+      </ListItemIcon>
+      <ListItemText 
+        primary={
+          <Typography variant="body1">
+            {value}
+          </Typography>
+        }
+      />
+    </ListItem>
+  );
+};
 
 // Ana başlık bileşeni
 const PageHeader = ({ workOrder }: { workOrder: WorkOrder }) => (
@@ -228,9 +253,8 @@ const PageHeader = ({ workOrder }: { workOrder: WorkOrder }) => (
   >
     <Box sx={{ 
       display: 'flex', 
-      alignItems: 'center',
+      alignItems: 'flex-start',
       gap: 2,
-      mb: 1
     }}>
       <Avatar 
         sx={{ 
@@ -254,9 +278,31 @@ const PageHeader = ({ workOrder }: { workOrder: WorkOrder }) => (
           </Typography>
           <StatusChip status={workOrder.status as WorkOrderStatus} />
         </Box>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
           {workOrder.summary}
         </Typography>
+        {workOrder.assignedTo && (
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1,
+            mt: 1
+          }}>
+            <Avatar 
+              sx={{ 
+                width: 24, 
+                height: 24, 
+                fontSize: 14,
+                bgcolor: 'primary.main'
+              }}
+            >
+              {workOrder.assignedTo.firstName[0]}
+            </Avatar>
+            <Typography variant="body2" color="text.secondary">
+              {workOrder.assignedTo.firstName} {workOrder.assignedTo.lastName}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   </Box>
@@ -308,6 +354,8 @@ const WorkOrderDetail: React.FC = () => {
   const signatureRef = useRef<SignaturePadType>(null);
   const [signature, setSignature] = useState<string>('');
   const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Ortak stil tanımlamaları
   const commonStyles = {
@@ -614,6 +662,28 @@ const WorkOrderDetail: React.FC = () => {
     }
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newFiles = Array.from(event.target.files);
+      setFiles(prev => [...prev, ...newFiles]);
+    }
+  };
+
+  const handleFileDelete = (fileToDelete: File) => {
+    setFiles(prev => prev.filter(file => file !== fileToDelete));
+  };
+
+  const handleFileDownload = (file: File) => {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
@@ -656,6 +726,7 @@ const WorkOrderDetail: React.FC = () => {
               <InfoListItem
                 icon={<LocationIcon color="action" fontSize="small" />}
                 value={localWorkOrder.company.address}
+                isAddress={true}
               />
             </List>
           </CardContainer>
@@ -686,38 +757,6 @@ const WorkOrderDetail: React.FC = () => {
               />
             </List>
           </CardContainer>
-        </Grid>
-
-        {/* Atanan Kişi */}
-        <Grid item xs={12}>
-          <Card variant="outlined">
-            <CardHeader
-              avatar={<PersonIcon color="primary" />}
-              title="Atanan Teknisyen"
-              sx={{ pb: 0 }}
-            />
-            <CardContent sx={{ pt: 1 }}>
-              {localWorkOrder.assignedTo ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Avatar sx={{ bgcolor: 'primary.light' }}>
-                    {localWorkOrder.assignedTo.firstName[0]}
-                  </Avatar>
-                  <Box>
-                    <Typography variant="body1">
-                      {localWorkOrder.assignedTo.firstName} {localWorkOrder.assignedTo.lastName}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {localWorkOrder.assignedTo.email}
-                    </Typography>
-                  </Box>
-                </Box>
-              ) : (
-                <Typography color="text.secondary">
-                  Henüz atama yapılmamış
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
         </Grid>
 
         {/* Hizmetler */}
@@ -1094,6 +1133,128 @@ const WorkOrderDetail: React.FC = () => {
                   </Box>
                 </Box>
               ))}
+            </Stack>
+          </CardContainer>
+        </Grid>
+
+        {/* Dosyalar */}
+        <Grid item xs={12}>
+          <CardContainer
+            icon={<AttachFileIcon />}
+            title="Dosyalar"
+            action={
+              <Button
+                startIcon={<CloudUploadIcon />}
+                onClick={() => fileInputRef.current?.click()}
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderRadius: 1,
+                  textTransform: 'none',
+                  px: 2
+                }}
+              >
+                Yükle
+              </Button>
+            }
+          >
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+              multiple
+            />
+            <Stack spacing={2}>
+              {files.map((file, index) => (
+                <Box 
+                  key={index}
+                  sx={{
+                    p: 2,
+                    borderRadius: 1,
+                    bgcolor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    '&:hover': {
+                      borderColor: theme.palette.primary.main,
+                      bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    }
+                  }}
+                >
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <AttachFileIcon color="action" />
+                      <Box>
+                        <Typography variant="subtitle2">
+                          {file.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {(file.size / 1024).toFixed(2)} KB
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleFileDownload(file)}
+                        sx={{
+                          color: 'primary.main',
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.primary.main, 0.1)
+                          }
+                        }}
+                      >
+                        <DownloadIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleFileDelete(file)}
+                        sx={{
+                          color: 'error.main',
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.error.main, 0.1)
+                          }
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+              {files.length === 0 && (
+                <Box 
+                  sx={{ 
+                    p: 4,
+                    textAlign: 'center',
+                    border: '2px dashed',
+                    borderColor: 'divider',
+                    borderRadius: 2,
+                    bgcolor: 'background.paper',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    }
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <CloudUploadIcon 
+                    sx={{ 
+                      fontSize: 48,
+                      color: 'text.secondary',
+                      mb: 2
+                    }} 
+                  />
+                  <Typography color="text.secondary">
+                    Dosya yüklemek için tıklayın veya sürükleyip bırakın
+                  </Typography>
+                </Box>
+              )}
             </Stack>
           </CardContainer>
         </Grid>
