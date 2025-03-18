@@ -68,6 +68,9 @@ import {
   AttachFile as AttachFileIcon,
   CloudUpload as CloudUploadIcon,
   Download as DownloadIcon,
+  Send as SendIcon,
+  Timeline as TimelineIcon,
+  Circle as CircleIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import { usePageTitle } from '../contexts/PageTitleContext';
@@ -78,6 +81,13 @@ import { WorkOrder, WorkOrderService, WorkOrderPart, WorkOrderStatus, WorkOrderT
 import { alpha } from '@mui/material/styles';
 import SignaturePad from 'react-signature-canvas';
 import type SignaturePadType from 'react-signature-canvas';
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 
 const priorityLabels = {
   high: 'Yüksek',
@@ -308,6 +318,167 @@ const PageHeader = ({ workOrder }: { workOrder: WorkOrder }) => (
   </Box>
 );
 
+// Timeline için tip tanımlamaları
+type TimelineEventType = 'status_change' | 'note' | 'start' | 'complete' | 'assign' | 'create';
+
+interface TimelineEvent {
+  id: number;
+  type: TimelineEventType;
+  content: string;
+  timestamp: string;
+  user: {
+    id: number;
+    name: string;
+    avatar: string;
+  };
+  metadata?: {
+    oldStatus?: WorkOrderStatus;
+    newStatus?: WorkOrderStatus;
+    note?: string;
+  };
+}
+
+// Örnek timeline verileri
+const sampleTimelineEvents: TimelineEvent[] = [
+  {
+    id: 1,
+    type: 'create',
+    content: 'İş emri oluşturuldu',
+    timestamp: '2024-03-15T09:00:00',
+    user: {
+      id: 1,
+      name: 'Ahmet Yılmaz',
+      avatar: 'AY'
+    }
+  },
+  {
+    id: 2,
+    type: 'assign',
+    content: 'Teknisyen atandı',
+    timestamp: '2024-03-15T09:15:00',
+    user: {
+      id: 2,
+      name: 'Mehmet Demir',
+      avatar: 'MD'
+    }
+  },
+  {
+    id: 3,
+    type: 'note',
+    content: 'Müşteri ile görüşüldü, randevu saati 14:00 olarak belirlendi',
+    timestamp: '2024-03-15T10:30:00',
+    user: {
+      id: 1,
+      name: 'Ahmet Yılmaz',
+      avatar: 'AY'
+    }
+  },
+  {
+    id: 4,
+    type: 'start',
+    content: 'İşe başlandı',
+    timestamp: '2024-03-15T14:00:00',
+    user: {
+      id: 3,
+      name: 'Ali Kaya',
+      avatar: 'AK'
+    }
+  },
+  {
+    id: 5,
+    type: 'status_change',
+    content: 'Durum güncellendi',
+    timestamp: '2024-03-15T14:01:00',
+    user: {
+      id: 3,
+      name: 'Ali Kaya',
+      avatar: 'AK'
+    },
+    metadata: {
+      oldStatus: 'pending',
+      newStatus: 'in_progress'
+    }
+  },
+  {
+    id: 6,
+    type: 'note',
+    content: 'Ek parça gerekiyor, tedarik edilecek',
+    timestamp: '2024-03-15T15:30:00',
+    user: {
+      id: 3,
+      name: 'Ali Kaya',
+      avatar: 'AK'
+    }
+  },
+  {
+    id: 7,
+    type: 'complete',
+    content: 'İş tamamlandı',
+    timestamp: '2024-03-15T17:00:00',
+    user: {
+      id: 3,
+      name: 'Ali Kaya',
+      avatar: 'AK'
+    }
+  },
+  {
+    id: 8,
+    type: 'status_change',
+    content: 'Durum güncellendi',
+    timestamp: '2024-03-15T17:01:00',
+    user: {
+      id: 3,
+      name: 'Ali Kaya',
+      avatar: 'AK'
+    },
+    metadata: {
+      oldStatus: 'in_progress',
+      newStatus: 'completed'
+    }
+  }
+];
+
+// Timeline event için renk ve ikon seçici
+const getTimelineConfig = (type: TimelineEventType) => {
+  switch (type) {
+    case 'status_change':
+      return {
+        color: 'info' as const,
+        icon: <EditIcon fontSize="small" />
+      };
+    case 'note':
+      return {
+        color: 'primary' as const,
+        icon: <DescriptionIcon fontSize="small" />
+      };
+    case 'start':
+      return {
+        color: 'warning' as const,
+        icon: <ScheduleIcon fontSize="small" />
+      };
+    case 'complete':
+      return {
+        color: 'success' as const,
+        icon: <CheckCircleIcon fontSize="small" />
+      };
+    case 'assign':
+      return {
+        color: 'secondary' as const,
+        icon: <PersonIcon fontSize="small" />
+      };
+    case 'create':
+      return {
+        color: 'primary' as const,
+        icon: <AddIcon fontSize="small" />
+      };
+    default:
+      return {
+        color: 'grey' as const,
+        icon: <CircleIcon fontSize="small" />
+      };
+  }
+};
+
 const WorkOrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { setTitle } = usePageTitle();
@@ -356,6 +527,8 @@ const WorkOrderDetail: React.FC = () => {
   const [signatureModalOpen, setSignatureModalOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>(sampleTimelineEvents);
+  const [newNote, setNewNote] = useState('');
 
   // Ortak stil tanımlamaları
   const commonStyles = {
@@ -682,6 +855,24 @@ const WorkOrderDetail: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleAddNote = () => {
+    if (newNote.trim()) {
+      const newEvent: TimelineEvent = {
+        id: Date.now(),
+        type: 'note',
+        content: newNote,
+        timestamp: new Date().toISOString(),
+        user: {
+          id: 1, // Örnek kullanıcı
+          name: 'Ahmet Yılmaz',
+          avatar: 'AY'
+        }
+      };
+      setTimelineEvents(prev => [...prev, newEvent]);
+      setNewNote('');
+    }
   };
 
   if (isLoading) {
@@ -1394,6 +1585,102 @@ const WorkOrderDetail: React.FC = () => {
               </Stack>
             </AccordionDetails>
           </Accordion>
+        </Grid>
+
+        {/* Timeline */}
+        <Grid item xs={12}>
+          <CardContainer
+            icon={<TimelineIcon />}
+            title="Zaman Çizelgesi"
+          >
+            <Box sx={{ mb: 2 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                gap: 1,
+                mb: 3
+              }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder="Not ekle..."
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddNote();
+                    }
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleAddNote}
+                  disabled={!newNote.trim()}
+                  sx={{
+                    minWidth: 'auto',
+                    px: 2
+                  }}
+                >
+                  <SendIcon />
+                </Button>
+              </Box>
+              <Timeline>
+                {timelineEvents.map((event) => {
+                  const config = getTimelineConfig(event.type);
+                  return (
+                    <TimelineItem key={event.id}>
+                      <TimelineOppositeContent sx={{ flex: 0.2 }}>
+                        <Typography variant="caption" color="text.secondary">
+                          {dayjs(event.timestamp).format('DD.MM.YYYY HH:mm')}
+                        </Typography>
+                      </TimelineOppositeContent>
+                      <TimelineSeparator>
+                        <TimelineDot color={config.color}>
+                          {config.icon}
+                        </TimelineDot>
+                        <TimelineConnector />
+                      </TimelineSeparator>
+                      <TimelineContent>
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'flex-start',
+                          gap: 1
+                        }}>
+                          <Box>
+                            <Typography variant="body2" fontWeight="medium">
+                              {event.user.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {event.content}
+                            </Typography>
+                            {event.type === 'status_change' && event.metadata && (
+                              <Box sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center',
+                                gap: 1,
+                                mt: 0.5
+                              }}>
+                                <Chip
+                                  label={statusLabels[event.metadata.oldStatus as WorkOrderStatus]}
+                                  color={statusColors[event.metadata.oldStatus as WorkOrderStatus]}
+                                  size="small"
+                                />
+                                <ArrowForwardIcon fontSize="small" color="action" />
+                                <Chip
+                                  label={statusLabels[event.metadata.newStatus as WorkOrderStatus]}
+                                  color={statusColors[event.metadata.newStatus as WorkOrderStatus]}
+                                  size="small"
+                                />
+                              </Box>
+                            )}
+                          </Box>
+                        </Box>
+                      </TimelineContent>
+                    </TimelineItem>
+                  );
+                })}
+              </Timeline>
+            </Box>
+          </CardContainer>
         </Grid>
       </Grid>
 
