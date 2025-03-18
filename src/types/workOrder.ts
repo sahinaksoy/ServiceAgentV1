@@ -27,6 +27,7 @@ export interface WorkOrderService {
   duration: number;
   price: number;
   hasServiceForm?: boolean;
+  status?: 'completed' | 'partially_completed' | 'pending';
   formData?: {
     genelGorunum: {
       temizlik: boolean;

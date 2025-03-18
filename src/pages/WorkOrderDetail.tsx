@@ -28,12 +28,15 @@ import {
   ListItemIcon,
   IconButton,
   Button,
+  ButtonGroup,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
   MenuItem,
+  Select,
+  SelectChangeEvent,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -105,6 +108,13 @@ const statusColors = {
   completed: 'success',
   cancelled: 'error',
 } as const;
+
+// Durum seçenekleri için sabit tanımlayalım
+const serviceStatusOptions = [
+  { value: 'completed', label: 'Tamamlandı', color: 'success' },
+  { value: 'partially_completed', label: 'Eksik Tamamlandı', color: 'warning' },
+  { value: 'pending', label: 'Beklemede', color: 'info' },
+] as const;
 
 const WorkOrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -191,7 +201,8 @@ const WorkOrderDetail: React.FC = () => {
         description: serviceCategoryLabels[service.category as ServiceCategory],
         duration: service.duration,
         price: service.price,
-        hasServiceForm: false, // Başlangıçta form yok
+        hasServiceForm: false,
+        status: 'pending',
       }));
 
       // Mevcut servislere yeni seçilenleri ekle
@@ -353,6 +364,23 @@ const WorkOrderDetail: React.FC = () => {
   const clearSignature = () => {
     signatureRef.current?.clear();
     setSignature('');
+  };
+
+  const handleServiceStatusChange = (serviceId: number, event: SelectChangeEvent<string>) => {
+    const status = event.target.value as 'completed' | 'partially_completed' | 'pending';
+    if (localWorkOrder) {
+      const updatedServices = localWorkOrder.services.map(service =>
+        service.id === serviceId
+          ? { ...service, status }
+          : service
+      );
+
+      const updatedWorkOrder = {
+        ...localWorkOrder,
+        services: updatedServices,
+      };
+      setLocalWorkOrder(updatedWorkOrder);
+    }
   };
 
   if (isLoading) {
@@ -602,7 +630,8 @@ const WorkOrderDetail: React.FC = () => {
                               alignItems: 'center', 
                               gap: 2,
                               mt: 1.5,
-                              color: 'text.secondary'
+                              color: 'text.secondary',
+                              flexWrap: 'wrap'
                             }}>
                               <Box 
                                 sx={{ 
@@ -625,16 +654,14 @@ const WorkOrderDetail: React.FC = () => {
                                 <CheckCircleIcon 
                                   fontSize="small" 
                                   sx={{ 
-                                    color: 'success.main',
-                                    ml: 'auto'
+                                    color: 'success.main'
                                   }} 
                                 />
                               ) : (
                                 <RadioButtonUncheckedIcon 
                                   fontSize="small" 
                                   sx={{ 
-                                    color: 'action.disabled',
-                                    ml: 'auto'
+                                    color: 'action.disabled'
                                   }} 
                                 />
                               )}
@@ -658,7 +685,8 @@ const WorkOrderDetail: React.FC = () => {
                         <Box 
                           sx={{ 
                             display: 'flex', 
-                            alignItems: 'center', 
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
                             gap: 1,
                             mt: 1,
                             pt: 1.5,
@@ -666,49 +694,94 @@ const WorkOrderDetail: React.FC = () => {
                             borderColor: 'divider'
                           }}
                         >
-                          <Typography variant="body2" color="text.secondary">
-                            Süre:
-                          </Typography>
-                          <TextField
-                            type="number"
-                            size="small"
-                            value={editingServiceId === service.id ? editedDuration : service.duration}
-                            onChange={(e) => {
-                              if (editingServiceId !== service.id) {
-                                setEditingServiceId(service.id);
-                              }
-                              setEditedDuration(Number(e.target.value));
-                            }}
-                            onBlur={() => {
-                              if (editingServiceId === service.id) {
-                                handleServiceDurationSave(service.id);
-                              }
-                            }}
-                            inputProps={{ 
-                              min: 0,
-                              style: { 
-                                width: '60px',
-                                padding: '4px 8px',
-                              }
-                            }}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                  borderColor: 'transparent',
+                          <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 1,
+                            width: { xs: '100%', sm: 'auto' }
+                          }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Süre:
+                            </Typography>
+                            <TextField
+                              type="number"
+                              size="small"
+                              value={editingServiceId === service.id ? editedDuration : service.duration}
+                              onChange={(e) => {
+                                if (editingServiceId !== service.id) {
+                                  setEditingServiceId(service.id);
+                                }
+                                setEditedDuration(Number(e.target.value));
+                              }}
+                              onBlur={() => {
+                                if (editingServiceId === service.id) {
+                                  handleServiceDurationSave(service.id);
+                                }
+                              }}
+                              inputProps={{ 
+                                min: 0,
+                                style: { 
+                                  width: '60px',
+                                  padding: '4px 8px',
+                                }
+                              }}
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  '& fieldset': {
+                                    borderColor: 'transparent',
+                                  },
+                                  '&:hover fieldset': {
+                                    borderColor: 'primary.main',
+                                  },
+                                  '&.Mui-focused fieldset': {
+                                    borderColor: 'primary.main',
+                                  },
+                                  bgcolor: 'background.paper',
                                 },
-                                '&:hover fieldset': {
-                                  borderColor: 'primary.main',
-                                },
-                                '&.Mui-focused fieldset': {
-                                  borderColor: 'primary.main',
-                                },
-                                bgcolor: 'background.paper',
-                              },
-                            }}
-                          />
-                          <Typography variant="body2" color="text.secondary">
-                            Saat
-                          </Typography>
+                              }}
+                            />
+                            <Typography variant="body2" color="text.secondary">
+                              Saat
+                            </Typography>
+                          </Box>
+                          <Box sx={{ 
+                            width: { xs: '100%', sm: 'auto' },
+                            mt: { xs: 1, sm: 0 }
+                          }}>
+                            <Select
+                              size="small"
+                              value={service.status || 'pending'}
+                              onChange={(event) => handleServiceStatusChange(service.id, event)}
+                              fullWidth
+                              sx={{
+                                '& .MuiSelect-select': {
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                }
+                              }}
+                            >
+                              {serviceStatusOptions.map((option) => (
+                                <MenuItem 
+                                  key={option.value} 
+                                  value={option.value}
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                  }}
+                                >
+                                  <CheckCircleIcon 
+                                    fontSize="small" 
+                                    sx={{ 
+                                      color: `${option.color}.main`,
+                                    }} 
+                                  />
+                                  {option.label}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </Box>
                         </Box>
                       </Box>
                     ))}
