@@ -732,6 +732,17 @@ export const handlers = [
     return HttpResponse.json(workOrders);
   }),
 
+  http.get('/api/work-orders/:id', ({ params }) => {
+    const { id } = params;
+    const workOrder = workOrders.find(wo => wo.id === Number(id));
+
+    if (!workOrder) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json(workOrder);
+  }),
+
   http.post('/api/work-orders', async ({ request }) => {
     const workOrderData = (await request.json()) as WorkOrderFormData;
     const selectedUser = users.find(user => user.id === workOrderData.assignedTo);

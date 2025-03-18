@@ -82,7 +82,6 @@ export const router = createBrowserRouter([
     ],
   },
 ], {
-  basename: '/ServiceAgent',
   future: {
     v7_relativeSplatPath: true
   }

@@ -26,6 +26,32 @@ export interface WorkOrderService {
   description: string;
   duration: number;
   price: number;
+  hasServiceForm?: boolean;
+  formData?: {
+    genelGorunum: {
+      temizlik: boolean;
+      paslanma: boolean;
+      boyaBozulmasi: boolean;
+      fizikselHasar: boolean;
+      titresim: boolean;
+      sesliCalisma: boolean;
+    };
+    merkeziSistem: {
+      marka: string;
+      model: string;
+      seriNo: string;
+      kapasiteKcal: string;
+      uretimYili: string;
+      yakitTipi: string;
+    };
+    sistemGorunum: {
+      suBasinci: string;
+      calismaSicakligi: string;
+      donusSicakligi: string;
+      bacaGaziSicakligi: string;
+    };
+    signature?: string;
+  };
 }
 
 export interface WorkOrderPart {
