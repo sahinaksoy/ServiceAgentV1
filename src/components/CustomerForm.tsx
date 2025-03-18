@@ -22,22 +22,13 @@ export const CustomerForm = ({ initialData, onSubmit, isSubmitting }: CustomerFo
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12}>
           <TextField
-            {...register('firstName')}
+            {...register('name')}
             label="İsim"
             fullWidth
-            error={!!errors.firstName}
-            helperText={errors.firstName?.message}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            {...register('lastName')}
-            label="Soyisim"
-            fullWidth
-            error={!!errors.lastName}
-            helperText={errors.lastName?.message}
+            error={!!errors.name}
+            helperText={errors.name?.message}
           />
         </Grid>
         <Grid item xs={12}>

@@ -31,7 +31,7 @@ const UserList = () => {
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const { data: users, isLoading, error, refetch } = useUsers();
+  const { data: users, isLoading, error } = useUsers();
   const deleteUserMutation = useDeleteUser();
   const { setTitle } = usePageTitle();
 

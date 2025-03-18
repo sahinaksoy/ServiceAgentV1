@@ -21,7 +21,7 @@ import DataGrid, {
   FilterRow,
   SearchPanel,
 } from 'devextreme-react/data-grid';
-import { Service, ServiceCategory, ServiceStatus, serviceCategoryLabels, serviceStatusLabels } from '../types/service';
+import { Service, serviceCategoryLabels, serviceStatusLabels } from '../types/service';
 import { mockServices } from '../mocks/services';
 import ServiceDialog from '../components/services/ServiceDialog';
 

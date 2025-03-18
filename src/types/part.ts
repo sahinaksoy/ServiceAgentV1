@@ -14,6 +14,7 @@ export enum PartStatus {
 export interface Part {
   id: number;
   name: string;
+  description?: string;
   unit: PartUnit;
   price: number;
   status: PartStatus;

@@ -11,6 +11,8 @@ let customers: Customer[] = [
     name: 'Meser Teknoloji',
     email: 'info@meser.com.tr',
     phone: '0212 555 1234',
+    mobile: '5551234567',
+    contactPerson: 'Ahmet Yılmaz',
     address: 'Kadıköy, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -21,6 +23,8 @@ let customers: Customer[] = [
     name: 'Arveta',
     email: 'info@arveta.com.tr',
     phone: '0216 444 5678',
+    mobile: '5559876543',
+    contactPerson: 'Ayşe Demir',
     address: 'Beşiktaş, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -31,6 +35,8 @@ let customers: Customer[] = [
     name: 'Ataşehir Makro Migros',
     email: 'atasehir@migros.com.tr',
     phone: '5553456789',
+    mobile: '5553456789',
+    contactPerson: 'Migros Yöneticisi',
     address: 'Ataşehir Bulvarı, Ataşehir, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -41,6 +47,8 @@ let customers: Customer[] = [
     name: 'Levent 5M Migros',
     email: 'levent@migros.com.tr',
     phone: '5557891234',
+    mobile: '5557891234',
+    contactPerson: 'Migros Yöneticisi',
     address: 'Levent Mah. Beşiktaş, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -51,6 +59,8 @@ let customers: Customer[] = [
     name: 'Beylikdüzü MM Migros',
     email: 'beylikduzu@migros.com.tr',
     phone: '5552345678',
+    mobile: '5552345678',
+    contactPerson: 'Migros Yöneticisi',
     address: 'Beylikdüzü Mah. Beylikdüzü, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -61,6 +71,8 @@ let customers: Customer[] = [
     name: 'Bakırköy 3M Migros',
     email: 'bakirkoy@migros.com.tr',
     phone: '5558765432',
+    mobile: '5558765432',
+    contactPerson: 'Migros Yöneticisi',
     address: 'Bakırköy Mah. Bakırköy, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -71,6 +83,8 @@ let customers: Customer[] = [
     name: 'Maltepe Makro Migros',
     email: 'maltepe@migros.com.tr',
     phone: '5554567890',
+    mobile: '5554567890',
+    contactPerson: 'Migros Yöneticisi',
     address: 'Maltepe Mah. Maltepe, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -81,6 +95,8 @@ let customers: Customer[] = [
     name: 'Üsküdar MM Migros',
     email: 'uskudar@migros.com.tr',
     phone: '5556789012',
+    mobile: '5556789012',
+    contactPerson: 'Migros Yöneticisi',
     address: 'Üsküdar Mah. Üsküdar, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -91,6 +107,8 @@ let customers: Customer[] = [
     name: 'Şişli 3M Migros',
     email: 'sisli@migros.com.tr',
     phone: '5550123456',
+    mobile: '5550123456',
+    contactPerson: 'Migros Yöneticisi',
     address: 'Şişli Mah. Şişli, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -101,6 +119,8 @@ let customers: Customer[] = [
     name: 'Beşiktaş MM Migros',
     email: 'besiktas@migros.com.tr',
     phone: '5559012345',
+    mobile: '5559012345',
+    contactPerson: 'Migros Yöneticisi',
     address: 'Beşiktaş Mah. Beşiktaş, İstanbul',
     status: 'active',
     createdAt: new Date().toISOString(),
@@ -566,7 +586,11 @@ export const handlers = [
   }),
 
   http.get('/api/customers/:id', ({ params }) => {
-    const customer = customers.find((c) => c.id === Number(params.id));
+    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+    if (!id) {
+      return new HttpResponse(null, { status: 400 });
+    }
+    const customer = customers.find((c) => c.id === id);
     if (!customer) {
       return new HttpResponse(null, { status: 404 });
     }
@@ -577,28 +601,36 @@ export const handlers = [
     const newCustomer = await request.json() as Omit<Customer, 'id'>;
     const customer: Customer = {
       ...newCustomer,
-      id: Math.max(...customers.map((c) => c.id ?? 0)) + 1,
+      id: String(Math.max(...customers.map((c) => Number(c.id))) + 1),
     };
     customers.push(customer);
     return HttpResponse.json(customer);
   }),
 
   http.put('/api/customers/:id', async ({ params, request }) => {
+    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+    if (!id) {
+      return new HttpResponse(null, { status: 400 });
+    }
     const updatedCustomer = await request.json() as Customer;
-    const index = customers.findIndex((c) => c.id === Number(params.id));
+    const index = customers.findIndex((c) => c.id === id);
     if (index === -1) {
       return new HttpResponse(null, { status: 404 });
     }
-    customers[index] = { ...updatedCustomer, id: Number(params.id) };
+    customers[index] = { ...updatedCustomer, id };
     return HttpResponse.json(customers[index]);
   }),
 
   http.delete('/api/customers/:id', ({ params }) => {
-    const index = customers.findIndex((c) => c.id === Number(params.id));
+    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+    if (!id) {
+      return new HttpResponse(null, { status: 400 });
+    }
+    const index = customers.findIndex((c) => c.id === id);
     if (index === -1) {
       return new HttpResponse(null, { status: 404 });
     }
-    customers = customers.filter((c) => c.id !== Number(params.id));
+    customers = customers.filter((c) => c.id !== id);
     return new HttpResponse(null, { status: 204 });
   }),
 

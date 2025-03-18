@@ -7,7 +7,6 @@ import { workOrderAPI } from '../../services/api';
 import { usePageTitle } from '../../contexts/PageTitleContext';
 import React from 'react';
 import { useSnackbar } from 'notistack';
-import dayjs from 'dayjs';
 
 const CreateWorkOrder = () => {
   const navigate = useNavigate();

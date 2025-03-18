@@ -5,8 +5,6 @@ import {
   Chip,
   IconButton,
   Tooltip,
-  Paper,
-  Divider,
 } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { Service, ServiceCategory, serviceCategoryLabels } from '../../types/service';

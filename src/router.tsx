@@ -1,14 +1,12 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
-import { Home } from './pages/home/Home';
 import { CustomerList } from './pages/customers/CustomerList';
 import { CustomerEdit } from './pages/customers/CustomerEdit';
 import Services from './pages/Services';
 import Parts from './pages/Parts';
 import WorkOrderList from './pages/workOrders/WorkOrderList';
-import WorkOrderDetail from './pages/workOrders/WorkOrderDetail';
 import CreateWorkOrder from './pages/workOrders/CreateWorkOrder';
-import EditWorkOrderCard from './pages/workOrders/EditWorkOrderCard';
+import WorkOrderDetail from './pages/WorkOrderDetail';
 
 const MainLayoutWrapper = () => {
   return (
@@ -71,15 +69,11 @@ export const router = createBrowserRouter([
             element: <WorkOrderDetail />,
           },
           {
-            path: ':id/card/edit',
-            element: <EditWorkOrderCard />,
-          },
-          {
             path: ':id',
             element: <WorkOrderDetail />,
           },
         ],
-      },
+      },        
       // 404 - Sayfa Bulunamadı
       {
         path: '*',

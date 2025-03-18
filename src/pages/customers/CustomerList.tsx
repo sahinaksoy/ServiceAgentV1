@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DataGrid, Column } from 'devextreme-react/data-grid';
+import { DataGrid } from 'devextreme-react/data-grid';
 import { Button, Box, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { customerService } from '../../services/customerService';
-import type { Customer } from '../../types/customer';
 
 export const CustomerList = () => {
   const theme = useTheme();
@@ -25,9 +23,8 @@ export const CustomerList = () => {
     },
   });
 
-  const columns: Column[] = [
-    { dataField: 'firstName', caption: 'İsim' },
-    { dataField: 'lastName', caption: 'Soyisim' },
+  const columns = [
+    { dataField: 'name', caption: 'İsim' },
     { dataField: 'email', caption: 'E-posta' },
     { dataField: 'phone', caption: 'Telefon', visible: !isMobile },
     { dataField: 'address', caption: 'Adres', visible: !isMobile },
@@ -37,16 +34,16 @@ export const CustomerList = () => {
         {
           hint: 'Düzenle',
           icon: 'edit',
-          onClick: (e: { row: { data: Customer } }) => {
-            navigate(`/customers/${e.row.data.id}/edit`);
+          onClick: (e: any) => {
+            navigate(`/customers/${e.row?.data.id}/edit`);
           },
         },
         {
           hint: 'Sil',
           icon: 'trash',
-          onClick: (e: { row: { data: Customer } }) => {
+          onClick: (e: any) => {
             if (window.confirm('Bu müşteriyi silmek istediğinizden emin misiniz?')) {
-              deleteMutation.mutate(e.row.data.id!);
+              deleteMutation.mutate(Number(e.row?.data.id));
             }
           },
         },
@@ -68,7 +65,7 @@ export const CustomerList = () => {
       </Box>
       <DataGrid
         dataSource={customers}
-        columns={columns}
+        columns={columns as any[]}
         showBorders
         columnAutoWidth
         rowAlternationEnabled

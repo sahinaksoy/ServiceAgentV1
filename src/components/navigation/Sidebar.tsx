@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemIcon, ListItemText, Collapse, ListItemButton } from '@mui/material';
+import { List, ListItemIcon, ListItemText, Collapse, ListItemButton } from '@mui/material';
 import {
   Home as HomeIcon,
   Assignment as AssignmentIcon,

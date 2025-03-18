@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { StoreStatus } from '../types/store';
 
 export const storeSchema = z.object({
   name: z.string()

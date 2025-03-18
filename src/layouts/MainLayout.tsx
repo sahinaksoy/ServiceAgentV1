@@ -6,41 +6,11 @@ import {
   IconButton, 
   Typography, 
   Drawer, 
-  List, 
-  ListItem, 
-  ListItemIcon, 
-  ListItemText, 
   useTheme, 
-  useMediaQuery, 
-  BottomNavigation, 
-  BottomNavigationAction, 
-  Paper, 
-  Container,
-  Avatar,
-  Menu,
-  MenuItem,
-  Divider,
-  Badge,
-  Collapse,
-  Tooltip
-} from '@mui/material';
+  useMediaQuery} from '@mui/material';
 import { 
   Menu as MenuIcon, 
-  Home as HomeIcon, 
-  Person as PersonIcon, 
-  Settings as SettingsIcon,
-  AccountCircle as AccountCircleIcon,
-  ExitToApp as LogoutIcon,
-  Notifications as NotificationsIcon,
-  Search as SearchIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ExpandLess as ExpandLessIcon,
-  ExpandMore as ExpandMoreIcon,
-  List as ListIcon,
-  Add as AddIcon,
-  Store as StoreIcon
-} from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
+  ChevronLeft as ChevronLeftIcon} from '@mui/icons-material';
 import { Sidebar } from '../components/navigation/Sidebar';
 import { PageTitleProvider, usePageTitle } from '../contexts/PageTitleContext';
 
@@ -48,21 +18,8 @@ interface MainLayoutProps {
   children: ReactNode;
 }
 
-interface MenuItem {
-  text: string;
-  icon: JSX.Element;
-  path: string;
-  subItems?: MenuItem[];
-}
 
 const DRAWER_WIDTH = 240;
-const MENU_ITEMS: MenuItem[] = [
-  { text: 'Ana Sayfa', icon: <HomeIcon />, path: '/' },
-  { text: 'İş Emirlerim', icon: <ListIcon />, path: '/work-orders' },
-  { text: 'Kullanıcılar', icon: <PersonIcon />, path: '/users' },
-  { text: 'Mağazalarım', icon: <StoreIcon />, path: '/stores' },
-  { text: 'Ayarlar', icon: <SettingsIcon />, path: '/settings' },
-];
 
 const MainLayoutContent = ({ children }: MainLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);

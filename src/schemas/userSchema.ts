@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { UserRole, UserStatus } from '../types/user';
 
 export const userSchema = z.object({
   firstName: z.string()

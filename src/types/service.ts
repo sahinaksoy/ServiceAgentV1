@@ -19,6 +19,7 @@ export interface Service {
   description?: string;
   estimatedDuration: number;
   duration: number; // dakika cinsinden
+  price: number;
   status: ServiceStatus;
   createdAt: string;
   updatedAt: string;

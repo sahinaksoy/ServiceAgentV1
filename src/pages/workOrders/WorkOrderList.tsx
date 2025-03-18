@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { 
   Box, 
-  Paper, 
   Typography, 
   IconButton, 
   useTheme, 
@@ -10,7 +9,6 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
   Button,
   Stack,
   Divider,
@@ -51,7 +49,6 @@ import {
   AccessTime as AccessTimeIcon,
   LocationOn as LocationOnIcon,
   Phone as PhoneIcon,
-  Person as PersonIcon,
   List as ListIcon,
   PendingActions as PendingIcon,
   Assignment as AssignedIcon,
@@ -75,8 +72,6 @@ import { useNavigate } from 'react-router-dom';
 import { WorkOrder } from '../../types/workOrder';
 import { User } from '../../types/user';
 import { useGlobalUsers } from '../../hooks/useGlobalUsers';
-import { useGlobalCustomers } from '../../hooks/useGlobalCustomers';
-import { useGlobalStores } from '../../hooks/useGlobalStores';
 import { useQuery } from '@tanstack/react-query';
 import { workOrderAPI } from '../../services/api';
 import dayjs from 'dayjs';
@@ -90,11 +85,6 @@ const priorityLabels = {
   low: 'Düşük',
 } as const;
 
-const priorityColors = {
-  high: 'error',
-  medium: 'warning',
-  low: 'success',
-} as const;
 
 const typeLabels = {
   emergency: 'Acil Çağrı',
@@ -145,8 +135,6 @@ const WorkOrderList = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { data: users = [] } = useGlobalUsers();
-  const { data: customers = [] } = useGlobalCustomers();
-  const { data: stores = [] } = useGlobalStores();
   const { setTitle } = usePageTitle();
   const [currentFilter, setCurrentFilter] = useState<FilterType>('all');
   const [menuAnchorEl, setMenuAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});
@@ -158,7 +146,7 @@ const WorkOrderList = () => {
   const [isAssigning, setIsAssigning] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: workOrders = [], isLoading } = useQuery({
+  const { data: workOrders = [] } = useQuery({
     queryKey: ['workOrders'],
     queryFn: workOrderAPI.getWorkOrders,
   });
@@ -173,18 +161,7 @@ const WorkOrderList = () => {
     navigate('/work-orders/create');
   };
 
-  const getStoreName = (id: string) => {
-    console.log('Store ID:', id);
-    console.log('Stores:', stores);
-    const store = stores.find(s => s.id === id);
-    console.log('Found store:', store);
-    return store ? store.name : id;
-  };
 
-  const getContactName = (id: string) => {
-    const user = users.find(u => u.id === id);
-    return user ? `${user.firstName} ${user.lastName}` : '';
-  };
 
   const filteredWorkOrders = workOrders.filter(workOrder => {
     switch (currentFilter) {
@@ -302,7 +279,7 @@ const WorkOrderList = () => {
         status: assigningWorkOrder.status === 'pending' ? 'in_progress' : assigningWorkOrder.status
       };
 
-      const result = await workOrderAPI.updateWorkOrder(updatedWorkOrder);
+      await workOrderAPI.updateWorkOrder(assigningWorkOrder.id, updatedWorkOrder);
       
       // Invalidate and refetch work orders
       await queryClient.invalidateQueries({ queryKey: ['workOrders'] });
@@ -320,7 +297,7 @@ const WorkOrderList = () => {
     return (
       user.firstName.toLowerCase().includes(searchText) ||
       user.lastName.toLowerCase().includes(searchText) ||
-      user.company?.name?.toLowerCase().includes(searchText) ||
+      user.company?.toLowerCase().includes(searchText) ||
       user.region?.toLowerCase().includes(searchText)
     );
   });
@@ -1059,7 +1036,7 @@ const WorkOrderList = () => {
                           secondary={
                             <Stack direction="row" spacing={1} alignItems="center">
                               <Typography variant="body2" component="span" color="text.secondary">
-                                {user.company?.name || 'Şirket bilgisi yok'}
+                                {user.company || 'Şirket bilgisi yok'}
                               </Typography>
                               {user.region && (
                                 <>

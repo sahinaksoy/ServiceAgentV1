@@ -6,6 +6,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MARKETING,
     name: 'Marka Oluşturma',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -15,6 +17,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MARKETING,
     name: 'Kampanya',
     duration: 90,
+    estimatedDuration: 90,
+    price: 500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -24,6 +28,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MARKETING,
     name: 'Metin Hazırlama',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -33,6 +39,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.SOFTWARE,
     name: 'Yazılım Test',
     duration: 180,
+    estimatedDuration: 180,
+    price: 1500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -42,6 +50,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MARKETING,
     name: 'İlk Görüşme',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -51,6 +61,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MARKETING,
     name: 'Sosyal Medya',
     duration: 90,
+    estimatedDuration: 90,
+    price: 500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -60,6 +72,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.OTHER,
     name: 'Satış Sonrası Destek',
     duration: 45,
+    estimatedDuration: 45,
+    price: 200,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -69,6 +83,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MARKETING,
     name: 'Pazarlama',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -78,6 +94,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.OTHER,
     name: 'Personel Tanıma Testi',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -87,6 +105,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'PANO ARIZASI',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -96,6 +116,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'BENMARİ ARIZASI',
     duration: 90,
+    estimatedDuration: 90,
+    price: 500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -105,6 +127,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.OTHER,
     name: 'İSG',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -114,6 +138,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'AYDINLATMA ARIZASI',
     duration: 45,
+    estimatedDuration: 45,
+    price: 200,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -123,6 +149,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'TOPRAKLAMA KONTROLÜ',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -132,6 +160,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'DATA HATTI KONTROL',
     duration: 45,
+    estimatedDuration: 45,
+    price: 200,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -141,6 +171,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'HAT ÇEKİMİ(KUVVETLİ AKIM)',
     duration: 180,
+    estimatedDuration: 180,
+    price: 1500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -150,6 +182,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'HAT ÇEKİMİ(ZAYIF AKIM)',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -159,6 +193,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.OTHER,
     name: 'KEŞİF',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -168,6 +204,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'KOMPANZASYON-OTOMASYON',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -177,6 +215,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'M-FIRIN ARIZASI',
     duration: 90,
+    estimatedDuration: 90,
+    price: 500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -186,6 +226,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'SİNEKLİK ARIZASI',
     duration: 45,
+    estimatedDuration: 45,
+    price: 200,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -195,6 +237,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.OTHER,
     name: 'KAPANIŞ',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -204,6 +248,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'PERİYODİK BAKIM',
     duration: 180,
+    estimatedDuration: 180,
+    price: 1500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -213,6 +259,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'EVAPORATÖR DEĞİŞİMİ',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -222,6 +270,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'GİDER ARIZASI',
     duration: 90,
+    estimatedDuration: 90,
+    price: 500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -231,6 +281,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'KOMPRESÖR DEĞİŞİMİ',
     duration: 180,
+    estimatedDuration: 180,
+    price: 1500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -240,6 +292,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.INSTALLATION,
     name: 'GRUP YER DEĞİŞİMİ',
     duration: 240,
+    estimatedDuration: 240,
+    price: 2000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -249,6 +303,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'ELEKTRİK TADİLAT',
     duration: 180,
+    estimatedDuration: 180, 
+    price: 1500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -258,6 +314,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'SOĞUTMA TADİLAT',
     duration: 180,
+    estimatedDuration: 180,
+    price: 1500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -267,6 +325,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.INSTALLATION,
     name: 'SOĞUTMA MONTAJ',
     duration: 240,
+    estimatedDuration: 240,
+    price: 2000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -276,6 +336,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'İZLEME KABLO ÇEKİMİ',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -285,6 +347,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'REYON ARIZASI',
     duration: 90,
+    estimatedDuration: 90,
+    price: 500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -294,6 +358,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.INSTALLATION,
     name: 'OTOMASYON PANO KURULUMU',
     duration: 180,
+    estimatedDuration: 180,
+    price: 1500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -303,6 +369,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'OTOMASYON KONTROL',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -312,6 +380,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.SOFTWARE,
     name: 'REYONDA İZLEME YOK',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -321,6 +391,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.OTHER,
     name: 'NAKLİYE',
     duration: 120,
+    estimatedDuration: 120,
+    price: 1000,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -330,6 +402,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.OTHER,
     name: 'ARAÇ MUAYENE',
     duration: 60,
+    estimatedDuration: 60,
+    price: 300,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -339,6 +413,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.MECHANIC,
     name: 'ARAÇ BAKIM/ARIZA',
     duration: 180,
+    estimatedDuration: 180,
+    price: 1500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -348,6 +424,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'PRİZ ARIZASI',
     duration: 45,
+    estimatedDuration: 45,
+    price: 200,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
@@ -357,6 +435,8 @@ export const mockServices: Service[] = [
     category: ServiceCategory.ELECTRICAL,
     name: 'CİHAZLARA ENERJİ GELMİYOR',
     duration: 90,
+    estimatedDuration: 90,
+    price: 500,
     status: ServiceStatus.ACTIVE,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'

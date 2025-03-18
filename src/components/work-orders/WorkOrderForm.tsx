@@ -5,30 +5,22 @@ import {
   TextField,
   Button,
   Grid,
-  FormControl,
   Autocomplete,
-  Chip,
   IconButton,
   Card,
   CardContent,
   Stack,
   Divider,
-  InputAdornment,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
+  List
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/tr';
 import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { WorkOrder, WorkOrderFormData } from '../../types/workOrder';
-import { workOrderSchema } from '../../schemas/workOrderSchema';
 import { useGlobalUsers } from '../../hooks/useGlobalUsers';
 import { useGlobalCustomers } from '../../hooks/useGlobalCustomers';
 import { Service } from '../../types/service';
@@ -235,10 +227,19 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
           category: service.category,
           duration: service.duration,
           status: service.status,
+          description: service.description || '',
+          price: service.price || 0,
           createdAt: service.createdAt,
           updatedAt: service.updatedAt
         })),
-        parts: selectedParts,
+        parts: selectedParts.map(part => ({
+          id: part.id,
+          name: part.name,
+          description: part.description || '',
+          unit: part.unit,
+          quantity: part.quantity,
+          unitPrice: part.price
+        })),
         totalAmount: calculateTotalPartsCost(),
         totalDuration: calculateTotalDuration()
       };

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { WorkOrderType, WorkOrderPriority } from '../types/workOrder';
 
 export const workOrderSchema = z.object({
   summary: z.string()

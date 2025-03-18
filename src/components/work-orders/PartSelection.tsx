@@ -5,7 +5,6 @@ import {
   Chip,
   IconButton,
   Tooltip,
-  Paper,
 } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { Part, partUnitLabels } from '../../types/part';
