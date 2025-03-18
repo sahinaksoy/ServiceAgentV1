@@ -330,7 +330,89 @@ let workOrders: WorkOrder[] = [
       contactPerson: 'Ali Yılmaz',
       email: 'atasehir@migros.com.tr',
       mobile: '5553456789',
-      address: 'Ataşehir Bulvarı, Ataşehir, İstanbul'
+      address: 'Ataşehir Bulvarı, Ataşehir, İstanbul',
+      previousWorkOrders: [
+        {
+          id: 101,
+          summary: 'Klima bakımı',
+          priority: 'medium',
+          type: 'maintenance',
+          category: 'mechanical',
+          status: 'completed',
+          dueDate: dayjs().subtract(30, 'day').toISOString(),
+          createdAt: dayjs().subtract(35, 'day').toISOString(),
+          updatedAt: dayjs().subtract(29, 'day').toISOString(),
+          assignedTo: {
+            id: '1',
+            firstName: 'Ahmet',
+            lastName: 'Yıldız',
+            email: 'ahmet.yildiz@example.com',
+            status: 'active'
+          },
+          services: [
+            {
+              id: 101,
+              name: 'Klima Bakımı',
+              description: 'Periyodik klima bakımı',
+              duration: 120,
+              price: 750,
+              status: 'completed'
+            }
+          ],
+          parts: [
+            {
+              id: 101,
+              name: 'Klima Filtresi',
+              description: 'Hepa Filtre',
+              quantity: 2,
+              unit: 'adet',
+              unitPrice: 150
+            }
+          ],
+          totalAmount: 1050,
+          totalDuration: 120
+        },
+        {
+          id: 102,
+          summary: 'Soğutucu tamiri',
+          priority: 'high',
+          type: 'emergency',
+          category: 'mechanical',
+          status: 'completed',
+          dueDate: dayjs().subtract(15, 'day').toISOString(),
+          createdAt: dayjs().subtract(16, 'day').toISOString(),
+          updatedAt: dayjs().subtract(14, 'day').toISOString(),
+          assignedTo: {
+            id: '2',
+            firstName: 'Ayşe',
+            lastName: 'Demir',
+            email: 'ayse.demir@example.com',
+            status: 'active'
+          },
+          services: [
+            {
+              id: 102,
+              name: 'Soğutucu Tamiri',
+              description: 'Acil soğutucu arıza tamiri',
+              duration: 180,
+              price: 1200,
+              status: 'completed'
+            }
+          ],
+          parts: [
+            {
+              id: 102,
+              name: 'Kompresör',
+              description: 'Soğutucu kompresörü',
+              quantity: 1,
+              unit: 'adet',
+              unitPrice: 2500
+            }
+          ],
+          totalAmount: 3700,
+          totalDuration: 180
+        }
+      ]
     },
     assignedTo: {
       id: '1',

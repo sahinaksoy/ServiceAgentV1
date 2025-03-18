@@ -37,6 +37,9 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -60,6 +63,8 @@ import {
   Description as DescriptionIcon,
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
+  ArrowForward as ArrowForwardIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import { usePageTitle } from '../contexts/PageTitleContext';
@@ -952,9 +957,7 @@ const WorkOrderDetail: React.FC = () => {
                             gap: 1,
                             width: { xs: '100%', sm: 'auto' }
                           }}>
-                            <Typography variant="body2" color="text.secondary">
-                              Adet:
-                            </Typography>
+                            
                             <TextField
                               type="number"
                               size="small"
@@ -996,40 +999,6 @@ const WorkOrderDetail: React.FC = () => {
                               {part.unit}
                             </Typography>
                           </Box>
-                          <Box sx={{ 
-                            display: 'flex', 
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            alignItems: { xs: 'flex-start', sm: 'center' },
-                            justifyContent: { xs: 'flex-start', sm: 'flex-end' },
-                            gap: 1,
-                            width: { xs: '100%', sm: 'auto' },
-                            mt: { xs: 1, sm: 0 }
-                          }}>
-                            <Box sx={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: 1 
-                            }}>
-                              <Typography variant="body2" color="text.secondary">
-                                Birim Fiyat:
-                              </Typography>
-                              <Typography variant="body2" fontWeight="medium">
-                                {part.unitPrice.toLocaleString('tr-TR')} ₺
-                              </Typography>
-                            </Box>
-                            <Box sx={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: 1 
-                            }}>
-                              <Typography variant="body2" color="text.secondary">
-                                Toplam:
-                              </Typography>
-                              <Typography variant="body2" fontWeight="medium" color="primary">
-                                {(part.unitPrice * part.quantity).toLocaleString('tr-TR')} ₺
-                              </Typography>
-                            </Box>
-                          </Box>
                         </Box>
                       </Box>
                     ))}
@@ -1038,37 +1007,127 @@ const WorkOrderDetail: React.FC = () => {
               </Card>
             </Grid>
 
-            {/* Toplam Tutar */}
+            {/* Geçmiş İş Emirleri */}
             <Grid item xs={12}>
-              <Card variant="outlined" sx={{ bgcolor: 'primary.light' }}>
-                <CardHeader
-                  avatar={
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      <MoneyIcon />
-                    </Avatar>
-                  }
-                  title={
-                    <Box sx={{ 
-                      display: 'flex', 
-                      flexDirection: isMobile ? 'column' : 'row',
-                      alignItems: isMobile ? 'flex-start' : 'center',
-                      justifyContent: 'space-between',
-                      gap: 2
-                    }}>
-                      <Typography variant="h6" color="primary.dark">Toplam Tutar</Typography>
-                      <Typography 
-                        variant={isMobile ? "h5" : "h4"} 
-                        sx={{ 
-                          color: 'primary.dark',
-                          fontWeight: 'bold'
+              <Accordion defaultExpanded={false}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    backgroundColor: 'background.paper',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider'
+                  }}
+                >
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 2,
+                    width: '100%'
+                  }}>
+                    <AccessTimeIcon color="primary" />
+                    <Typography variant="h6" sx={{ flex: 1 }}>
+                      Geçmiş İş Emirleri
+                    </Typography>
+                    <Chip 
+                      label={`${localWorkOrder.company.previousWorkOrders?.length || 0} Kayıt`}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails sx={{ p: 2 }}>
+                  <Stack spacing={2}>
+                    {localWorkOrder.company.previousWorkOrders?.map((workOrder) => (
+                      <Box 
+                        key={workOrder.id}
+                        sx={{
+                          p: 2,
+                          borderRadius: 1,
+                          bgcolor: 'background.paper',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          '&:hover': {
+                            borderColor: theme.palette.primary.main,
+                            bgcolor: alpha(theme.palette.primary.main, 0.05),
+                          }
                         }}
                       >
-                        {localWorkOrder.totalAmount.toLocaleString('tr-TR')} ₺
+                        <Box sx={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          mb: 1.5
+                        }}>
+                          <Box>
+                            <Typography variant="subtitle1" fontWeight="medium">
+                              {workOrder.summary}
+                            </Typography>
+                            <Typography 
+                              variant="body2" 
+                              color="text.secondary"
+                              sx={{ mt: 0.5 }}
+                            >
+                              {typeLabels[workOrder.type as WorkOrderType]} - {categoryLabels[workOrder.category as WorkOrderCategory]}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Chip
+                              label={statusLabels[workOrder.status as WorkOrderStatus]}
+                              color={statusColors[workOrder.status as WorkOrderStatus]}
+                              size="small"
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() => window.location.href = `/work-orders/${workOrder.id}`}
+                              sx={{
+                                color: 'primary.main',
+                                '&:hover': {
+                                  bgcolor: alpha(theme.palette.primary.main, 0.1)
+                                }
+                              }}
+                            >
+                              <ArrowForwardIcon fontSize="small" />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                        <Box 
+                          sx={{ 
+                            display: 'flex', 
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            justifyContent: 'space-between',
+                            gap: 1,
+                            mt: 1,
+                            pt: 1.5,
+                            borderTop: '1px solid',
+                            borderColor: 'divider'
+                          }}
+                        >
+                          <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 2,
+                            color: 'text.secondary'
+                          }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <AccessTimeIcon fontSize="small" />
+                              <Typography variant="body2">
+                                {dayjs(workOrder.createdAt).format('DD.MM.YYYY')}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Box>
+                      </Box>
+                    ))}
+                    {(!localWorkOrder.company.previousWorkOrders || localWorkOrder.company.previousWorkOrders.length === 0) && (
+                      <Typography color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                        Bu müşteriye ait geçmiş iş emri bulunmamaktadır.
                       </Typography>
-                    </Box>
-                  }
-                />
-              </Card>
+                    )}
+                  </Stack>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
           </Grid>
         </CardContent>

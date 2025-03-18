@@ -10,6 +10,7 @@ export interface WorkOrderCompany {
   email: string;
   mobile: string;
   address: string;
+  previousWorkOrders?: Omit<WorkOrder, 'company'>[];
 }
 
 export interface WorkOrderAssignee {
