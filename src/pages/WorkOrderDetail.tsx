@@ -65,6 +65,7 @@ import dayjs from 'dayjs';
 import { usePageTitle } from '../contexts/PageTitleContext';
 import { Service, ServiceCategory, serviceCategoryLabels } from '../types/service';
 import ServiceSelectionDialog from '../components/workOrders/ServiceSelectionDialog';
+import PartSelectionDialog from '../components/workOrders/PartSelectionDialog';
 import { WorkOrder, WorkOrderService, WorkOrderPart, WorkOrderStatus, WorkOrderType, WorkOrderCategory, WorkOrderPriority } from '../types/workOrder';
 import { alpha } from '@mui/material/styles';
 import SignaturePad from 'react-signature-canvas';
@@ -130,6 +131,8 @@ const WorkOrderDetail: React.FC = () => {
   const [localWorkOrder, setLocalWorkOrder] = useState<WorkOrder | null>(null);
   const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
   const [editedDuration, setEditedDuration] = useState<number>(0);
+  const [editingPartId, setEditingPartId] = useState<number | null>(null);
+  const [editedQuantity, setEditedQuantity] = useState<number>(0);
   const [serviceFormDialogOpen, setServiceFormDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<WorkOrderService | null>(null);
   const [formData, setFormData] = useState({
@@ -233,6 +236,31 @@ const WorkOrderDetail: React.FC = () => {
     setPartDialogOpen(true);
   };
 
+  const handlePartSelect = (selectedParts: WorkOrderPart[]) => {
+    if (localWorkOrder) {
+      // Mevcut parçalara yeni seçilenleri ekle
+      const updatedParts = [
+        ...localWorkOrder.parts,
+        ...selectedParts.filter(newPart => 
+          !localWorkOrder.parts.some((existingPart: WorkOrderPart) => existingPart.id === newPart.id)
+        )
+      ];
+
+      // Toplam tutarı hesapla
+      const totalAmount = localWorkOrder.services.reduce((total: number, service: WorkOrderService) => total + service.price, 0) + 
+        updatedParts.reduce((total: number, part: WorkOrderPart) => total + (part.quantity * part.unitPrice), 0);
+
+      // Local state'i güncelle
+      const updatedWorkOrder = {
+        ...localWorkOrder,
+        parts: updatedParts,
+        totalAmount: totalAmount,
+      };
+      setLocalWorkOrder(updatedWorkOrder);
+    }
+    setPartDialogOpen(false);
+  };
+
   const handlePartEdit = (part: WorkOrderPart) => {
     setSelectedPart(part);
     setPartDialogOpen(true);
@@ -262,6 +290,28 @@ const WorkOrderDetail: React.FC = () => {
       setLocalWorkOrder(updatedWorkOrder);
     }
     setPartDialogOpen(false);
+  };
+
+  const handlePartQuantitySave = (partId: number) => {
+    if (localWorkOrder && editedQuantity >= 0) {
+      const updatedParts = localWorkOrder.parts.map(part => 
+        part.id === partId 
+          ? { ...part, quantity: editedQuantity }
+          : part
+      );
+
+      // Toplam tutarı güncelle
+      const totalAmount = localWorkOrder.services.reduce((total: number, service: WorkOrderService) => total + service.price, 0) + 
+        updatedParts.reduce((total: number, part: WorkOrderPart) => total + (part.quantity * part.unitPrice), 0);
+
+      const updatedWorkOrder = {
+        ...localWorkOrder,
+        parts: updatedParts,
+        totalAmount: totalAmount,
+      };
+      setLocalWorkOrder(updatedWorkOrder);
+      setEditingPartId(null);
+    }
   };
 
   // Toplam süreyi hesapla
@@ -400,8 +450,8 @@ const WorkOrderDetail: React.FC = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', p: isMobile ? 1 : 3 }}>
-      <Card elevation={3}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', p: isMobile ? 0.5 : 1 }}>
+      <Card elevation={3} sx={{ m: 0 }}>
         <CardHeader
           avatar={
             <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -434,52 +484,52 @@ const WorkOrderDetail: React.FC = () => {
             </Typography>
           }
         />
-        <CardContent sx={{ p: isMobile ? 1 : 2 }}>
-          <Grid container spacing={isMobile ? 2 : 3}>
+        <CardContent sx={{ p: isMobile ? 0.5 : 2 }}>
+          <Grid container spacing={isMobile ? 0.5 : 3}>
             {/* Temel Bilgiler */}
             <Grid item xs={12} md={6}>
               <Card variant="outlined" sx={{ height: '100%' }}>
                 <CardHeader
                   avatar={<PersonIcon color="primary" />}
                   title="Firma Bilgileri"
-                  sx={{ pb: 0 }}
+                  sx={{ pb: 0, pt: isMobile ? 1 : 2 }}
                 />
-                <CardContent sx={{ pt: 1 }}>
+                <CardContent sx={{ pt: 0.5, pb: isMobile ? 0.5 : 1 }}>
                   <List disablePadding>
-                    <ListItem disablePadding sx={{ mb: 2 }}>
-                      <ListItemIcon>
-                        <PersonIcon color="action" />
+                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <PersonIcon color="action" fontSize="small" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="İletişim Kişisi"
-                        secondary={localWorkOrder.company.contactPerson}
+                        primary={<Typography variant="body2" color="text.secondary">İletişim Kişisi</Typography>}
+                        secondary={<Typography variant="body1">{localWorkOrder.company.contactPerson}</Typography>}
                       />
                     </ListItem>
-                    <ListItem disablePadding sx={{ mb: 2 }}>
-                      <ListItemIcon>
-                        <EmailIcon color="action" />
+                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <EmailIcon color="action" fontSize="small" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="E-posta"
-                        secondary={localWorkOrder.company.email}
+                        primary={<Typography variant="body2" color="text.secondary">E-posta</Typography>}
+                        secondary={<Typography variant="body1">{localWorkOrder.company.email}</Typography>}
                       />
                     </ListItem>
-                    <ListItem disablePadding sx={{ mb: 2 }}>
-                      <ListItemIcon>
-                        <PhoneIcon color="action" />
+                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <PhoneIcon color="action" fontSize="small" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Telefon"
-                        secondary={localWorkOrder.company.mobile}
+                        primary={<Typography variant="body2" color="text.secondary">Telefon</Typography>}
+                        secondary={<Typography variant="body1">{localWorkOrder.company.mobile}</Typography>}
                       />
                     </ListItem>
                     <ListItem disablePadding>
-                      <ListItemIcon>
-                        <LocationIcon color="action" />
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <LocationIcon color="action" fontSize="small" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Adres"
-                        secondary={localWorkOrder.company.address}
+                        primary={<Typography variant="body2" color="text.secondary">Adres</Typography>}
+                        secondary={<Typography variant="body1">{localWorkOrder.company.address}</Typography>}
                       />
                     </ListItem>
                   </List>
@@ -493,44 +543,44 @@ const WorkOrderDetail: React.FC = () => {
                 <CardHeader
                   avatar={<CategoryIcon color="primary" />}
                   title="İş Emri Detayları"
-                  sx={{ pb: 0 }}
+                  sx={{ pb: 0, pt: isMobile ? 1 : 2 }}
                 />
-                <CardContent sx={{ pt: 1 }}>
+                <CardContent sx={{ pt: 0.5, pb: isMobile ? 0.5 : 1 }}>
                   <List disablePadding>
-                    <ListItem disablePadding sx={{ mb: 2 }}>
-                      <ListItemIcon>
-                        <FlagIcon color="action" />
+                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <FlagIcon color="action" fontSize="small" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Tip"
-                        secondary={typeLabels[localWorkOrder.type as WorkOrderType]}
+                        primary={<Typography variant="body2" color="text.secondary">Tip</Typography>}
+                        secondary={<Typography variant="body1">{typeLabels[localWorkOrder.type as WorkOrderType]}</Typography>}
                       />
                     </ListItem>
-                    <ListItem disablePadding sx={{ mb: 2 }}>
-                      <ListItemIcon>
-                        <CategoryIcon color="action" />
+                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <CategoryIcon color="action" fontSize="small" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Kategori"
-                        secondary={categoryLabels[localWorkOrder.category as WorkOrderCategory]}
+                        primary={<Typography variant="body2" color="text.secondary">Kategori</Typography>}
+                        secondary={<Typography variant="body1">{categoryLabels[localWorkOrder.category as WorkOrderCategory]}</Typography>}
                       />
                     </ListItem>
-                    <ListItem disablePadding sx={{ mb: 2 }}>
-                      <ListItemIcon>
-                        <PriorityIcon color="action" />
+                    <ListItem disablePadding sx={{ mb: isMobile ? 0.5 : 1 }}>
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <PriorityIcon color="action" fontSize="small" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Öncelik"
-                        secondary={priorityLabels[localWorkOrder.priority as WorkOrderPriority]}
+                        primary={<Typography variant="body2" color="text.secondary">Öncelik</Typography>}
+                        secondary={<Typography variant="body1">{priorityLabels[localWorkOrder.priority as WorkOrderPriority]}</Typography>}
                       />
                     </ListItem>
                     <ListItem disablePadding>
-                      <ListItemIcon>
-                        <ScheduleIcon color="action" />
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <ScheduleIcon color="action" fontSize="small" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Son Tarih"
-                        secondary={dayjs(localWorkOrder.dueDate).format('DD.MM.YYYY HH:mm')}
+                        primary={<Typography variant="body2" color="text.secondary">Son Tarih</Typography>}
+                        secondary={<Typography variant="body1">{dayjs(localWorkOrder.dueDate).format('DD.MM.YYYY HH:mm')}</Typography>}
                       />
                     </ListItem>
                   </List>
@@ -816,58 +866,172 @@ const WorkOrderDetail: React.FC = () => {
               <Card variant="outlined">
                 <CardHeader
                   avatar={<PartIcon color="primary" />}
-                  title="Parçalar"
-                  action={
-                    <Button
-                      startIcon={<AddIcon />}
-                      onClick={handlePartAdd}
-                      color="primary"
-                    >
-                      Parça Ekle
-                    </Button>
+                  title={
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                      <Typography variant="h6">Parçalar</Typography>
+                      <Button
+                        startIcon={<AddIcon />}
+                        onClick={handlePartAdd}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                        sx={{ textTransform: 'none' }}
+                      >
+                        EKLE
+                      </Button>
+                    </Box>
                   }
                 />
                 <CardContent>
                   <Stack spacing={2}>
                     {localWorkOrder.parts.map((part) => (
-                      <Card key={part.id} variant="outlined">
-                        <CardContent>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <Box>
-                              <Typography variant="subtitle1" fontWeight="medium">
-                                {part.name}
-                              </Typography>
+                      <Box 
+                        key={part.id}
+                        sx={{
+                          p: 2,
+                          borderRadius: 1,
+                          bgcolor: 'background.paper',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          '&:hover': {
+                            borderColor: theme.palette.primary.main,
+                            bgcolor: alpha(theme.palette.primary.main, 0.05),
+                          }
+                        }}
+                      >
+                        <Box sx={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          mb: 1.5
+                        }}>
+                          <Box>
+                            <Typography variant="subtitle1" fontWeight="medium">
+                              {part.name}
+                            </Typography>
+                            <Typography 
+                              variant="body2" 
+                              color="text.secondary"
+                              sx={{ mt: 0.5 }}
+                            >
+                              {part.description}
+                            </Typography>
+                          </Box>
+                          <IconButton 
+                            size="small" 
+                            onClick={() => handlePartDelete(part.id)}
+                            color="error"
+                            sx={{
+                              opacity: 0.7,
+                              '&:hover': {
+                                opacity: 1,
+                                bgcolor: 'error.lighter'
+                              }
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                        <Box 
+                          sx={{ 
+                            display: 'flex', 
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            justifyContent: { xs: 'flex-start', sm: 'space-between' },
+                            gap: 1,
+                            mt: 1,
+                            pt: 1.5,
+                            borderTop: '1px solid',
+                            borderColor: 'divider',
+                            width: '100%'
+                          }}
+                        >
+                          <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 1,
+                            width: { xs: '100%', sm: 'auto' }
+                          }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Adet:
+                            </Typography>
+                            <TextField
+                              type="number"
+                              size="small"
+                              value={editingPartId === part.id ? editedQuantity : part.quantity}
+                              onChange={(e) => {
+                                if (editingPartId !== part.id) {
+                                  setEditingPartId(part.id);
+                                }
+                                setEditedQuantity(Number(e.target.value));
+                              }}
+                              onBlur={() => {
+                                if (editingPartId === part.id) {
+                                  handlePartQuantitySave(part.id);
+                                }
+                              }}
+                              inputProps={{ 
+                                min: 0,
+                                style: { 
+                                  width: '60px',
+                                  padding: '4px 8px',
+                                }
+                              }}
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  '& fieldset': {
+                                    borderColor: 'transparent',
+                                  },
+                                  '&:hover fieldset': {
+                                    borderColor: 'primary.main',
+                                  },
+                                  '&.Mui-focused fieldset': {
+                                    borderColor: 'primary.main',
+                                  },
+                                  bgcolor: 'background.paper',
+                                },
+                              }}
+                            />
+                            <Typography variant="body2" color="text.secondary">
+                              {part.unit}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ 
+                            display: 'flex', 
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+                            gap: 1,
+                            width: { xs: '100%', sm: 'auto' },
+                            mt: { xs: 1, sm: 0 }
+                          }}>
+                            <Box sx={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: 1 
+                            }}>
                               <Typography variant="body2" color="text.secondary">
-                                {part.description}
+                                Birim Fiyat:
                               </Typography>
-                              <Box sx={{ mt: 1, display: 'flex', gap: 2 }}>
-                                <Typography variant="body2">
-                                  {part.quantity} {part.unit}
-                                </Typography>
-                                <Typography variant="body2" fontWeight="medium">
-                                  {(part.unitPrice * part.quantity).toLocaleString('tr-TR')} ₺
-                                </Typography>
-                              </Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {part.unitPrice.toLocaleString('tr-TR')} ₺
+                              </Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                              <IconButton 
-                                size="small" 
-                                onClick={() => handlePartEdit(part)}
-                                color="primary"
-                              >
-                                <EditIcon />
-                              </IconButton>
-                              <IconButton 
-                                size="small" 
-                                onClick={() => handlePartDelete(part.id)}
-                                color="error"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
+                            <Box sx={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: 1 
+                            }}>
+                              <Typography variant="body2" color="text.secondary">
+                                Toplam:
+                              </Typography>
+                              <Typography variant="body2" fontWeight="medium" color="primary">
+                                {(part.unitPrice * part.quantity).toLocaleString('tr-TR')} ₺
+                              </Typography>
                             </Box>
                           </Box>
-                        </CardContent>
-                      </Card>
+                        </Box>
+                      </Box>
                     ))}
                   </Stack>
                 </CardContent>
@@ -917,66 +1081,12 @@ const WorkOrderDetail: React.FC = () => {
         onSelect={handleServiceSelect}
       />
 
-      {/* Parça Ekleme/Düzenleme Dialog */}
-      <Dialog 
-        open={partDialogOpen} 
+      {/* Parça Seçme Dialog */}
+      <PartSelectionDialog
+        open={partDialogOpen}
         onClose={() => setPartDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {selectedPart ? 'Parça Düzenle' : 'Yeni Parça Ekle'}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              label="Parça Adı"
-              fullWidth
-              defaultValue={selectedPart?.name}
-              required
-            />
-            <TextField
-              label="Açıklama"
-              fullWidth
-              multiline
-              rows={2}
-              defaultValue={selectedPart?.description}
-            />
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label="Miktar"
-                type="number"
-                defaultValue={selectedPart?.quantity}
-                required
-                sx={{ flex: 1 }}
-              />
-              <TextField
-                select
-                label="Birim"
-                defaultValue={selectedPart?.unit || 'adet'}
-                sx={{ flex: 1 }}
-              >
-                <MenuItem value="adet">Adet</MenuItem>
-                <MenuItem value="metre">Metre</MenuItem>
-                <MenuItem value="kg">Kilogram</MenuItem>
-                <MenuItem value="litre">Litre</MenuItem>
-              </TextField>
-            </Box>
-            <TextField
-              label="Birim Fiyat (₺)"
-              type="number"
-              defaultValue={selectedPart?.unitPrice}
-              required
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPartDialogOpen(false)}>İptal</Button>
-          <Button onClick={() => handlePartSave({})} variant="contained">
-            Kaydet
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onSelect={handlePartSelect}
+      />
 
       {/* Teknik Servis Form Dialog */}
       <Dialog

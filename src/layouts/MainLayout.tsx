@@ -110,7 +110,7 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: { xs: 0, sm: 3 },
           width: { sm: `calc(100% - ${desktopOpen ? DRAWER_WIDTH : 0}px)` },
           height: { xs: 'calc(100vh - 56px)', sm: 'calc(100vh - 64px)' },
           mt: { xs: '56px', sm: '64px' },
