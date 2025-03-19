@@ -1,4 +1,5 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem, IconButton, Typography, Box, Chip, Divider, Paper, ListSubheader } from '@mui/material';
+import { Add as AddIcon, Delete as DeleteIcon, DeviceThermostat as DeviceIcon } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Store, StoreFormData } from '../../types/store';
@@ -12,10 +13,83 @@ interface StoreDialogProps {
   mode: 'add' | 'edit' | 'view';
 }
 
+interface Device {
+  id: string;
+  name: string;
+  type: string;
+  serialNumber: string;
+  status: 'active' | 'warning' | 'error' | 'maintenance';
+  lastMaintenance: string;
+  nextMaintenance: string;
+}
+
 const statusOptions = [
   { value: 'active', label: 'Aktif' },
   { value: 'inactive', label: 'Pasif' },
   { value: 'maintenance', label: 'Bakımda' },
+];
+
+const deviceStatusOptions = [
+  { value: 'active', label: 'Aktif' },
+  { value: 'warning', label: 'Uyarı' },
+  { value: 'error', label: 'Hata' },
+  { value: 'maintenance', label: 'Bakımda' },
+];
+
+const deviceCategories = {
+  iklimlendirme: [
+    { value: 'split_klima', label: 'Split Klima' },
+    { value: 'vrf', label: 'VRF Sistemi' },
+    { value: 'fancoil', label: 'Fan Coil' }
+  ],
+  sogutma: [
+    { value: 'chiller', label: 'Chiller' },
+    { value: 'isi_pompasi', label: 'Isı Pompası' }
+  ],
+  havalandirma: [
+    { value: 'havalandirma', label: 'Havalandırma Sistemi' },
+    { value: 'rooftop', label: 'Rooftop' },
+    { value: 'nem_alici', label: 'Nem Alıcı' }
+  ]
+};
+
+const defaultDevices: Device[] = [
+  {
+    id: '1',
+    name: 'VRF Sistem A',
+    type: 'vrf',
+    serialNumber: 'VRF-2024-001',
+    status: 'active',
+    lastMaintenance: '2024-02-15',
+    nextMaintenance: '2024-05-15'
+  },
+  {
+    id: '2',
+    name: 'Chiller Ünitesi 1',
+    type: 'chiller',
+    serialNumber: 'CHL-2024-002',
+    status: 'active',
+    lastMaintenance: '2024-02-01',
+    nextMaintenance: '2024-05-01'
+  },
+  {
+    id: '3',
+    name: 'Havalandırma Sistemi',
+    type: 'havalandirma',
+    serialNumber: 'HVL-2024-003',
+    status: 'active',
+    lastMaintenance: '2024-03-01',
+    nextMaintenance: '2024-06-01'
+  },
+  {
+    id: '4',
+    name: 'Fan Coil Ünitesi A',
+    type: 'fancoil',
+    serialNumber: 'FCU-2024-004',
+    status: 'maintenance',
+    lastMaintenance: '2024-01-15',
+    nextMaintenance: '2024-04-15'
+  }
 ];
 
 export const StoreDialog = ({ open, onClose, onSubmit, store, mode }: StoreDialogProps) => {
@@ -26,7 +100,7 @@ export const StoreDialog = ({ open, onClose, onSubmit, store, mode }: StoreDialo
     view: 'Mağaza Detayları',
   }[mode];
 
-  const { control, handleSubmit, formState: { errors } } = useForm<StoreFormData>({
+  const { control, handleSubmit, formState: { errors }, register, watch, setValue } = useForm<StoreFormData>({
     resolver: zodResolver(storeSchema),
     defaultValues: store || {
       name: '',
@@ -38,184 +112,294 @@ export const StoreDialog = ({ open, onClose, onSubmit, store, mode }: StoreDialo
       status: 'active',
       manager: '',
       employeeCount: 1,
+      devices: defaultDevices,
     },
   });
 
+  const devices = watch('devices') || [];
+
+  const handleAddDevice = () => {
+    const newDevice: Device = {
+      id: Date.now().toString(),
+      name: '',
+      type: 'chiller',
+      serialNumber: '',
+      status: 'active',
+      lastMaintenance: new Date().toISOString().split('T')[0],
+      nextMaintenance: new Date().toISOString().split('T')[0],
+    };
+    setValue('devices', [...devices, newDevice]);
+  };
+
+  const handleRemoveDevice = (index: number) => {
+    const newDevices = [...devices];
+    newDevices.splice(index, 1);
+    setValue('devices', newDevices);
+  };
+
+  const handleDeviceChange = (index: number, field: keyof Device, value: any) => {
+    const newDevices = [...devices];
+    newDevices[index] = { ...newDevices[index], [field]: value };
+    setValue('devices', newDevices);
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{title}</DialogTitle>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent>
+      <DialogTitle>
+        {title}
+      </DialogTitle>
+      <DialogContent>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <Controller
-                name="name"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Mağaza Adı"
-                    fullWidth
-                    error={!!errors.name}
-                    helperText={errors.name?.message}
-                    disabled={isViewMode}
-                  />
-                )}
+              <TextField
+                fullWidth
+                label="Mağaza Adı"
+                {...register('name')}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Controller
-                name="email"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="E-posta"
-                    fullWidth
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
-                    disabled={isViewMode}
-                  />
-                )}
+              <TextField
+                fullWidth
+                label="E-posta"
+                {...register('email')}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Controller
-                name="phone"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Telefon"
-                    fullWidth
-                    error={!!errors.phone}
-                    helperText={errors.phone?.message}
-                    disabled={isViewMode}
-                  />
-                )}
+              <TextField
+                fullWidth
+                label="Telefon"
+                {...register('phone')}
+                error={!!errors.phone}
+                helperText={errors.phone?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Controller
-                name="region"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Bölge"
-                    fullWidth
-                    error={!!errors.region}
-                    helperText={errors.region?.message}
-                    disabled={isViewMode}
-                  />
-                )}
+              <TextField
+                fullWidth
+                label="Bölge"
+                {...register('region')}
+                error={!!errors.region}
+                helperText={errors.region?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Controller
-                name="company"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Şirket"
-                    fullWidth
-                    error={!!errors.company}
-                    helperText={errors.company?.message}
-                    disabled={isViewMode}
-                  />
-                )}
+              <TextField
+                fullWidth
+                label="Şirket"
+                {...register('company')}
+                error={!!errors.company}
+                helperText={errors.company?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Durum"
-                    fullWidth
-                    error={!!errors.status}
-                    helperText={errors.status?.message}
-                    disabled={isViewMode}
-                  >
-                    {statusOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
+              <TextField
+                fullWidth
+                label="Durum"
+                {...register('status')}
+                select
+                error={!!errors.status}
+                helperText={errors.status?.message}
+                disabled={mode === 'view'}
+              >
+                {statusOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Mağaza Yetkilisi"
+                {...register('manager')}
+                error={!!errors.manager}
+                helperText={errors.manager?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Controller
-                name="manager"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Yönetici"
-                    fullWidth
-                    error={!!errors.manager}
-                    helperText={errors.manager?.message}
-                    disabled={isViewMode}
-                  />
-                )}
+              <TextField
+                fullWidth
+                label="Yetkili Telefon"
+                {...register('managerPhone')}
+                error={!!errors.managerPhone}
+                helperText={errors.managerPhone?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Controller
-                name="employeeCount"
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <TextField
-                    {...field}
-                    type="number"
-                    value={value}
-                    onChange={(e) => onChange(Number(e.target.value))}
-                    label="Çalışan Sayısı"
-                    fullWidth
-                    error={!!errors.employeeCount}
-                    helperText={errors.employeeCount?.message}
-                    disabled={isViewMode}
-                  />
-                )}
+              <TextField
+                fullWidth
+                label="Çalışan Sayısı"
+                {...register('employeeCount')}
+                type="number"
+                error={!!errors.employeeCount}
+                helperText={errors.employeeCount?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
             <Grid item xs={12}>
-              <Controller
-                name="address"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Adres"
-                    fullWidth
-                    multiline
-                    rows={3}
-                    error={!!errors.address}
-                    helperText={errors.address?.message}
-                    disabled={isViewMode}
-                  />
-                )}
+              <TextField
+                fullWidth
+                label="Adres"
+                {...register('address')}
+                multiline
+                rows={3}
+                error={!!errors.address}
+                helperText={errors.address?.message}
+                disabled={mode === 'view'}
               />
             </Grid>
+
+            <Grid item xs={12}>
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6">
+                    Cihazlar ({devices.length})
+                  </Typography>
+                  {!isViewMode && (
+                    <Button
+                      startIcon={<AddIcon />}
+                      onClick={handleAddDevice}
+                      variant="outlined"
+                      size="small"
+                    >
+                      Cihaz Ekle
+                    </Button>
+                  )}
+                </Box>
+                <Divider />
+              </Box>
+
+              {devices.map((device, index) => (
+                <Paper 
+                  key={device.id} 
+                  sx={{ 
+                    p: 2, 
+                    mb: 2, 
+                    bgcolor: '#f8f9fa',
+                    border: '1px solid #e0e0e0'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="subtitle1" sx={{ display: 'flex', alignItems: 'center' }}>
+                      <DeviceIcon sx={{ mr: 1 }} />
+                      Cihaz #{index + 1}
+                    </Typography>
+                    {!isViewMode && (
+                      <IconButton 
+                        size="small" 
+                        color="error" 
+                        onClick={() => handleRemoveDevice(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
+                  </Box>
+
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Cihaz Adı"
+                        value={device.name}
+                        onChange={(e) => handleDeviceChange(index, 'name', e.target.value)}
+                        disabled={isViewMode}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Seri No"
+                        value={device.serialNumber}
+                        onChange={(e) => handleDeviceChange(index, 'serialNumber', e.target.value)}
+                        disabled={isViewMode}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        select
+                        label="Cihaz Tipi"
+                        value={device.type}
+                        onChange={(e) => handleDeviceChange(index, 'type', e.target.value)}
+                        disabled={isViewMode}
+                      >
+                        {Object.entries(deviceCategories).map(([category, devices]) => [
+                          <ListSubheader key={category}>{category.toUpperCase()}</ListSubheader>,
+                          ...devices.map(option => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))
+                        ])}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        select
+                        label="Durum"
+                        value={device.status}
+                        onChange={(e) => handleDeviceChange(index, 'status', e.target.value)}
+                        disabled={isViewMode}
+                      >
+                        {deviceStatusOptions.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        type="date"
+                        label="Son Bakım Tarihi"
+                        value={device.lastMaintenance}
+                        onChange={(e) => handleDeviceChange(index, 'lastMaintenance', e.target.value)}
+                        disabled={isViewMode}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        type="date"
+                        label="Sonraki Bakım Tarihi"
+                        value={device.nextMaintenance}
+                        onChange={(e) => handleDeviceChange(index, 'nextMaintenance', e.target.value)}
+                        disabled={isViewMode}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              ))}
+            </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>
-            {isViewMode ? 'Kapat' : 'İptal'}
-          </Button>
-          {!isViewMode && (
-            <Button type="submit" variant="contained" color="primary">
-              {mode === 'add' ? 'Ekle' : 'Güncelle'}
-            </Button>
+
+          {mode !== 'view' && (
+            <DialogActions>
+              <Button onClick={onClose}>İptal</Button>
+              <Button type="submit" variant="contained">
+                {mode === 'add' ? 'Ekle' : 'Güncelle'}
+              </Button>
+            </DialogActions>
           )}
-        </DialogActions>
-      </form>
+        </Box>
+      </DialogContent>
     </Dialog>
   );
 } 

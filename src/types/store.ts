@@ -10,6 +10,7 @@ export interface Store {
   company: string;
   status: StoreStatus;
   manager: string;
+  managerPhone: string;
   employeeCount: number;
   createdAt: string;
   updatedAt: string;
@@ -24,5 +25,6 @@ export interface StoreFormData {
   company: string;
   status: StoreStatus;
   manager: string;
+  managerPhone: string;
   employeeCount: number;
 } 

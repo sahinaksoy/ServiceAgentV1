@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { 
   Box, 
   AppBar, 
@@ -13,6 +13,7 @@ import {
   ChevronLeft as ChevronLeftIcon} from '@mui/icons-material';
 import { Sidebar } from '../components/navigation/Sidebar';
 import { PageTitleProvider, usePageTitle } from '../contexts/PageTitleContext';
+import { queryClient } from '../hooks/useUsers';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -35,6 +36,17 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
       setDesktopOpen(!desktopOpen);
     }
   };
+
+  useEffect(() => {
+    // Uygulama açılır açılmaz kullanıcı verilerini arka planda yükle
+    queryClient.prefetchQuery({
+      queryKey: ['users'],
+      queryFn: async () => {
+        const response = await fetch('/api/users');
+        return response.json();
+      },
+    });
+  }, []);
 
   return (
     <Box sx={{ 

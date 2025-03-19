@@ -1,18 +1,41 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query';
 import { User, UserFormData } from '../types/user';
 import { userAPI } from '../services/api';
 
+// QueryClient'ı configure edelim
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity, // Veriyi hep taze kabul et
+      cacheTime: Infinity, // Süresiz cache
+      refetchOnWindowFocus: false, // Sekme değişiminde yeniden yükleme yapma
+      refetchOnMount: false, // Komponent mount olduğunda yeniden yükleme yapma
+      retry: false, // Hata durumunda tekrar deneme
+    },
+  },
+});
+
 // Mock API calls
 
-
-
-
-
 export const useUsers = () => {
-  return useQuery<User[], Error>({
+  return useQuery({
     queryKey: ['users'],
-    queryFn: userAPI.getUsers,
-    staleTime: 0 // Her zaman yeni veri çek
+    queryFn: async () => {
+      const response = await fetch('/api/users');
+      if (!response.ok) {
+        throw new Error('Kullanıcılar yüklenirken bir hata oluştu');
+      }
+      return response.json();
+    },
+    // Ek optimizasyonlar
+    initialData: () => {
+      // Cache'de veri varsa onu kullan
+      return queryClient.getQueryData(['users']);
+    },
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 

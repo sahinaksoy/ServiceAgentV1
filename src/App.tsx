@@ -15,21 +15,11 @@ import Services from './pages/Services';
 import Parts from './pages/Parts';
 import { PageTitleProvider } from './contexts/PageTitleContext';
 import WorkOrderDetail from './pages/WorkOrderDetail';
+import { queryClient } from './hooks/useUsers';
+import Dashboard from './pages/dashboard/Dashboard';
 
 // DevExtreme CSS imports
 import 'devextreme/dist/css/dx.light.css';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: true,
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-      retry: 1,
-      staleTime: 0,
-    },
-  },
-});
 
 function App() {
   return (
@@ -45,7 +35,7 @@ function App() {
             <Router>
               <MainLayout>
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<Dashboard />} />
                   <Route path="/work-orders" element={<WorkOrderList />} />
                   <Route path="/work-orders/create" element={<CreateWorkOrder />} />
                   <Route path="/users" element={<UserList />} />

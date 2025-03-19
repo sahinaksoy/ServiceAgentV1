@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Box, Paper, Typography, IconButton, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Paper, Typography, IconButton, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
 import DataGrid, {
   Column,
   Paging,
@@ -78,19 +78,44 @@ const UserList = () => {
   }, []);
 
   if (error) {
-    return <Typography color="error">Bir hata oluştu: {error.message}</Typography>;
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography color="error">
+          Bir hata oluştu: {error.message}
+        </Typography>
+      </Box>
+    );
   }
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h5">Kullanıcı Yönetimi</Typography>
+        <Typography variant="h5">Kullanıcılar</Typography>
         <IconButton color="primary" onClick={handleAdd}>
           <AddIcon />
         </IconButton>
       </Box>
 
-      <Paper sx={{ flexGrow: 1, overflow: 'hidden' }}>
+      <Paper sx={{ flexGrow: 1, position: 'relative' }}>
+        {isLoading ? (
+          <Box 
+            sx={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              bgcolor: 'rgba(255, 255, 255, 0.7)',
+              zIndex: 1
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : null}
+
         <DataGrid
           dataSource={users || []}
           showBorders
@@ -102,27 +127,25 @@ const UserList = () => {
           noDataText="Kullanıcı bulunamadı"
           repaintChangesOnly={true}
         >
-          <LoadPanel enabled={isLoading} />
-          <Scrolling mode="virtual" rowRenderingMode="virtual" />
           <StateStoring enabled type="localStorage" storageKey="userListGridState" />
-          <Selection mode="single" />
           <FilterRow visible />
           <HeaderFilter visible />
           <ColumnChooser enabled />
-          <Export enabled />
           
           <Column dataField="firstName" caption="Ad" />
           <Column dataField="lastName" caption="Soyad" />
-          <Column dataField="email" caption="E-posta" visible={!isMobile} />
-          <Column dataField="phone" caption="Telefon" visible={!isMobile} />
+          <Column dataField="email" caption="E-posta" />
+          <Column dataField="phone" caption="Telefon" />
+          <Column dataField="roles" caption="Roller" />
+          <Column dataField="status" caption="Durum" />
           <Column dataField="region" caption="Bölge" />
           <Column dataField="company" caption="Şirket" />
-          <Column dataField="status" caption="Durum" />
+          
           <Column
             caption="İşlemler"
             width={120}
             alignment="center"
-            cellRender={(cell: any) => (
+            cellRender={(cell) => (
               <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                 <IconButton size="small" onClick={() => handleView(cell.data)}>
                   <ViewIcon fontSize="small" />
