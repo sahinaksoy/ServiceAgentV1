@@ -316,88 +316,98 @@ let stores: Store[] = [
 let workOrders: WorkOrder[] = [
   {
     id: 1,
-    summary: 'Klima bakım ve onarım',
+    summary: 'Klima Bakım ve Onarım',
     priority: 'high',
     type: 'maintenance',
     category: 'mechanical',
-    status: 'pool',
-    dueDate: dayjs().add(1, 'day').toISOString(),
-    createdAt: dayjs().subtract(2, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(2, 'hour').toISOString(),
-    company: {
-      id: '3',
-      name: 'Ataşehir Makro Migros',
-      contactPerson: 'Ali Yılmaz',
-      email: 'atasehir@migros.com.tr',
-      mobile: '5553456789',
-      address: 'Ataşehir Bulvarı, Ataşehir, İstanbul',
-      previousWorkOrders: [
-        {
-          id: 101,
-          summary: 'Klima bakımı',
-          priority: 'medium',
-          type: 'maintenance',
-          category: 'mechanical',
-          status: 'completed',
-          dueDate: dayjs().subtract(30, 'day').toISOString(),
-          createdAt: dayjs().subtract(35, 'day').toISOString(),
-          updatedAt: dayjs().subtract(29, 'day').toISOString(),
-          assignedTo: {
-            id: '1',
-            firstName: 'Ahmet',
-            lastName: 'Yıldız',
-            email: 'ahmet.yildiz@example.com',
-            status: 'active'
-          },
-          services: [
-            {
-              id: 156,
-              name: 'PERİYODİK BAKIM',
-              description: 'Klima periyodik bakımı',
-              duration: 180,
-              price: 1500,
-              status: 'completed'
-            }
-          ],
-          parts: [
-            {
-              id: 5,
-              name: 'Kuru Filtre',
-              description: 'Filtre değişimi',
-              quantity: 1,
-              unit: 'ADET',
-              unitPrice: 800
-            }
-          ],
-          totalAmount: 2300,
-          totalDuration: 180
-        }
-      ]
+    status: 'awaiting_approval',
+    dueDate: dayjs().add(2, 'day').toISOString(),
+    createdAt: dayjs().subtract(1, 'day').toISOString(),
+    updatedAt: dayjs().toISOString(),
+    company: customers[0],
+    assignedTo: {
+      id: '1',
+      firstName: 'Ahmet',
+      lastName: 'Yılmaz',
+      email: 'ahmet.yilmaz@example.com',
+      status: 'active'
     },
-    assignedTo: null,
-    services: [],
-    parts: [],
-    totalAmount: 0,
-    totalDuration: 0
+    services: [
+      {
+        id: 1,
+        name: 'Klima Bakım',
+        description: 'Periyodik klima bakımı',
+        duration: 2,
+        price: 1500,
+        hasServiceForm: true,
+        status: 'completed',
+        formData: {
+          genelGorunum: {
+            temizlik: true,
+            paslanma: false,
+            boyaBozulmasi: false,
+            fizikselHasar: false,
+            titresim: true,
+            sesliCalisma: true
+          },
+          merkeziSistem: {
+            marka: 'Mitsubishi',
+            model: 'X-2000',
+            seriNo: 'MIT123456',
+            kapasiteKcal: '24000',
+            uretimYili: '2022',
+            yakitTipi: 'Elektrik'
+          },
+          sistemGorunum: {
+            suBasinci: '2.4',
+            calismaSicakligi: '22',
+            donusSicakligi: '18',
+            bacaGaziSicakligi: 'N/A'
+          }
+        }
+      },
+      {
+        id: 2,
+        name: 'Filtre Değişimi',
+        description: 'Klima filtrelerinin değişimi',
+        duration: 1,
+        price: 500,
+        hasServiceForm: false,
+        status: 'completed'
+      }
+    ],
+    parts: [
+      {
+        id: 1,
+        name: 'Klima Filtresi',
+        description: 'Hepa Filtre',
+        unit: 'Adet',
+        quantity: 2,
+        unitPrice: 250
+      },
+      {
+        id: 2,
+        name: 'Temizlik Sıvısı',
+        description: 'Klima temizleme solüsyonu',
+        unit: 'Lt',
+        quantity: 1,
+        unitPrice: 150
+      }
+    ],
+    totalAmount: 2650,
+    totalDuration: 3
   },
   {
     id: 2,
-    summary: 'Elektrik tesisatı kontrolü',
-    priority: 'medium',
-    type: 'maintenance',
-    category: 'electrical',
-    status: 'pending',
-    dueDate: dayjs().add(5, 'day').toISOString(),
-    createdAt: dayjs().subtract(1, 'day').toISOString(),
-    updatedAt: dayjs().subtract(12, 'hour').toISOString(),
-    company: {
-      id: '4',
-      name: 'Levent 5M Migros',
-      contactPerson: 'Mehmet Demir',
-      email: 'levent@migros.com.tr',
-      mobile: '5557891234',
-      address: 'Levent Mah. Beşiktaş, İstanbul'
-    },
+    summary: 'Soğutma Sistemi Arıza Tespiti',
+    priority: 'high',
+    type: 'emergency',
+    category: 'mechanical',
+    status: 'awaiting_approval',
+    dueDate: dayjs().add(1, 'day').toISOString(),
+    createdAt: dayjs().subtract(2, 'hour').toISOString(),
+    updatedAt: dayjs().toISOString(),
+    company: customers[1],
     assignedTo: {
       id: '2',
       firstName: 'Ayşe',
@@ -407,40 +417,51 @@ let workOrders: WorkOrder[] = [
     },
     services: [
       {
-        id: 142,
-        name: 'PANO ARIZASI',
-        description: 'Elektrik pano kontrolü',
-        duration: 120,
-        price: 1000
-      },
-      {
-        id: 146,
-        name: 'TOPRAKLAMA KONTROLÜ',
-        description: 'Topraklama ölçümü ve kontrolü',
-        duration: 60,
-        price: 300
+        id: 3,
+        name: 'Arıza Tespiti',
+        description: 'Soğutma sistemi arıza tespiti',
+        duration: 1,
+        price: 750,
+        hasServiceForm: true,
+        status: 'completed',
+        formData: {
+          genelGorunum: {
+            temizlik: true,
+            paslanma: true,
+            boyaBozulmasi: false,
+            fizikselHasar: false,
+            titresim: false,
+            sesliCalisma: true
+          },
+          merkeziSistem: {
+            marka: 'Carrier',
+            model: 'C-500',
+            seriNo: 'CAR789012',
+            kapasiteKcal: '36000',
+            uretimYili: '2021',
+            yakitTipi: 'Elektrik'
+          },
+          sistemGorunum: {
+            suBasinci: '3.2',
+            calismaSicakligi: '25',
+            donusSicakligi: '20',
+            bacaGaziSicakligi: 'N/A'
+          }
+        }
       }
     ],
     parts: [
       {
-        id: 15,
-        name: 'Kontaklar',
-        description: 'Yeni kontaktör',
-        quantity: 2,
-        unit: 'ADET',
-        unitPrice: 150
-      },
-      {
-        id: 16,
-        name: 'Sigortalar',
-        description: 'Otomatik sigorta',
-        quantity: 3,
-        unit: 'ADET',
-        unitPrice: 100
+        id: 3,
+        name: 'Kompresör',
+        description: 'Soğutma sistemi kompresörü',
+        unit: 'Adet',
+        quantity: 1,
+        unitPrice: 3500
       }
     ],
-    totalAmount: 1900,
-    totalDuration: 180
+    totalAmount: 4250,
+    totalDuration: 1
   },
   {
     id: 3,

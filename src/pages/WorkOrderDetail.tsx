@@ -40,6 +40,8 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  FormControl,
+  Menu,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -71,6 +73,9 @@ import {
   Send as SendIcon,
   Timeline as TimelineIcon,
   Circle as CircleIcon,
+  MoreVert as MoreVertIcon,
+  PlayArrow as PlayArrowIcon,
+  Cancel as CancelIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import { usePageTitle } from '../contexts/PageTitleContext';
@@ -120,6 +125,7 @@ const statusLabels = {
   in_progress: 'Devam Ediyor',
   completed: 'Tamamlandı',
   cancelled: 'İptal',
+  awaiting_approval: 'Onay Bekliyor',
 } as const;
 
 const statusColors = {
@@ -128,6 +134,7 @@ const statusColors = {
   in_progress: 'primary',
   completed: 'success',
   cancelled: 'error',
+  awaiting_approval: 'secondary',
 } as const;
 
 // Durum seçenekleri için sabit tanımlayalım
@@ -252,73 +259,211 @@ const InfoListItem = ({ icon, value, isAddress = false }: { icon: React.ReactNod
   );
 };
 
-// Ana başlık bileşeni
-const PageHeader = ({ workOrder }: { workOrder: WorkOrder }) => (
-  <Box 
-    sx={{ 
-      mb: 3,
-      p: 2,
-      bgcolor: 'background.paper',
-      borderRadius: 2,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-    }}
-  >
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'flex-start',
-      gap: 2,
-    }}>
-      <Avatar 
-        sx={{ 
-          bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
-          color: 'primary.main',
-          width: 48,
-          height: 48
-        }}
-      >
-        <BusinessIcon />
-      </Avatar>
-      <Box sx={{ flex: 1 }}>
+interface PageHeaderProps {
+  workOrder: WorkOrder;
+  localWorkOrder: WorkOrder | null;
+  setLocalWorkOrder: (workOrder: WorkOrder | null) => void;
+  timelineEvents: TimelineEvent[];
+  setTimelineEvents: (events: TimelineEvent[]) => void;
+}
+
+const PageHeader: React.FC<PageHeaderProps> = ({ 
+  workOrder, 
+  localWorkOrder, 
+  setLocalWorkOrder, 
+  timelineEvents, 
+  setTimelineEvents 
+}) => {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleStatusChange = (event: SelectChangeEvent<string>) => {
+    const newStatus = event.target.value;
+    if (localWorkOrder) {
+      const updatedWorkOrder = {
+        ...localWorkOrder,
+        status: newStatus as WorkOrderStatus
+      };
+      setLocalWorkOrder(updatedWorkOrder);
+
+      let eventType: TimelineEventType = 'status_change';
+      let content = 'Durum güncellendi';
+
+      switch (newStatus) {
+        case 'in_progress':
+          eventType = 'start';
+          content = 'İşe başlandı';
+          break;
+        case 'completed':
+          eventType = 'complete';
+          content = 'İş tamamlandı';
+          break;
+        case 'cancelled':
+          content = 'İş emri iptal edildi';
+          break;
+      }
+
+      const newEvent: TimelineEvent = {
+        id: Date.now(),
+        type: eventType,
+        content: content,
+        timestamp: new Date().toISOString(),
+        user: {
+          id: 1,
+          name: 'Ahmet Yılmaz',
+          avatar: 'AY'
+        },
+        metadata: {
+          oldStatus: workOrder.status,
+          newStatus: newStatus as WorkOrderStatus
+        }
+      };
+      setTimelineEvents([...timelineEvents, newEvent]);
+    }
+  };
+
+  return (
+    <Box 
+      sx={{ 
+        mb: 3,
+        p: 2,
+        bgcolor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      }}
+    >
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        gap: 2,
+      }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'flex-start',
+          gap: 2,
+        }}>
+          <Avatar 
+            sx={{ 
+              bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+              color: 'primary.main',
+              width: 48,
+              height: 48
+            }}
+          >
+            <BusinessIcon />
+          </Avatar>
+          <Box sx={{ flex: 1 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 2,
+              mb: 0.5
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
+                  {workOrder.company.name}
+                </Typography>
+                <StatusChip status={workOrder.status as WorkOrderStatus} />
+              </Box>
+               
+            </Box>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+              {workOrder.summary}
+            </Typography>
+            {workOrder.assignedTo && (
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                mt: 1
+              }}>
+                <Avatar 
+                  sx={{ 
+                    width: 24, 
+                    height: 24, 
+                    fontSize: 14,
+                    bgcolor: 'primary.main'
+                  }}
+                >
+                  {workOrder.assignedTo.firstName[0]}
+                </Avatar>
+                <Typography variant="body2" color="text.secondary">
+                  {workOrder.assignedTo.firstName} {workOrder.assignedTo.lastName}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </Box>
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center',
           gap: 2,
-          mb: 0.5
+          pt: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider'
         }}>
-          <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
-            {workOrder.company.name}
-          </Typography>
-          <StatusChip status={workOrder.status as WorkOrderStatus} />
-        </Box>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-          {workOrder.summary}
-        </Typography>
-        {workOrder.assignedTo && (
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 1,
-            mt: 1
-          }}>
-            <Avatar 
-              sx={{ 
-                width: 24, 
-                height: 24, 
-                fontSize: 14,
-                bgcolor: 'primary.main'
+          <FormControl size="small" sx={{ minWidth: 200 }}>
+            <Select
+              value=""
+              displayEmpty
+              onChange={handleStatusChange}
+              renderValue={() => "Durum Değiştir"}
+              sx={{
+                '& .MuiSelect-select': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }
               }}
             >
-              {workOrder.assignedTo.firstName[0]}
-            </Avatar>
-            <Typography variant="body2" color="text.secondary">
-              {workOrder.assignedTo.firstName} {workOrder.assignedTo.lastName}
-            </Typography>
-          </Box>
-        )}
+              {workOrder.status === 'pending' && (
+                <MenuItem value="in_progress">
+                  <ListItemIcon>
+                    <PlayArrowIcon fontSize="small" color="success" />
+                  </ListItemIcon>
+                  <ListItemText>İşe Başla</ListItemText>
+                </MenuItem>
+              )}
+              {workOrder.status === 'in_progress' && (
+                <MenuItem value="awaiting_approval">
+                  <ListItemIcon>
+                    <CheckCircleIcon fontSize="small" color="success" />
+                  </ListItemIcon>
+                  <ListItemText>İşi Tamamla</ListItemText>
+                </MenuItem>
+              )}
+              {workOrder.status === 'awaiting_approval' && (
+                <MenuItem value="completed">
+                  <ListItemIcon>
+                    <CheckCircleIcon fontSize="small" color="success" />
+                  </ListItemIcon>
+                  <ListItemText>Onayla</ListItemText>
+                </MenuItem>
+              )}
+              {(workOrder.status === 'pending' || workOrder.status === 'in_progress' || workOrder.status === 'awaiting_approval') && (
+                <MenuItem value="cancelled">
+                  <ListItemIcon>
+                    <CancelIcon fontSize="small" color="error" />
+                  </ListItemIcon>
+                  <ListItemText>İptal Et</ListItemText>
+                </MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 // Timeline için tip tanımlamaları
 type TimelineEventType = 'status_change' | 'note' | 'start' | 'complete' | 'assign' | 'create';
@@ -895,7 +1040,13 @@ const WorkOrderDetail: React.FC = () => {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: isMobile ? 1 : 3 }}>
-      <PageHeader workOrder={localWorkOrder} />
+      <PageHeader
+        workOrder={localWorkOrder as WorkOrder}
+        localWorkOrder={localWorkOrder}
+        setLocalWorkOrder={setLocalWorkOrder}
+        timelineEvents={timelineEvents}
+        setTimelineEvents={setTimelineEvents}
+      />
       <Grid container spacing={isMobile ? 1 : 3}>
         {/* Firma Bilgileri */}
         <Grid item xs={12} md={6}>

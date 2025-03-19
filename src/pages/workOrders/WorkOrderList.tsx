@@ -105,6 +105,7 @@ const statusColors = {
   in_progress: 'primary',
   completed: 'success',
   cancelled: 'error',
+  awaiting_approval: 'secondary',
 } as const;
 
 const statusLabels = {
@@ -113,9 +114,10 @@ const statusLabels = {
   in_progress: 'Devam Ediyor',
   completed: 'Tamamlandı',
   cancelled: 'İptal',
+  awaiting_approval: 'Onay Bekliyor',
 } as const;
 
-type FilterType = 'all' | 'pool' | 'pending' | 'in_progress' | 'completed' | 'cancelled';
+type FilterType = 'all' | 'pool' | 'pending' | 'in_progress' | 'completed' | 'cancelled' | 'awaiting_approval';
 
 type SortOption = 'dueDate' | 'priority' | 'status' | 'category';
 
@@ -177,6 +179,8 @@ const WorkOrderList = () => {
         return workOrder.status === 'completed';
       case 'cancelled':
         return workOrder.status === 'cancelled';
+      case 'awaiting_approval':
+        return workOrder.status === 'awaiting_approval';
       default:
         return true;
     }
@@ -189,6 +193,7 @@ const WorkOrderList = () => {
     in_progress: workOrders.filter(wo => wo.status === 'in_progress').length,
     completed: workOrders.filter(wo => wo.status === 'completed').length,
     cancelled: workOrders.filter(wo => wo.status === 'cancelled').length,
+    awaiting_approval: workOrders.filter(wo => wo.status === 'awaiting_approval').length,
   };
 
   const handleCardMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, workOrderId: string) => {
@@ -400,6 +405,20 @@ const WorkOrderList = () => {
             }
             label={!isMobile && "Devam Ediyor"}
             value="in_progress"
+            iconPosition="start"
+          />
+          <Tab 
+            icon={
+              <Badge 
+                badgeContent={filterCounts.awaiting_approval} 
+                color="secondary"
+                sx={{ '& .MuiBadge-badge': { right: -3, top: -3 } }}
+              >
+                <PendingIcon />
+              </Badge>
+            }
+            label={!isMobile && "Onay Bekliyor"}
+            value="awaiting_approval"
             iconPosition="start"
           />
           <Tab 
