@@ -318,9 +318,9 @@ let workOrders: WorkOrder[] = [
     id: 1,
     summary: 'Klima bakım ve onarım',
     priority: 'high',
-    type: 'emergency',
+    type: 'maintenance',
     category: 'mechanical',
-    status: 'pending',
+    status: 'pool',
     dueDate: dayjs().add(1, 'day').toISOString(),
     createdAt: dayjs().subtract(2, 'hour').toISOString(),
     updatedAt: dayjs().subtract(2, 'hour').toISOString(),
@@ -351,120 +351,42 @@ let workOrders: WorkOrder[] = [
           },
           services: [
             {
-              id: 101,
-              name: 'Klima Bakımı',
-              description: 'Periyodik klima bakımı',
-              duration: 120,
-              price: 750,
-              status: 'completed'
-            }
-          ],
-          parts: [
-            {
-              id: 101,
-              name: 'Klima Filtresi',
-              description: 'Hepa Filtre',
-              quantity: 2,
-              unit: 'adet',
-              unitPrice: 150
-            }
-          ],
-          totalAmount: 1050,
-          totalDuration: 120
-        },
-        {
-          id: 102,
-          summary: 'Soğutucu tamiri',
-          priority: 'high',
-          type: 'emergency',
-          category: 'mechanical',
-          status: 'completed',
-          dueDate: dayjs().subtract(15, 'day').toISOString(),
-          createdAt: dayjs().subtract(16, 'day').toISOString(),
-          updatedAt: dayjs().subtract(14, 'day').toISOString(),
-          assignedTo: {
-            id: '2',
-            firstName: 'Ayşe',
-            lastName: 'Demir',
-            email: 'ayse.demir@example.com',
-            status: 'active'
-          },
-          services: [
-            {
-              id: 102,
-              name: 'Soğutucu Tamiri',
-              description: 'Acil soğutucu arıza tamiri',
+              id: 156,
+              name: 'PERİYODİK BAKIM',
+              description: 'Klima periyodik bakımı',
               duration: 180,
-              price: 1200,
+              price: 1500,
               status: 'completed'
             }
           ],
           parts: [
             {
-              id: 102,
-              name: 'Kompresör',
-              description: 'Soğutucu kompresörü',
+              id: 5,
+              name: 'Kuru Filtre',
+              description: 'Filtre değişimi',
               quantity: 1,
-              unit: 'adet',
-              unitPrice: 2500
+              unit: 'ADET',
+              unitPrice: 800
             }
           ],
-          totalAmount: 3700,
+          totalAmount: 2300,
           totalDuration: 180
         }
       ]
     },
-    assignedTo: {
-      id: '1',
-      firstName: 'Ahmet',
-      lastName: 'Yılmaz',
-      email: 'ahmet.yilmaz@example.com',
-      status: 'active'
-    },
-    services: [
-      {
-        id: 1,
-        name: 'Klima Genel Kontrol',
-        description: 'Klima sisteminin genel kontrolü ve temizliği',
-        duration: 60,
-        price: 750
-      },
-      {
-        id: 2,
-        name: 'Kompresör Bakımı',
-        description: 'Klima kompresörünün bakımı ve yağ kontrolü',
-        duration: 90,
-        price: 1200
-      }
-    ],
-    parts: [
-      {
-        id: 1,
-        name: 'Klima Filtresi',
-        description: 'Yüksek performanslı hava filtresi',
-        quantity: 2,
-        unit: 'adet',
-        unitPrice: 250
-      },
-      {
-        id: 2,
-        name: 'Kompresör Yağı',
-        description: 'Özel klima kompresör yağı',
-        quantity: 1,
-        unit: 'litre',
-        unitPrice: 300
-      }
-    ],
-    totalAmount: 2750,
-    totalDuration: 150
+    assignedTo: null,
+    services: [],
+    parts: [],
+    totalAmount: 0,
+    totalDuration: 0
   },
   {
     id: 2,
-    summary: 'Elektrik tesisatı yenileme',
+    summary: 'Elektrik tesisatı kontrolü',
     priority: 'medium',
-    type: 'renovation',
+    type: 'maintenance',
     category: 'electrical',
-    status: 'in_progress',
+    status: 'pending',
     dueDate: dayjs().add(5, 'day').toISOString(),
     createdAt: dayjs().subtract(1, 'day').toISOString(),
     updatedAt: dayjs().subtract(12, 'hour').toISOString(),
@@ -485,59 +407,51 @@ let workOrders: WorkOrder[] = [
     },
     services: [
       {
-        id: 3,
-        name: 'Kablo Döşeme',
-        description: 'Yeni elektrik kablolarının döşenmesi',
-        duration: 240,
-        price: 3500
+        id: 142,
+        name: 'PANO ARIZASI',
+        description: 'Elektrik pano kontrolü',
+        duration: 120,
+        price: 1000
       },
       {
-        id: 4,
-        name: 'Pano Montajı',
-        description: 'Yeni elektrik panosunun montajı',
-        duration: 120,
-        price: 2000
+        id: 146,
+        name: 'TOPRAKLAMA KONTROLÜ',
+        description: 'Topraklama ölçümü ve kontrolü',
+        duration: 60,
+        price: 300
       }
     ],
     parts: [
       {
-        id: 3,
-        name: 'NYM Kablo',
-        description: '3x2.5 NYM Kablo',
-        quantity: 100,
-        unit: 'metre',
-        unitPrice: 15
+        id: 15,
+        name: 'Kontaklar',
+        description: 'Yeni kontaktör',
+        quantity: 2,
+        unit: 'ADET',
+        unitPrice: 150
       },
       {
-        id: 4,
-        name: 'Elektrik Panosu',
-        description: '24 Sigortalı Elektrik Panosu',
-        quantity: 1,
-        unit: 'adet',
-        unitPrice: 1800
-      },
-      {
-        id: 5,
-        name: 'Sigorta',
-        description: '16A Otomatik Sigorta',
-        quantity: 12,
-        unit: 'adet',
-        unitPrice: 45
+        id: 16,
+        name: 'Sigortalar',
+        description: 'Otomatik sigorta',
+        quantity: 3,
+        unit: 'ADET',
+        unitPrice: 100
       }
     ],
-    totalAmount: 8840,
-    totalDuration: 360
+    totalAmount: 1900,
+    totalDuration: 180
   },
   {
     id: 3,
-    summary: 'Periyodik soğutucu bakımı',
-    priority: 'low',
-    type: 'maintenance',
+    summary: 'Soğutma sistemi arızası',
+    priority: 'high',
+    type: 'emergency',
     category: 'mechanical',
-    status: 'completed',
-    dueDate: dayjs().subtract(1, 'day').toISOString(),
-    createdAt: dayjs().subtract(3, 'day').toISOString(),
-    updatedAt: dayjs().subtract(1, 'day').toISOString(),
+    status: 'in_progress',
+    dueDate: dayjs().add(1, 'day').toISOString(),
+    createdAt: dayjs().subtract(6, 'hour').toISOString(),
+    updatedAt: dayjs().subtract(1, 'hour').toISOString(),
     company: {
       id: '5',
       name: 'Beylikdüzü MM Migros',
@@ -555,27 +469,44 @@ let workOrders: WorkOrder[] = [
     },
     services: [
       {
-        id: 5,
-        name: 'Soğutucu Bakımı',
-        description: 'Periyodik soğutucu bakımı ve temizlik',
-        duration: 120,
-        price: 1500
+        id: 143,
+        name: 'BENMARİ ARIZASI',
+        description: 'Soğutma sistemi onarımı',
+        duration: 90,
+        price: 500
       }
     ],
-    parts: [],
-    totalAmount: 1500,
-    totalDuration: 120
+    parts: [
+      {
+        id: 1,
+        name: 'Kompresör',
+        description: 'Yeni kompresör',
+        quantity: 1,
+        unit: 'ADET',
+        unitPrice: 15000
+      },
+      {
+        id: 11,
+        name: 'Soğutucu Gaz',
+        description: 'R404a gaz',
+        quantity: 2,
+        unit: 'KILOGRAM',
+        unitPrice: 150
+      }
+    ],
+    totalAmount: 15800,
+    totalDuration: 90
   },
   {
     id: 4,
-    summary: 'Acil aydınlatma arızası',
-    priority: 'high',
-    type: 'emergency',
-    category: 'electrical',
-    status: 'cancelled',
-    dueDate: dayjs().subtract(2, 'day').toISOString(),
+    summary: 'Yıllık bakım kontrolü',
+    priority: 'low',
+    type: 'maintenance',
+    category: 'mechanical',
+    status: 'completed',
+    dueDate: dayjs().subtract(1, 'day').toISOString(),
     createdAt: dayjs().subtract(2, 'day').toISOString(),
-    updatedAt: dayjs().subtract(2, 'day').toISOString(),
+    updatedAt: dayjs().subtract(1, 'day').toISOString(),
     company: {
       id: '6',
       name: 'Bakırköy 3M Migros',
@@ -584,21 +515,52 @@ let workOrders: WorkOrder[] = [
       mobile: '5558765432',
       address: 'Bakırköy Mah. Bakırköy, İstanbul'
     },
-    assignedTo: null,
-    services: [],
-    parts: [],
-    totalAmount: 0,
-    totalDuration: 0
+    assignedTo: {
+      id: '1',
+      firstName: 'Ahmet',
+      lastName: 'Yılmaz',
+      email: 'ahmet.yilmaz@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 156,
+        name: 'PERİYODİK BAKIM',
+        description: 'Yıllık genel bakım',
+        duration: 180,
+        price: 1500
+      }
+    ],
+    parts: [
+      {
+        id: 5,
+        name: 'Kuru Filtre',
+        description: 'Filtre değişimi',
+        quantity: 2,
+        unit: 'ADET',
+        unitPrice: 800
+      },
+      {
+        id: 14,
+        name: 'Yağ',
+        description: 'Kompresör yağı',
+        quantity: 3,
+        unit: 'LITRE',
+        unitPrice: 250
+      }
+    ],
+    totalAmount: 3850,
+    totalDuration: 180
   },
   {
     id: 5,
-    summary: 'Yeni soğutma sistemi kurulumu',
+    summary: 'Aydınlatma sistemi yenileme',
     priority: 'medium',
-    type: 'investment',
-    category: 'mechanical',
-    status: 'pending',
-    dueDate: dayjs().add(10, 'day').toISOString(),
-    createdAt: dayjs().subtract(1, 'day').toISOString(),
+    type: 'renovation',
+    category: 'electrical',
+    status: 'cancelled',
+    dueDate: dayjs().add(7, 'day').toISOString(),
+    createdAt: dayjs().subtract(3, 'day').toISOString(),
     updatedAt: dayjs().subtract(1, 'day').toISOString(),
     company: {
       id: '7',
@@ -607,6 +569,96 @@ let workOrders: WorkOrder[] = [
       email: 'maltepe@migros.com.tr',
       mobile: '5554567890',
       address: 'Maltepe Mah. Maltepe, İstanbul'
+    },
+    assignedTo: null,
+    services: [],
+    parts: [],
+    totalAmount: 0,
+    totalDuration: 0
+  },
+  {
+    id: 6,
+    summary: 'Kompresör değişimi',
+    priority: 'high',
+    type: 'emergency',
+    category: 'mechanical',
+    status: 'pool',
+    dueDate: dayjs().add(1, 'day').toISOString(),
+    createdAt: dayjs().subtract(4, 'hour').toISOString(),
+    updatedAt: dayjs().subtract(4, 'hour').toISOString(),
+    company: {
+      id: '8',
+      name: 'Üsküdar MM Migros',
+      contactPerson: 'Mustafa Özkan',
+      email: 'uskudar@migros.com.tr',
+      mobile: '5556789012',
+      address: 'Üsküdar Mah. Üsküdar, İstanbul'
+    },
+    assignedTo: null,
+    services: [],
+    parts: [],
+    totalAmount: 0,
+    totalDuration: 0
+  },
+  {
+    id: 7,
+    summary: 'Elektrik panosu bakımı',
+    priority: 'medium',
+    type: 'maintenance',
+    category: 'electrical',
+    status: 'pending',
+    dueDate: dayjs().add(3, 'day').toISOString(),
+    createdAt: dayjs().subtract(1, 'day').toISOString(),
+    updatedAt: dayjs().subtract(1, 'day').toISOString(),
+    company: {
+      id: '9',
+      name: 'Şişli 3M Migros',
+      contactPerson: 'Ayşe Yıldız',
+      email: 'sisli@migros.com.tr',
+      mobile: '5550123456',
+      address: 'Şişli Mah. Şişli, İstanbul',
+      previousWorkOrders: [
+        {
+          id: 102,
+          summary: 'Elektrik arızası',
+          priority: 'high',
+          type: 'emergency',
+          category: 'electrical',
+          status: 'completed',
+          dueDate: dayjs().subtract(15, 'day').toISOString(),
+          createdAt: dayjs().subtract(16, 'day').toISOString(),
+          updatedAt: dayjs().subtract(15, 'day').toISOString(),
+          assignedTo: {
+            id: '2',
+            firstName: 'Ayşe',
+            lastName: 'Demir',
+            email: 'ayse.demir@example.com',
+            status: 'active'
+          },
+          services: [
+            {
+              id: 142,
+              name: 'PANO ARIZASI',
+              description: 'Acil pano arızası müdahalesi',
+              duration: 120,
+              price: 1000,
+              status: 'completed'
+            }
+          ],
+          parts: [
+            {
+              id: 15,
+              name: 'Kontaklar',
+              description: 'Kontaktör değişimi',
+              quantity: 1,
+              unit: 'ADET',
+              unitPrice: 150
+            }
+          ],
+          totalAmount: 1150,
+          totalDuration: 120
+        }
+      ]
     },
     assignedTo: {
       id: '2',
@@ -617,48 +669,159 @@ let workOrders: WorkOrder[] = [
     },
     services: [
       {
-        id: 6,
-        name: 'Sistem Kurulumu',
-        description: 'Yeni soğutma sistemi kurulumu',
-        duration: 480,
-        price: 8500
-      },
-      {
-        id: 7,
-        name: 'Test ve Devreye Alma',
-        description: 'Sistemin test edilmesi ve devreye alınması',
-        duration: 240,
-        price: 3500
+        id: 142,
+        name: 'PANO ARIZASI',
+        description: 'Elektrik panosu bakımı',
+        duration: 120,
+        price: 1000
       }
     ],
     parts: [
       {
-        id: 6,
-        name: 'Soğutma Ünitesi',
-        description: 'Endüstriyel tip soğutma ünitesi',
-        quantity: 1,
-        unit: 'adet',
-        unitPrice: 25000
-      },
-      {
-        id: 7,
-        name: 'Bakır Boru Seti',
-        description: 'Soğutma sistemi bakır boru seti',
-        quantity: 1,
-        unit: 'set',
-        unitPrice: 4500
-      },
-      {
-        id: 8,
-        name: 'İzolasyon Malzemesi',
-        description: 'Boru izolasyon malzemesi',
-        quantity: 50,
-        unit: 'metre',
-        unitPrice: 35
+        id: 16,
+        name: 'Sigortalar',
+        description: 'Sigorta değişimi',
+        quantity: 4,
+        unit: 'ADET',
+        unitPrice: 100
       }
     ],
-    totalAmount: 43250,
-    totalDuration: 720
+    totalAmount: 1400,
+    totalDuration: 120
+  },
+  {
+    id: 8,
+    summary: 'Soğuk hava deposu iyileştirme',
+    priority: 'medium',
+    type: 'renovation',
+    category: 'mechanical',
+    status: 'in_progress',
+    dueDate: dayjs().add(5, 'day').toISOString(),
+    createdAt: dayjs().subtract(2, 'day').toISOString(),
+    updatedAt: dayjs().subtract(6, 'hour').toISOString(),
+    company: {
+      id: '10',
+      name: 'Beşiktaş MM Migros',
+      contactPerson: 'Mehmet Yılmaz',
+      email: 'besiktas@migros.com.tr',
+      mobile: '5559012345',
+      address: 'Beşiktaş Mah. Beşiktaş, İstanbul'
+    },
+    assignedTo: {
+      id: '1',
+      firstName: 'Ahmet',
+      lastName: 'Yılmaz',
+      email: 'ahmet.yilmaz@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 156,
+        name: 'PERİYODİK BAKIM',
+        description: 'Soğuk hava deposu bakımı',
+        duration: 180,
+        price: 1500
+      }
+    ],
+    parts: [
+      {
+        id: 2,
+        name: 'Kondenser',
+        description: 'Yeni kondenser',
+        quantity: 1,
+        unit: 'ADET',
+        unitPrice: 8000
+      },
+      {
+        id: 12,
+        name: 'Bakır Boru',
+        description: 'Bakır boru tesisatı',
+        quantity: 10,
+        unit: 'METRE',
+        unitPrice: 200
+      },
+      {
+        id: 13,
+        name: 'İzolasyon Malzemesi',
+        description: 'Boru izolasyonu',
+        quantity: 12,
+        unit: 'METRE',
+        unitPrice: 80
+      }
+    ],
+    totalAmount: 11460,
+    totalDuration: 180
+  },
+  {
+    id: 9,
+    summary: 'UPS sistemi kurulumu',
+    priority: 'high',
+    type: 'investment',
+    category: 'electrical',
+    status: 'completed',
+    dueDate: dayjs().subtract(1, 'day').toISOString(),
+    createdAt: dayjs().subtract(5, 'day').toISOString(),
+    updatedAt: dayjs().subtract(1, 'day').toISOString(),
+    company: {
+      id: '1',
+      name: 'Beşiktaş MM Migros',
+      contactPerson: 'Mehmet Yılmaz',
+      email: 'besiktas@migros.com.tr',
+      mobile: '5559012345',
+      address: 'Beşiktaş Mah. Beşiktaş, İstanbul'
+    },
+    assignedTo: {
+      id: '2',
+      firstName: 'Ayşe',
+      lastName: 'Demir',
+      email: 'ayse.demir@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 148,
+        name: 'HAT ÇEKİMİ(KUVVETLİ AKIM)',
+        description: 'UPS güç hattı çekimi',
+        duration: 180,
+        price: 1500
+      }
+    ],
+    parts: [
+      {
+        id: 17,
+        name: 'Kablolar',
+        description: 'UPS güç kablosu',
+        quantity: 50,
+        unit: 'METRE',
+        unitPrice: 50
+      }
+    ],
+    totalAmount: 4000,
+    totalDuration: 180
+  },
+  {
+    id: 10,
+    summary: 'Havalandırma sistemi arızası',
+    priority: 'high',
+    type: 'emergency',
+    category: 'mechanical',
+    status: 'cancelled',
+    dueDate: dayjs().add(1, 'day').toISOString(),
+    createdAt: dayjs().subtract(8, 'hour').toISOString(),
+    updatedAt: dayjs().subtract(6, 'hour').toISOString(),
+    company: {
+      id: '2',
+      name: 'Şişli 3M Migros',
+      contactPerson: 'Ayşe Yıldız',
+      email: 'sisli@migros.com.tr',
+      mobile: '5550123456',
+      address: 'Şişli Mah. Şişli, İstanbul'
+    },
+    assignedTo: null,
+    services: [],
+    parts: [],
+    totalAmount: 0,
+    totalDuration: 0
   }
 ];
 

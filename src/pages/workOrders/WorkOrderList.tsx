@@ -100,6 +100,7 @@ const categoryLabels = {
 } as const;
 
 const statusColors = {
+  pool: 'info',
   pending: 'warning',
   in_progress: 'primary',
   completed: 'success',
@@ -107,13 +108,14 @@ const statusColors = {
 } as const;
 
 const statusLabels = {
+  pool: 'Havuz',
   pending: 'Beklemede',
   in_progress: 'Devam Ediyor',
   completed: 'Tamamlandı',
   cancelled: 'İptal',
 } as const;
 
-type FilterType = 'all' | 'pending' | 'in_progress' | 'completed' | 'cancelled';
+type FilterType = 'all' | 'pool' | 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
 type SortOption = 'dueDate' | 'priority' | 'status' | 'category';
 
@@ -165,6 +167,8 @@ const WorkOrderList = () => {
 
   const filteredWorkOrders = workOrders.filter(workOrder => {
     switch (currentFilter) {
+      case 'pool':
+        return workOrder.status === 'pool';
       case 'pending':
         return workOrder.status === 'pending';
       case 'in_progress':
@@ -180,6 +184,7 @@ const WorkOrderList = () => {
 
   const filterCounts = {
     all: workOrders.length,
+    pool: workOrders.filter(wo => wo.status === 'pool').length,
     pending: workOrders.filter(wo => wo.status === 'pending').length,
     in_progress: workOrders.filter(wo => wo.status === 'in_progress').length,
     completed: workOrders.filter(wo => wo.status === 'completed').length,
@@ -353,6 +358,20 @@ const WorkOrderList = () => {
             }
             label={!isMobile && "Tümü"}
             value="all"
+            iconPosition="start"
+          />
+          <Tab 
+            icon={
+              <Badge 
+                badgeContent={filterCounts.pool} 
+                color="info"
+                sx={{ '& .MuiBadge-badge': { right: -3, top: -3 } }}
+              >
+                <ListIcon />
+              </Badge>
+            }
+            label={!isMobile && "Havuz"}
+            value="pool"
             iconPosition="start"
           />
           <Tab 

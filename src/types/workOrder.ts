@@ -1,7 +1,7 @@
 export type WorkOrderPriority = 'high' | 'medium' | 'low';
 export type WorkOrderType = 'emergency' | 'maintenance' | 'renovation' | 'additional' | 'investment';
 export type WorkOrderCategory = 'mechanical' | 'electrical';
-export type WorkOrderStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
+export type WorkOrderStatus = 'pool' | 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
 export interface WorkOrderCompany {
   id: string;

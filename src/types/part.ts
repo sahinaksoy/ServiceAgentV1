@@ -1,9 +1,9 @@
 export enum PartUnit {
-  PIECE = 'PIECE',
+  ADET = 'ADET',
   KILOGRAM = 'KILOGRAM',
-  CUBIC_METER = 'CUBIC_METER',
-  METER = 'METER',
-  LITER = 'LITER'
+  METREKUP = 'METREKUP',
+  METRE = 'METRE',
+  LITRE = 'LITRE'
 }
 
 export enum PartStatus {
@@ -23,11 +23,11 @@ export interface Part {
 }
 
 export const partUnitLabels: Record<PartUnit, string> = {
-  [PartUnit.PIECE]: 'Adet',
+  [PartUnit.ADET]: 'Adet',
   [PartUnit.KILOGRAM]: 'Kilogram',
-  [PartUnit.CUBIC_METER]: 'Metreküp',
-  [PartUnit.METER]: 'Metre',
-  [PartUnit.LITER]: 'Litre'
+  [PartUnit.METREKUP]: 'Metreküp',
+  [PartUnit.METRE]: 'Metre',
+  [PartUnit.LITRE]: 'Litre'
 };
 
 export const partStatusLabels: Record<PartStatus, string> = {

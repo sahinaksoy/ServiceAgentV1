@@ -115,15 +115,17 @@ const categoryLabels = {
 } as const;
 
 const statusLabels = {
-  pending: 'Bekliyor',
+  pool: 'Havuz',
+  pending: 'Beklemede',
   in_progress: 'Devam Ediyor',
   completed: 'Tamamlandı',
-  cancelled: 'İptal Edildi',
+  cancelled: 'İptal',
 } as const;
 
 const statusColors = {
+  pool: 'info',
   pending: 'warning',
-  in_progress: 'info',
+  in_progress: 'primary',
   completed: 'success',
   cancelled: 'error',
 } as const;
@@ -876,7 +878,7 @@ const WorkOrderDetail: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
+  return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
         <Typography>Yükleniyor...</Typography>
       </Box>
@@ -1434,13 +1436,6 @@ const WorkOrderDetail: React.FC = () => {
                   }}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <CloudUploadIcon 
-                    sx={{ 
-                      fontSize: 48,
-                      color: 'text.secondary',
-                      mb: 2
-                    }} 
-                  />
                   <Typography color="text.secondary">
                     Dosya yüklemek için tıklayın veya sürükleyip bırakın
                   </Typography>
@@ -1482,9 +1477,11 @@ const WorkOrderDetail: React.FC = () => {
                 width: '100%'
               }}>
                 <AccessTimeIcon color="primary" />
-                <Typography variant="h6" sx={{ flex: 1 }}>
-                  Geçmiş İş Emirleri
-                </Typography>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h6">
+                    Geçmiş İş Emirleri
+                  </Typography>
+                </Box>
                 <Chip 
                   label={`${localWorkOrder.company.previousWorkOrders?.length || 0} Kayıt`}
                   size="small"
@@ -1589,98 +1586,144 @@ const WorkOrderDetail: React.FC = () => {
 
         {/* Timeline */}
         <Grid item xs={12}>
-          <CardContainer
-            icon={<TimelineIcon />}
-            title="Zaman Çizelgesi"
+          <Accordion 
+            defaultExpanded={false}
+            sx={{
+              borderRadius: 2,
+              '&:before': {
+                display: 'none',
+              },
+              '& .MuiAccordionSummary-root': {
+                borderRadius: 2,
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                }
+              }
+            }}
           >
-            <Box sx={{ mb: 2 }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{
+                backgroundColor: 'background.paper',
+                borderBottom: '1px solid',
+                borderColor: 'divider'
+              }}
+            >
               <Box sx={{ 
                 display: 'flex', 
-                gap: 1,
-                mb: 3
+                alignItems: 'center', 
+                gap: 2,
+                width: '100%'
               }}>
-                <TextField
-                  fullWidth
+                <TimelineIcon color="primary" />
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h6">
+                    Zaman Çizelgesi
+                  </Typography>
+                  {timelineEvents.length > 0 && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                      Son Aksiyon: {dayjs(timelineEvents[timelineEvents.length - 1].timestamp).format('DD.MM.YYYY HH:mm')} - {timelineEvents[timelineEvents.length - 1].user.name}
+                    </Typography>
+                  )}
+                </Box>
+                <Chip 
+                  label={`${timelineEvents.length} Kayıt`}
                   size="small"
-                  placeholder="Not ekle..."
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleAddNote();
-                    }
-                  }}
+                  color="primary"
+                  variant="outlined"
                 />
-                <Button
-                  variant="contained"
-                  onClick={handleAddNote}
-                  disabled={!newNote.trim()}
-                  sx={{
-                    minWidth: 'auto',
-                    px: 2
-                  }}
-                >
-                  <SendIcon />
-                </Button>
               </Box>
-              <Timeline>
-                {timelineEvents.map((event) => {
-                  const config = getTimelineConfig(event.type);
-                  return (
-                    <TimelineItem key={event.id}>
-                      <TimelineOppositeContent sx={{ flex: 0.2 }}>
-                        <Typography variant="caption" color="text.secondary">
-                          {dayjs(event.timestamp).format('DD.MM.YYYY HH:mm')}
-                        </Typography>
-                      </TimelineOppositeContent>
-                      <TimelineSeparator>
-                        <TimelineDot color={config.color}>
-                          {config.icon}
-                        </TimelineDot>
-                        <TimelineConnector />
-                      </TimelineSeparator>
-                      <TimelineContent>
-                        <Box sx={{ 
-                          display: 'flex', 
-                          alignItems: 'flex-start',
-                          gap: 1
-                        }}>
-                          <Box>
-                            <Typography variant="body2" fontWeight="medium">
-                              {event.user.name}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {event.content}
-                            </Typography>
-                            {event.type === 'status_change' && event.metadata && (
-                              <Box sx={{ 
-                                display: 'flex', 
-                                alignItems: 'center',
-                                gap: 1,
-                                mt: 0.5
-                              }}>
-                                <Chip
-                                  label={statusLabels[event.metadata.oldStatus as WorkOrderStatus]}
-                                  color={statusColors[event.metadata.oldStatus as WorkOrderStatus]}
-                                  size="small"
-                                />
-                                <ArrowForwardIcon fontSize="small" color="action" />
-                                <Chip
-                                  label={statusLabels[event.metadata.newStatus as WorkOrderStatus]}
-                                  color={statusColors[event.metadata.newStatus as WorkOrderStatus]}
-                                  size="small"
-                                />
-                              </Box>
-                            )}
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 2 }}>
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  gap: 1,
+                  mb: 3
+                }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Not ekle..."
+                    value={newNote}
+                    onChange={(e) => setNewNote(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleAddNote();
+                      }
+                    }}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={handleAddNote}
+                    disabled={!newNote.trim()}
+                    sx={{
+                      minWidth: 'auto',
+                      px: 2
+                    }}
+                  >
+                    <SendIcon />
+                  </Button>
+                </Box>
+                <Timeline>
+                  {[...timelineEvents].reverse().map((event) => {
+                    const config = getTimelineConfig(event.type);
+                    return (
+                      <TimelineItem key={event.id}>
+                        <TimelineOppositeContent sx={{ flex: 0.2 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {dayjs(event.timestamp).format('DD.MM.YYYY HH:mm')}
+                          </Typography>
+                        </TimelineOppositeContent>
+                        <TimelineSeparator>
+                          <TimelineDot color={config.color}>
+                            {config.icon}
+                          </TimelineDot>
+                          <TimelineConnector />
+                        </TimelineSeparator>
+                        <TimelineContent>
+                          <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'flex-start',
+                            gap: 1
+                          }}>
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {event.user.name}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                {event.content}
+                              </Typography>
+                              {event.type === 'status_change' && event.metadata && (
+                                <Box sx={{ 
+                                  display: 'flex', 
+                                  alignItems: 'center',
+                                  gap: 1,
+                                  mt: 0.5
+                                }}>
+                                  <Chip
+                                    label={statusLabels[event.metadata.oldStatus as WorkOrderStatus]}
+                                    color={statusColors[event.metadata.oldStatus as WorkOrderStatus]}
+                                    size="small"
+                                  />
+                                  <ArrowForwardIcon fontSize="small" color="action" />
+                                  <Chip
+                                    label={statusLabels[event.metadata.newStatus as WorkOrderStatus]}
+                                    color={statusColors[event.metadata.newStatus as WorkOrderStatus]}
+                                    size="small"
+                                  />
+                                </Box>
+                              )}
+                            </Box>
                           </Box>
-                        </Box>
-                      </TimelineContent>
-                    </TimelineItem>
-                  );
-                })}
-              </Timeline>
-            </Box>
-          </CardContainer>
+                        </TimelineContent>
+                      </TimelineItem>
+                    );
+                  })}
+                </Timeline>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
         </Grid>
       </Grid>
 
