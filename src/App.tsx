@@ -17,6 +17,7 @@ import { PageTitleProvider } from './contexts/PageTitleContext';
 import WorkOrderDetail from './pages/WorkOrderDetail';
 import { queryClient } from './hooks/useUsers';
 import Dashboard from './pages/dashboard/Dashboard';
+import Reports from './pages/Reports';
 
 // DevExtreme CSS imports
 import 'devextreme/dist/css/dx.light.css';
@@ -44,6 +45,7 @@ function App() {
                   <Route path="/services" element={<Services />} />
                   <Route path="/parts" element={<Parts />} />
                   <Route path="/work-orders/:id/edit" element={<WorkOrderDetail />} />
+                  <Route path="/reports" element={<Reports />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </MainLayout>

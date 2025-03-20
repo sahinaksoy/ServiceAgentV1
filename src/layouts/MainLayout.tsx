@@ -14,13 +14,37 @@ import {
 import { Sidebar } from '../components/navigation/Sidebar';
 import { PageTitleProvider, usePageTitle } from '../contexts/PageTitleContext';
 import { queryClient } from '../hooks/useUsers';
+import { styled } from '@mui/material/styles';
 
 interface MainLayoutProps {
   children: ReactNode;
 }
 
-
 const DRAWER_WIDTH = 240;
+
+const LogoContainer = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#1B3160', // Lacivert arka plan
+  height: '64px', // AppBar ile aynı yükseklik
+  position: 'fixed', // Sabit pozisyon
+  top: 0,
+  left: 0,
+  width: '240px', // Drawer genişliği kadar
+  zIndex: theme.zIndex.drawer + 2, // AppBar'dan daha üstte
+  [theme.breakpoints.down('sm')]: {
+    display: 'none'
+  }
+}));
+
+const Logo = styled('img')({
+  height: '35px',
+  width: 'auto',
+  objectFit: 'contain',
+  filter: 'brightness(0) invert(1)' // Logo'yu beyaz yap
+});
 
 const MainLayoutContent = ({ children }: MainLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -114,7 +138,16 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
             },
           }}
         >
-          <Sidebar />
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            {!isMobile && (
+              <LogoContainer>
+                <Logo src="/logo-square.png" alt="Logo" />
+              </LogoContainer>
+            )}
+            <Box sx={{ flexGrow: 1, overflow: 'auto', mt: 1 }}>
+              <Sidebar />
+            </Box>
+          </Box>
         </Drawer>
       </Box>
 

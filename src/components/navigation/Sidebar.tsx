@@ -10,6 +10,7 @@ import {
   ExpandLess,
   ExpandMore,
   Inventory as InventoryIcon,
+  Assessment as AssessmentIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
@@ -19,6 +20,7 @@ const MENU_ITEMS = [
   { text: 'İş Emirleri', icon: <AssignmentIcon />, path: '/work-orders' },
   { text: 'Kullanıcılar', icon: <PeopleIcon />, path: '/users' },
   { text: 'Mağazalar', icon: <StoreIcon />, path: '/stores' },
+  { text: 'Raporlar', icon: <AssessmentIcon />, path: '/reports' },
   { text: 'Hizmetlerim', icon: <BuildIcon />, path: '/services', hasSubmenu: true },
 ];
 
