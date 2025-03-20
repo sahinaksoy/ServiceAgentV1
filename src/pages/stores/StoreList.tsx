@@ -156,7 +156,7 @@ const StoreList = () => {
   const { setTitle } = usePageTitle();
 
   React.useEffect(() => {
-    setTitle('Mağazalarım');
+    setTitle('Mağazalar');
   }, [setTitle]);
 
   const handleAdd = () => {

@@ -39,7 +39,7 @@ const WorkOrderAnalysis = () => {
   const [reportData, setReportData] = useState<WorkOrderReport[]>([]);
 
   useEffect(() => {
-    setTitle('İş Emri Analizi');
+    setTitle('Pivot Tablosu');
     fetchReportData();
   }, [setTitle]);
 

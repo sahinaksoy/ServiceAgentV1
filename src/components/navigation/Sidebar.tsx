@@ -27,7 +27,7 @@ const MENU_ITEMS = [
     path: '/reports', 
     hasSubmenu: true 
   },
-  { text: 'Hizmetlerim', icon: <BuildIcon />, path: '/services', hasSubmenu: true },
+  { text: 'Hizmetler', icon: <BuildIcon />, path: '/services', hasSubmenu: true },
 ];
 
 const SETTINGS_MENU = { text: 'Ayarlar', icon: <SettingsIcon />, path: '/settings' };
@@ -39,8 +39,8 @@ const SERVICES_MENU_ITEMS = [
 
 // Raporlar için alt menü öğeleri
 const REPORTS_MENU_ITEMS = [
-  { text: 'Genel Durum', icon: <DashboardIcon />, path: '/reports' },
-  { text: 'İş Emri Analizi', icon: <AssignmentIcon />, path: '/reports/work-order-analysis' },
+  { text: 'İş Emri Raporu', icon: <DashboardIcon />, path: '/reports' },
+  { text: 'Pivot Tablosu', icon: <AssignmentIcon />, path: '/reports/work-order-analysis' },
 ];
 
 export const Sidebar = () => {
@@ -103,7 +103,7 @@ export const Sidebar = () => {
           <ListItemIcon>
             <BuildIcon />
           </ListItemIcon>
-          <ListItemText primary="Hizmetlerim" />
+          <ListItemText primary="Hizmetler" />
           {servicesOpen ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={servicesOpen} timeout="auto" unmountOnExit>

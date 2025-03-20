@@ -158,7 +158,7 @@ const WorkOrderList = () => {
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
-    setTitle('İş Emirlerim');
+    setTitle('İş Emirleri');
   }, [setTitle]);
 
   const handleAdd = () => {
@@ -913,7 +913,7 @@ const WorkOrderList = () => {
                   <Box>
                     <Typography variant="subtitle2" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                       <ServiceIcon fontSize="small" color="action" />
-                      Hizmetler
+                      Servisler
                     </Typography>
                     <TableContainer component={MuiPaper} variant="outlined">
                       <Table size="small" sx={{ '& td, & th': { py: 0.5, px: 1 } }}>
