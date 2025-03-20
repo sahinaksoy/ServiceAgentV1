@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'manager' | 'user';
+export type UserRole = 'saha_calisani' | 'ekip_sefi' | 'muhendis' | 'yonetici' | 'taseron_saha_calisani' | 'taseron_ekip_sefi' | 'admin';
 
 export type UserStatus = 'active' | 'inactive' | 'pending';
 

@@ -1,13 +1,14 @@
 import { http, HttpResponse } from 'msw';
+import { User, UserFormData } from '../../types/user';
 
-const users = [
+const users: User[] = [
   {
     id: '1',
     firstName: 'Ahmet',
     lastName: 'Yılmaz',
-    email: 'ahmet@example.com',
-    phone: '5551234567',
-    roles: ['saha_calisani'],
+    email: 'ahmet.yilmaz@meser.com.tr',
+    phone: '0532 123 4567',
+    roles: ['saha_calisani', 'ekip_sefi'],
     status: 'active',
     region: 'Kadıköy',
     company: 'Meser',
@@ -16,11 +17,11 @@ const users = [
   },
   {
     id: '2',
-    firstName: 'Mehmet',
+    firstName: 'Ayşe',
     lastName: 'Demir',
-    email: 'mehmet@example.com',
-    phone: '5551234568',
-    roles: ['ekip_sefi', 'muhendis'],
+    email: 'ayse.demir@arveta.com.tr',
+    phone: '0533 765 4321',
+    roles: ['muhendis', 'yonetici'],
     status: 'active',
     region: 'Beşiktaş',
     company: 'Arveta',
@@ -29,11 +30,11 @@ const users = [
   },
   {
     id: '3',
-    firstName: 'Ayşe',
+    firstName: 'Mehmet',
     lastName: 'Kaya',
-    email: 'ayse@example.com',
-    phone: '5551234569',
-    roles: ['muhendis'],
+    email: 'mehmet.kaya@noord.com.tr',
+    phone: '0532 987 6543',
+    roles: ['taseron_saha_calisani', 'taseron_ekip_sefi'],
     status: 'active',
     region: 'Şişli',
     company: 'Noord',
@@ -92,4 +93,52 @@ const users = [
     createdAt: '2024-01-07T10:00:00.000Z',
     updatedAt: '2024-01-07T10:00:00.000Z'
   }
+];
+
+export const handlers = [
+  http.get('/api/users', () => {
+    return HttpResponse.json(users);
+  }),
+
+  http.post('/api/users', async ({ request }) => {
+    const newUser = await request.json() as UserFormData;
+    const user: User = {
+      id: String(users.length + 1),
+      ...newUser,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    users.push(user);
+    return HttpResponse.json(user);
+  }),
+
+  http.put('/api/users/:id', async ({ params, request }) => {
+    const { id } = params;
+    const updates = await request.json() as UserFormData;
+    const userIndex = users.findIndex(u => u.id === id);
+    
+    if (userIndex === -1) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    const updatedUser: User = {
+      ...users[userIndex],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    users[userIndex] = updatedUser;
+    return HttpResponse.json(updatedUser);
+  }),
+
+  http.delete('/api/users/:id', ({ params }) => {
+    const { id } = params;
+    const userIndex = users.findIndex(u => u.id === id);
+    
+    if (userIndex === -1) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    users.splice(userIndex, 1);
+    return new HttpResponse(null, { status: 204 });
+  })
 ];

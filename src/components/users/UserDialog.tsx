@@ -17,9 +17,9 @@ const roles: UserRole[] = [
   'ekip_sefi',
   'muhendis',
   'yonetici',
-  'mudur',
   'taseron_saha_calisani',
-  'taseron_ekip_sefi'
+  'taseron_ekip_sefi',
+  'admin'
 ];
 const statuses: UserStatus[] = ['active', 'inactive', 'pending'];
 const regions = ['Kadıköy', 'Beşiktaş', 'Şişli']; // API'den gelebilir
@@ -160,9 +160,9 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
                         'ekip_sefi': 'Ekip Şefi',
                         'muhendis': 'Mühendis',
                         'yonetici': 'Yönetici',
-                        'mudur': 'Müdür',
                         'taseron_saha_calisani': 'Taşeron Saha Çalışanı',
-                        'taseron_ekip_sefi': 'Taşeron Ekip Şefi'
+                        'taseron_ekip_sefi': 'Taşeron Ekip Şefi',
+                        'admin': 'Admin'
                       };
                       return roleLabels[option] || option;
                     }}
@@ -181,9 +181,9 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
                           'ekip_sefi': 'Ekip Şefi',
                           'muhendis': 'Mühendis',
                           'yonetici': 'Yönetici',
-                          'mudur': 'Müdür',
                           'taseron_saha_calisani': 'Taşeron Saha Çalışanı',
-                          'taseron_ekip_sefi': 'Taşeron Ekip Şefi'
+                          'taseron_ekip_sefi': 'Taşeron Ekip Şefi',
+                          'admin': 'Admin'
                         };
                         return (
                           <Chip

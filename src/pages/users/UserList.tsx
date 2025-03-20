@@ -145,9 +145,9 @@ const UserList = () => {
                 'ekip_sefi': 'Ekip Şefi',
                 'muhendis': 'Mühendis',
                 'yonetici': 'Yönetici',
-                'mudur': 'Müdür',
                 'taseron_saha_calisani': 'Taşeron Saha Çalışanı',
-                'taseron_ekip_sefi': 'Taşeron Ekip Şefi'
+                'taseron_ekip_sefi': 'Taşeron Ekip Şefi',
+                'admin': 'Yönetici'
               };
               
               return (
