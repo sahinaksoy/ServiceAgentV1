@@ -6,10 +6,10 @@ import {
   Typography, 
   Box,
   IconButton,
-  LinearProgress,
   Chip,
   Paper,
-  Button
+  Button,
+  useTheme
 } from '@mui/material';
 import {
   Warning as WarningIcon,
@@ -19,8 +19,11 @@ import {
   TrendingUp as TrendingUpIcon,
   Store as StoreIcon,
   Engineering as EngineeringIcon,
-  CalendarMonth as CalendarIcon
+  CalendarMonth as CalendarIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { usePageTitle } from '../../contexts/PageTitleContext';
 
 // Örnek veri yapısı
 interface EmergencyCase {
@@ -42,6 +45,13 @@ interface WorkOrder {
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const { setTitle } = usePageTitle();
+
+  useEffect(() => {
+    setTitle('Ana Sayfa');
+  }, [setTitle]);
+
   // Örnek state yönetimi
   const [emergencyCases, setEmergencyCases] = useState<EmergencyCase[]>([
     { store: 'Ataşehir Migros', issue: 'Soğutma Arızası', severity: 'high' },
@@ -83,73 +93,107 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // Kart tıklama işleyicileri
-  const handleEmergencyClick = (store: string) => {
-    // İş emri oluşturma veya detay sayfasına yönlendirme
-    console.log(`Acil durum detayı: ${store}`);
-  };
+  const theme = useTheme();
 
-  const handleMaintenanceClick = (date: string) => {
-    // Bakım detaylarına yönlendirme
-    console.log(`Bakım detayı: ${date}`);
+  const handleNavigation = (path: string) => {
+    const element = document.querySelector('.dashboard-container');
+    if (element) {
+      element.classList.add('fade-out');
+      setTimeout(() => {
+        navigate(path);
+      }, 300);
+    }
   };
 
   return (
-    <Box sx={{ 
-      p: 3,
-      height: '100%',
-      overflow: 'auto',
-      backgroundColor: 'background.default'
-    }}>
-      {/* Acil Durumlar ve Önemli Metrikler */}
-      <Grid container spacing={3}>
+    <Box 
+      className="dashboard-container"
+      sx={{ 
+        p: 3,
+        opacity: 1,
+        transform: 'translateY(0)',
+        transition: 'all 0.3s ease-in-out',
+        '&.fade-out': {
+          opacity: 0,
+          transform: 'translateY(-20px)'
+        }
+      }}
+    >
+      <Grid container spacing={2.5}>
         {/* Acil Müdahale Kartı */}
         <Grid item xs={12} md={6} lg={3}>
           <Card 
+            elevation={0}
+            onClick={() => handleNavigation('/work-orders')}
             sx={{ 
-              background: 'linear-gradient(to right bottom, #fff5f5, #ffffff)',
-              border: '1px solid #ffecec',
-              boxShadow: '0 2px 12px rgba(255, 82, 82, 0.1)',
-              transition: 'all 0.3s ease',
+              backgroundColor: '#fff',
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: '#e0e0e0',
+              minHeight: '240px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              transform: 'translateY(0)',
               '&:hover': {
                 transform: 'translateY(-4px)',
-                boxShadow: '0 4px 20px rgba(255, 82, 82, 0.15)'
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                borderColor: 'primary.main'
+              },
+              '&:active': {
+                transform: 'translateY(0)',
+                transition: 'all 0.1s ease-in-out'
               }
             }}
           >
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <WarningIcon sx={{ color: '#ff5252', opacity: 0.8 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Box
+                  sx={{
+                    backgroundColor: 'error.light',
+                    borderRadius: 2,
+                    p: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <WarningIcon sx={{ color: 'error.main' }} />
+                </Box>
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    ml: 1, 
-                    color: '#ff5252',
-                    fontWeight: 500,
-                    opacity: 0.9
+                    ml: 2,
+                    color: 'error.main',
+                    fontWeight: 600
                   }}
                 >
-                  Acil Müdahale (3)
+                  Acil Müdahale
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {emergencyCases.map((emergency) => (
-                  <Chip 
+                  <Box
                     key={emergency.store}
-                    label={`${emergency.store} - ${emergency.issue}`}
                     sx={{
-                      background: 'rgba(255, 82, 82, 0.08)',
-                      color: '#ff5252',
-                      border: '1px solid rgba(255, 82, 82, 0.2)',
+                      p: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: 'rgba(255, 82, 82, 0.08)',
+                      border: '1px solid',
+                      borderColor: 'error.light',
+                      transition: 'all 0.2s ease',
+                      cursor: 'pointer',
                       '&:hover': {
-                        background: 'rgba(255, 82, 82, 0.12)',
-                      },
-                      '& .MuiChip-label': {
-                        fontWeight: 400
+                        backgroundColor: 'rgba(255, 82, 82, 0.12)',
                       }
                     }}
-                    onClick={() => handleEmergencyClick(emergency.store)}
-                  />
+                  >
+                    <Typography variant="subtitle2" color="error.main" fontWeight={600}>
+                      {emergency.store}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {emergency.issue}
+                    </Typography>
+                  </Box>
                 ))}
               </Box>
             </CardContent>
@@ -159,71 +203,86 @@ export default function Dashboard() {
         {/* Planlı Bakımlar Kartı */}
         <Grid item xs={12} md={6} lg={3}>
           <Card 
+            elevation={0}
+            onClick={() => handleNavigation('/stores')}
             sx={{ 
-              background: 'linear-gradient(to right bottom, #f8f9ff, #ffffff)',
-              border: '1px solid #eef0ff',
-              boxShadow: '0 2px 12px rgba(63, 81, 181, 0.1)',
-              transition: 'all 0.3s ease',
+              backgroundColor: '#fff',
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: '#e0e0e0',
+              minHeight: '240px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              transform: 'translateY(0)',
               '&:hover': {
                 transform: 'translateY(-4px)',
-                boxShadow: '0 4px 20px rgba(63, 81, 181, 0.15)'
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                borderColor: 'primary.main'
+              },
+              '&:active': {
+                transform: 'translateY(0)',
+                transition: 'all 0.1s ease-in-out'
               }
             }}
           >
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <BuildIcon sx={{ color: '#3f51b5', opacity: 0.8 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Box
+                  sx={{
+                    backgroundColor: 'primary.light',
+                    borderRadius: 2,
+                    p: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <BuildIcon sx={{ color: 'primary.main' }} />
+                </Box>
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    ml: 1, 
-                    color: '#3f51b5',
-                    fontWeight: 500,
-                    opacity: 0.9
+                    ml: 2,
+                    color: 'primary.main',
+                    fontWeight: 600
                   }}
                 >
-                  Planlı Bakımlar (5)
+                  Planlı Bakımlar
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {[
                   { text: 'Bu Hafta', count: 2 },
                   { text: 'Gelecek Hafta', count: 3 }
                 ].map((period) => (
-                  <Box 
+                  <Box
                     key={period.text}
                     sx={{
+                      p: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: 'rgba(63, 81, 181, 0.08)',
+                      border: '1px solid',
+                      borderColor: 'primary.light',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      p: 1.5,
-                      borderRadius: 1,
-                      background: 'rgba(63, 81, 181, 0.08)',
-                      border: '1px solid rgba(63, 81, 181, 0.12)',
                       transition: 'all 0.2s ease',
                       cursor: 'pointer',
                       '&:hover': {
-                        background: 'rgba(63, 81, 181, 0.12)',
+                        backgroundColor: 'rgba(63, 81, 181, 0.12)',
                       }
                     }}
-                    onClick={() => handleMaintenanceClick(period.text)}
                   >
-                    <Typography 
-                      sx={{ 
-                        color: '#3f51b5',
-                        fontWeight: 500
-                      }}
-                    >
+                    <Typography variant="subtitle2" color="primary.main" fontWeight={600}>
                       {period.text}
                     </Typography>
                     <Chip
                       label={period.count}
                       size="small"
                       sx={{
-                        background: 'rgba(63, 81, 181, 0.15)',
-                        color: '#3f51b5',
-                        fontWeight: 500,
-                        minWidth: '32px'
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        fontWeight: 600
                       }}
                     />
                   </Box>
@@ -233,74 +292,264 @@ export default function Dashboard() {
           </Card>
         </Grid>
 
-        {/* Performans Metrikleri */}
+        {/* Arıza Trendleri Kartı */}
         <Grid item xs={12} md={6} lg={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <TrendingUpIcon color="success" />
-                <Typography variant="h6" sx={{ ml: 1 }}>
-                  Sistem Performansı
+          <Card 
+            elevation={0}
+            sx={{ 
+              backgroundColor: '#fff',
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: '#e0e0e0',
+              minHeight: '240px',
+            }}
+          >
+            <CardContent sx={{ p: 2 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mb: 2,
+                gap: 1.5 
+              }}>
+                <Box sx={{ 
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  backgroundColor: '#e3f2fd',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <TrendingUpIcon sx={{ fontSize: 24 }} />
+                </Box>
+                <Typography variant="h6" fontSize="1.1rem" fontWeight={600}>
+                  Arıza Trendleri
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Ortalama Çalışma Sıcaklığı
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Box sx={{ 
+                  p: 1.5,
+                  borderRadius: 2,
+                  backgroundColor: '#ffebee',
+                }}>
+                  <Typography variant="body2" color="#d32f2f" fontSize="0.75rem">
+                    En Sık Arıza
                   </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={systemMetrics.temperature} 
-                    color="success"
-                    sx={{ mt: 1 }}
-                  />
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mt: 0.5
+                  }}>
+                    <Typography variant="subtitle2" color="#b71c1c">
+                      Soğutma Sistemi
+                    </Typography>
+                    <Box sx={{ 
+                      px: 1.5, 
+                      py: 0.25, 
+                      borderRadius: 1.5, 
+                      backgroundColor: '#fff',
+                      border: '1px solid #ef5350'
+                    }}>
+                      <Typography variant="caption" color="#d32f2f" fontWeight={600}>
+                        15 vaka
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Enerji Verimliliği
+
+                <Box sx={{ 
+                  p: 1.5,
+                  borderRadius: 2,
+                  backgroundColor: '#fff3e0',
+                }}>
+                  <Typography variant="body2" color="#f57c00" fontSize="0.75rem">
+                    Artış Gösteren
                   </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={systemMetrics.efficiency} 
-                    color="success"
-                    sx={{ mt: 1 }}
-                  />
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mt: 0.5
+                  }}>
+                    <Typography variant="subtitle2" color="#e65100">
+                      Elektrik Sistemi
+                    </Typography>
+                    <Box sx={{ 
+                      px: 1.5, 
+                      py: 0.25, 
+                      borderRadius: 1.5, 
+                      backgroundColor: '#fff',
+                      border: '1px solid #ff9800'
+                    }}>
+                      <Typography variant="caption" color="#f57c00" fontWeight={600}>
+                        +25%
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Box sx={{ 
+                  p: 1.5,
+                  borderRadius: 2,
+                  backgroundColor: '#e8f5e9',
+                }}>
+                  <Typography variant="body2" color="#2e7d32" fontSize="0.75rem">
+                    Azalan Trend
+                  </Typography>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mt: 0.5
+                  }}>
+                    <Typography variant="subtitle2" color="#1b5e20">
+                      Mekanik Arızalar
+                    </Typography>
+                    <Box sx={{ 
+                      px: 1.5, 
+                      py: 0.25, 
+                      borderRadius: 1.5, 
+                      backgroundColor: '#fff',
+                      border: '1px solid #4caf50'
+                    }}>
+                      <Typography variant="caption" color="#2e7d32" fontWeight={600}>
+                        -30%
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Teknisyen Durumu */}
+        {/* Teknisyen Durumu Kartı */}
         <Grid item xs={12} md={6} lg={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <EngineeringIcon color="primary" />
-                <Typography variant="h6" sx={{ ml: 1 }}>
+          <Card 
+            elevation={0}
+            sx={{ 
+              backgroundColor: '#fff',
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: '#e0e0e0',
+              minHeight: '240px',
+            }}
+          >
+            <CardContent sx={{ p: 2 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mb: 2,
+                gap: 1.5 
+              }}>
+                <Box sx={{ 
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  backgroundColor: '#e8f5e9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <EngineeringIcon sx={{ fontSize: 24 }} />
+                </Box>
+                <Typography variant="h6" fontSize="1.1rem" fontWeight={600}>
                   Teknisyen Durumu
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Chip label="Aktif Görevde (8)" color="success" />
-                <Chip label="Müsait (4)" color="primary" />
-                <Chip label="İzinli (2)" color="default" />
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Box sx={{ 
+                  p: 1.5,
+                  borderRadius: 2,
+                  backgroundColor: '#e8f5e9',
+                }}>
+                  <Typography variant="body2" color="#2e7d32" fontSize="0.75rem">
+                    Aktif Görevde
+                  </Typography>
+                  <Typography variant="h4" color="#1b5e20" fontWeight={700}>
+                    8
+                  </Typography>
+                </Box>
+
+                <Box sx={{ 
+                  p: 1.5,
+                  borderRadius: 2,
+                  backgroundColor: '#f3f6ff',
+                }}>
+                  <Typography variant="body2" color="#1976d2" fontSize="0.75rem">
+                    Müsait
+                  </Typography>
+                  <Typography variant="h4" color="#0d47a1" fontWeight={700}>
+                    4
+                  </Typography>
+                </Box>
+
+                <Box sx={{ 
+                  p: 1.5,
+                  borderRadius: 2,
+                  backgroundColor: '#e3f2fd',
+                }}>
+                  <Typography variant="body2" color="#1976d2" fontSize="0.75rem">
+                    Bugün Tamamlanan
+                  </Typography>
+                  <Typography variant="h4" color="#0d47a1" fontWeight={700}>
+                    6
+                  </Typography>
+                </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Detaylı Bilgiler */}
+      {/* Alt kısımdaki kartlar için */}
       <Grid container spacing={3} sx={{ mt: 1 }}>
-        {/* Son İş Emirleri */}
+        {/* Son İş Emirleri Kartı */}
         <Grid item xs={12} lg={6}>
-          <Paper sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Son İş Emirleri</Typography>
-              <Button variant="outlined" size="small">Tümünü Gör</Button>
+          <Paper 
+            elevation={0}
+            onClick={() => handleNavigation('/work-orders')}
+            sx={{ 
+              p: 3,
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: 'divider',
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              transform: 'translateY(0)',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                borderColor: 'primary.main'
+              },
+              '&:active': {
+                transform: 'translateY(0)',
+                transition: 'all 0.1s ease-in-out'
+              }
+            }}
+          >
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <AssignmentIcon sx={{ color: 'primary.main', mr: 1 }} />
+                <Typography variant="h6">Son İş Emirleri</Typography>
+              </Box>
+              <Button 
+                variant="outlined" 
+                size="small"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600
+                }}
+              >
+                Tümünü Gör
+              </Button>
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {[
                 { store: 'Ataşehir Migros', issue: 'Soğutma Sistemi Bakımı', status: 'progress' },
                 { store: 'Kadıköy Migros', issue: 'Kompresör Değişimi', status: 'pending' },
@@ -312,13 +561,21 @@ export default function Dashboard() {
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center',
-                    p: 1,
-                    borderRadius: 1,
-                    bgcolor: 'background.default'
+                    p: 2,
+                    borderRadius: 2,
+                    backgroundColor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      backgroundColor: 'action.hover'
+                    }
                   }}
                 >
                   <Box>
-                    <Typography variant="subtitle2">{order.store}</Typography>
+                    <Typography variant="subtitle2" fontWeight={600}>
+                      {order.store}
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {order.issue}
                     </Typography>
@@ -329,6 +586,7 @@ export default function Dashboard() {
                     color={order.status === 'progress' ? 'primary' : 
                            order.status === 'pending' ? 'warning' : 'success'}
                     size="small"
+                    sx={{ fontWeight: 500 }}
                   />
                 </Box>
               ))}
@@ -336,14 +594,49 @@ export default function Dashboard() {
           </Paper>
         </Grid>
 
-        {/* Yaklaşan Bakımlar */}
+        {/* Yaklaşan Bakımlar Kartı */}
         <Grid item xs={12} lg={6}>
-          <Paper sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Yaklaşan Bakımlar</Typography>
-              <Button variant="outlined" size="small">Takvimi Gör</Button>
+          <Paper 
+            elevation={0}
+            onClick={() => handleNavigation('/stores')}
+            sx={{ 
+              p: 3,
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: 'divider',
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              transform: 'translateY(0)',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                borderColor: 'primary.main'
+              },
+              '&:active': {
+                transform: 'translateY(0)',
+                transition: 'all 0.1s ease-in-out'
+              }
+            }}
+          >
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <CalendarIcon sx={{ color: 'primary.main', mr: 1 }} />
+                <Typography variant="h6">Yaklaşan Bakımlar</Typography>
+              </Box>
+              <Button 
+                variant="outlined" 
+                size="small"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600
+                }}
+              >
+                Takvimi Gör
+              </Button>
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {[
                 { date: '15 Mart', store: 'Beşiktaş Migros', type: 'Periyodik Bakım' },
                 { date: '18 Mart', store: 'Şişli Migros', type: 'Filtre Değişimi' },
@@ -355,21 +648,35 @@ export default function Dashboard() {
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center',
-                    p: 1,
-                    borderRadius: 1,
-                    bgcolor: 'background.default'
+                    p: 2,
+                    borderRadius: 2,
+                    backgroundColor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      backgroundColor: 'action.hover'
+                    }
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <CalendarIcon color="primary" />
                     <Box>
-                      <Typography variant="subtitle2">{maintenance.store}</Typography>
+                      <Typography variant="subtitle2" fontWeight={600}>
+                        {maintenance.store}
+                      </Typography>
                       <Typography variant="body2" color="text.secondary">
                         {maintenance.type}
                       </Typography>
                     </Box>
                   </Box>
-                  <Typography variant="body2" color="primary">
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: 'primary.main',
+                      fontWeight: 600
+                    }}
+                  >
                     {maintenance.date}
                   </Typography>
                 </Box>

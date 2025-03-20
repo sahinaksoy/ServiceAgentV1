@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Box, Paper, Typography, IconButton, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
+import { Box, Paper, Typography, IconButton, useTheme, useMediaQuery, CircularProgress, Chip } from '@mui/material';
 import DataGrid, {
   Column,
   Paging,
@@ -136,8 +136,44 @@ const UserList = () => {
           <Column dataField="lastName" caption="Soyad" />
           <Column dataField="email" caption="E-posta" />
           <Column dataField="phone" caption="Telefon" />
-          <Column dataField="roles" caption="Roller" />
-          <Column dataField="status" caption="Durum" />
+          <Column 
+            dataField="roles" 
+            caption="Roller"
+            cellRender={(cell) => {
+              const roleLabels: Record<string, string> = {
+                'saha_calisani': 'Saha Çalışanı',
+                'ekip_sefi': 'Ekip Şefi',
+                'muhendis': 'Mühendis',
+                'yonetici': 'Yönetici',
+                'mudur': 'Müdür',
+                'taseron_saha_calisani': 'Taşeron Saha Çalışanı',
+                'taseron_ekip_sefi': 'Taşeron Ekip Şefi'
+              };
+              
+              return (
+                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                  {cell.value.map((role: string) => (
+                    <Chip
+                      key={role}
+                      label={roleLabels[role] || role}
+                      size="small"
+                      sx={{
+                        height: '24px',
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                        color: '#1976d2',
+                        border: '1px solid rgba(25, 118, 210, 0.2)',
+                        '& .MuiChip-label': {
+                          px: 1,
+                          fontSize: '0.75rem',
+                          fontWeight: 500
+                        }
+                      }}
+                    />
+                  ))}
+                </Box>
+              );
+            }}
+          />
           <Column dataField="region" caption="Bölge" />
           <Column dataField="company" caption="Şirket" />
           

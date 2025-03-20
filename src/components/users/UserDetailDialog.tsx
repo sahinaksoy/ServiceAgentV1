@@ -7,32 +7,44 @@ interface UserDetailDialogProps {
   user: User;
 }
 
-const DetailRow = ({ label, value }: { label: string; value: string | string[] }) => (
-  <Grid container spacing={2} sx={{ mb: 2 }}>
-    <Grid item xs={4}>
-      <Typography variant="subtitle2" color="text.secondary">
-        {label}
-      </Typography>
+const DetailRow = ({ label, value }: { label: string; value: string | string[] }) => {
+  const roleLabels: Record<string, string> = {
+    'saha_calisani': 'Saha Çalışanı',
+    'ekip_sefi': 'Ekip Şefi',
+    'muhendis': 'Mühendis',
+    'yonetici': 'Yönetici',
+    'mudur': 'Müdür',
+    'taseron_saha_calisani': 'Taşeron Saha Çalışanı',
+    'taseron_ekip_sefi': 'Taşeron Ekip Şefi'
+  };
+
+  return (
+    <Grid container spacing={2} sx={{ mb: 2 }}>
+      <Grid item xs={4}>
+        <Typography variant="subtitle2" color="text.secondary">
+          {label}
+        </Typography>
+      </Grid>
+      <Grid item xs={8}>
+        {Array.isArray(value) ? (
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {value.map((v) => (
+              <Chip
+                key={v}
+                label={roleLabels[v] || v}
+                color="primary"
+                variant="outlined"
+                size="small"
+              />
+            ))}
+          </Box>
+        ) : (
+          <Typography>{value}</Typography>
+        )}
+      </Grid>
     </Grid>
-    <Grid item xs={8}>
-      {Array.isArray(value) ? (
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          {value.map((v) => (
-            <Chip
-              key={v}
-              label={v}
-              color="primary"
-              variant="outlined"
-              size="small"
-            />
-          ))}
-        </Box>
-      ) : (
-        <Typography>{value}</Typography>
-      )}
-    </Grid>
-  </Grid>
-);
+  );
+};
 
 export const UserDetailDialog = ({ open, onClose, user }: UserDetailDialogProps) => {
   return (

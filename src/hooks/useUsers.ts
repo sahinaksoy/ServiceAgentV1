@@ -25,12 +25,23 @@ export const useUsers = () => {
       if (!response.ok) {
         throw new Error('Kullanıcılar yüklenirken bir hata oluştu');
       }
-      return response.json();
+      const data = await response.json();
+      
+      // Durum alanını Türkçeleştir
+      return data.map((user: any) => ({
+        ...user,
+        status: user.status === 'active' ? 'Aktif' : 'Pasif'
+      }));
     },
-    // Ek optimizasyonlar
     initialData: () => {
-      // Cache'de veri varsa onu kullan
-      return queryClient.getQueryData(['users']);
+      const cachedData = queryClient.getQueryData(['users']);
+      if (cachedData) {
+        return (cachedData as any[]).map(user => ({
+          ...user,
+          status: user.status === 'active' ? 'Aktif' : 'Pasif'
+        }));
+      }
+      return undefined;
     },
     staleTime: Infinity,
     cacheTime: Infinity,

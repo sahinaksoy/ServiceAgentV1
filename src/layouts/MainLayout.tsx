@@ -7,14 +7,19 @@ import {
   Typography, 
   Drawer, 
   useTheme, 
-  useMediaQuery} from '@mui/material';
+  useMediaQuery,
+  Menu,
+  MenuItem,
+  Button} from '@mui/material';
 import { 
   Menu as MenuIcon, 
-  ChevronLeft as ChevronLeftIcon} from '@mui/icons-material';
+  ChevronLeft as ChevronLeftIcon,
+  AccountCircle as AccountIcon} from '@mui/icons-material';
 import { Sidebar } from '../components/navigation/Sidebar';
 import { PageTitleProvider, usePageTitle } from '../contexts/PageTitleContext';
 import { queryClient } from '../hooks/useUsers';
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -22,36 +27,20 @@ interface MainLayoutProps {
 
 const DRAWER_WIDTH = 240;
 
-const LogoContainer = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(2),
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: '#1B3160', // Lacivert arka plan
-  height: '64px', // AppBar ile aynı yükseklik
-  position: 'fixed', // Sabit pozisyon
-  top: 0,
-  left: 0,
-  width: '240px', // Drawer genişliği kadar
-  zIndex: theme.zIndex.drawer + 2, // AppBar'dan daha üstte
-  [theme.breakpoints.down('sm')]: {
-    display: 'none'
-  }
-}));
-
 const Logo = styled('img')({
   height: '35px',
   width: 'auto',
-  objectFit: 'contain',
-  filter: 'brightness(0) invert(1)' // Logo'yu beyaz yap
+  objectFit: 'contain'
 });
 
 const MainLayoutContent = ({ children }: MainLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { title } = usePageTitle();
+  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     if (isMobile) {
@@ -59,6 +48,24 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
     } else {
       setDesktopOpen(!desktopOpen);
     }
+  };
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+    handleProfileMenuClose();
+  };
+
+  const handleLogout = () => {
+    // Çıkış işlemleri burada yapılacak
+    handleProfileMenuClose();
   };
 
   useEffect(() => {
@@ -87,6 +94,7 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
+          zIndex: theme.zIndex.drawer + 2,
         }}
       >
         <Toolbar>
@@ -102,6 +110,93 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
           <Typography variant="h6" noWrap component="div">
             {title}
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box 
+            sx={{ 
+              position: 'absolute',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: { xs: 'none', sm: 'block' }
+            }}
+          >
+            <img 
+              src="/logo-circle.png" 
+              alt="Logo" 
+              style={{ 
+                height: '64px', 
+                width: '64px',
+                objectFit: 'contain',
+                padding: 0,
+                margin: 0
+              }} 
+            />
+          </Box>
+          <Box 
+            sx={{ 
+              display: { xs: 'none', sm: 'flex' },
+              alignItems: 'center'
+            }}
+          >
+            <IconButton
+              onClick={handleProfileMenuOpen}
+              sx={{ 
+                height: '64px',
+                width: '64px',
+                borderRadius: 0,
+                color: 'inherit',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                }
+              }}
+            >
+              <AccountIcon sx={{ fontSize: 35 }} />
+            </IconButton>
+          </Box>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleProfileMenuClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1.5,
+                '& .MuiMenuItem-root': {
+                  px: 2,
+                  py: 1,
+                },
+                '&:before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: 'background.paper',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            }}
+          >
+            <MenuItem onClick={handleProfileClick}>
+              <AccountIcon sx={{ mr: 1 }} />
+              Profilim
+            </MenuItem>
+            <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+              Çıkış Yap
+            </MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
 
@@ -116,6 +211,26 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
           }),
         }}
       >
+        <Box
+          sx={{
+            height: { xs: '56px', sm: '64px' },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: DRAWER_WIDTH,
+            bgcolor: 'background.paper',
+            borderBottom: '1px solid',
+            borderRight: '1px solid',
+            borderColor: 'divider',
+            zIndex: theme.zIndex.drawer
+          }}
+        >
+          <Logo src="/logo-square.png" alt="Logo" />
+        </Box>
+
         <Drawer
           variant={isMobile ? 'temporary' : 'persistent'}
           open={isMobile ? mobileOpen : desktopOpen}
@@ -139,11 +254,6 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
           }}
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            {!isMobile && (
-              <LogoContainer>
-                <Logo src="/logo-square.png" alt="Logo" />
-              </LogoContainer>
-            )}
             <Box sx={{ flexGrow: 1, overflow: 'auto', mt: 1 }}>
               <Sidebar />
             </Box>

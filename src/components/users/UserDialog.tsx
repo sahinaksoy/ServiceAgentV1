@@ -12,7 +12,15 @@ interface UserDialogProps {
   user?: User;
 }
 
-const roles: UserRole[] = ['admin', 'manager', 'user'];
+const roles: UserRole[] = [
+  'saha_calisani',
+  'ekip_sefi',
+  'muhendis',
+  'yonetici',
+  'mudur',
+  'taseron_saha_calisani',
+  'taseron_ekip_sefi'
+];
 const statuses: UserStatus[] = ['active', 'inactive', 'pending'];
 const regions = ['Kadıköy', 'Beşiktaş', 'Şişli']; // API'den gelebilir
 const companies = ['Meser', 'Arveta', 'Noord']; // API'den gelebilir
@@ -146,7 +154,18 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
                     {...field}
                     multiple
                     options={roles}
-                    getOptionLabel={(option) => option}
+                    getOptionLabel={(option) => {
+                      const roleLabels: Record<string, string> = {
+                        'saha_calisani': 'Saha Çalışanı',
+                        'ekip_sefi': 'Ekip Şefi',
+                        'muhendis': 'Mühendis',
+                        'yonetici': 'Yönetici',
+                        'mudur': 'Müdür',
+                        'taseron_saha_calisani': 'Taşeron Saha Çalışanı',
+                        'taseron_ekip_sefi': 'Taşeron Ekip Şefi'
+                      };
+                      return roleLabels[option] || option;
+                    }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -156,15 +175,26 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
                       />
                     )}
                     renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          {...getTagProps({ index })}
-                          key={option}
-                          label={option}
-                          color="primary"
-                          variant="outlined"
-                        />
-                      ))
+                      value.map((option, index) => {
+                        const roleLabels: Record<string, string> = {
+                          'saha_calisani': 'Saha Çalışanı',
+                          'ekip_sefi': 'Ekip Şefi',
+                          'muhendis': 'Mühendis',
+                          'yonetici': 'Yönetici',
+                          'mudur': 'Müdür',
+                          'taseron_saha_calisani': 'Taşeron Saha Çalışanı',
+                          'taseron_ekip_sefi': 'Taşeron Ekip Şefi'
+                        };
+                        return (
+                          <Chip
+                            {...getTagProps({ index })}
+                            key={option}
+                            label={roleLabels[option] || option}
+                            color="primary"
+                            variant="outlined"
+                          />
+                        );
+                      })
                     }
                     onChange={(_, value) => field.onChange(value)}
                   />

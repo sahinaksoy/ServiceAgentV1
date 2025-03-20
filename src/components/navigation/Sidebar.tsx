@@ -20,7 +20,12 @@ const MENU_ITEMS = [
   { text: 'İş Emirleri', icon: <AssignmentIcon />, path: '/work-orders' },
   { text: 'Kullanıcılar', icon: <PeopleIcon />, path: '/users' },
   { text: 'Mağazalar', icon: <StoreIcon />, path: '/stores' },
-  { text: 'Raporlar', icon: <AssessmentIcon />, path: '/reports' },
+  { 
+    text: 'Raporlar', 
+    icon: <AssessmentIcon />, 
+    path: '/reports', 
+    hasSubmenu: true 
+  },
   { text: 'Hizmetlerim', icon: <BuildIcon />, path: '/services', hasSubmenu: true },
 ];
 
@@ -31,10 +36,17 @@ const SERVICES_MENU_ITEMS = [
   { text: 'Parçalar', icon: <InventoryIcon />, path: '/parts' },
 ];
 
+// Raporlar için alt menü öğeleri
+const REPORTS_MENU_ITEMS = [
+  { text: 'Genel Durum', icon: <AssessmentIcon />, path: '/reports' },
+  { text: 'İş Emri Analizi', icon: <AssignmentIcon />, path: '/reports/work-order-analysis' },
+];
+
 export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [reportsOpen, setReportsOpen] = useState(false);
 
   const isPathActive = (path: string) => {
     if (path === '/') {
@@ -45,6 +57,10 @@ export const Sidebar = () => {
 
   const handleServicesClick = () => {
     setServicesOpen(!servicesOpen);
+  };
+
+  const handleReportsClick = () => {
+    setReportsOpen(!reportsOpen);
   };
 
   return (
@@ -89,6 +105,47 @@ export const Sidebar = () => {
         <Collapse in={servicesOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             {SERVICES_MENU_ITEMS.map((item) => (
+              <ListItemButton
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                selected={isPathActive(item.path)}
+                sx={{ 
+                  pl: 4,
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(63, 81, 181, 0.08)',
+                    color: 'primary.main',
+                    '&:hover': {
+                      backgroundColor: 'rgba(63, 81, 181, 0.12)',
+                    },
+                    '& .MuiListItemIcon-root': {
+                      color: 'primary.main',
+                    },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: isPathActive(item.path) ? 'primary.main' : 'action.active',
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            ))}
+          </List>
+        </Collapse>
+
+        <ListItemButton onClick={handleReportsClick}>
+          <ListItemIcon>
+            <AssessmentIcon />
+          </ListItemIcon>
+          <ListItemText primary="Raporlar" />
+          {reportsOpen ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {REPORTS_MENU_ITEMS.map((item) => (
               <ListItemButton
                 key={item.path}
                 onClick={() => navigate(item.path)}
