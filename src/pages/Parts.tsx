@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Box, 
-  Typography, 
   Paper, 
   useTheme, 
   useMediaQuery,
@@ -12,6 +11,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Typography,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { usePageTitle } from '../contexts/PageTitleContext';
@@ -19,7 +19,6 @@ import DataGrid, {
   Column,
   Paging,
   FilterRow,
-  SearchPanel,
 } from 'devextreme-react/data-grid';
 import { Part, partUnitLabels, partStatusLabels } from '../types/part';
 import { mockParts } from '../mocks/parts';
@@ -100,15 +99,7 @@ const Parts: React.FC = () => {
           borderRadius: { xs: 0, sm: 1 }
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontSize: { xs: '1.5rem', sm: '2rem' }
-            }}
-          >
-            Parçalar
-          </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -126,7 +117,6 @@ const Parts: React.FC = () => {
         >
           <Paging defaultPageSize={10} />
           <FilterRow visible={true} />
-          <SearchPanel visible={true} />
 
           <Column dataField="id" caption="ID" allowEditing={false} />
           <Column dataField="name" caption="Parça Adı" />

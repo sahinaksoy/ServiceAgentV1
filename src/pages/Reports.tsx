@@ -6,179 +6,70 @@ import {
   Store as StoreIcon,
   Engineering as TechnicianIcon,
   Memory as SystemIcon,
-  TrendingUp as TrendingUpIcon
+  TrendingUp as TrendingUpIcon,
+  Build as BuildIcon,
+  Person as PersonIcon
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const Reports = () => {
   const { setTitle } = usePageTitle();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTitle('Raporlar');
   }, [setTitle]);
 
+  const reportCards = [
+    {
+      title: 'İş Emri Raporu',
+      icon: WorkIcon,
+      path: '/reports/work-order-report',
+      description: 'Detaylı iş emri raporu ve analizleri'
+    },
+    {
+      title: 'İş Emri Analizi',
+      icon: BuildIcon,
+      path: '/reports/work-order-analysis',
+      description: 'İş emirleri pivot tablo analizi'
+    }
+  ];
+
   return (
     <Box sx={{ p: 3 }}>
       <Grid container spacing={3}>
-        {/* İş Emirleri Analizi */}
-        <Grid item xs={12} md={6}>
-          <Paper 
-            elevation={0} 
-            sx={{ 
-              p: 3, 
-              height: '100%',
-              borderRadius: 2,
-              bgcolor: 'background.paper',
-              border: '1px solid',
-              borderColor: 'divider'
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <WorkIcon sx={{ fontSize: 28, mr: 2, color: 'primary.main' }} />
-              <Typography variant="h6" color="text.primary">İş Emirleri Analizi</Typography>
-            </Box>
-            <Divider sx={{ my: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Typography 
-                  variant="h4" 
-                  sx={{ 
-                    mb: 1, 
-                    fontWeight: 'bold',
-                    color: 'text.primary' 
-                  }}
-                >
-                  150
+        {reportCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={card.title}>
+              <Paper
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 2,
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 4
+                  }
+                }}
+                onClick={() => navigate(card.path)}
+              >
+                <Icon sx={{ fontSize: 40, color: 'primary.main' }} />
+                <Typography variant="h6" align="center">
+                  {card.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Toplam İş Emri
+                <Typography variant="body2" color="text.secondary" align="center">
+                  {card.description}
                 </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography 
-                  variant="h4" 
-                  sx={{ 
-                    mb: 1, 
-                    fontWeight: 'bold',
-                    color: '#4CAF50'
-                  }}
-                >
-                  120
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Tamamlanan
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography 
-                  variant="h4" 
-                  sx={{ 
-                    mb: 1, 
-                    fontWeight: 'bold',
-                    color: '#FFC107'
-                  }}
-                >
-                  30
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Bekleyen
-                </Typography>
-              </Grid>
+              </Paper>
             </Grid>
-          </Paper>
-        </Grid>
-
-        {/* Mağaza Performansı */}
-        <Grid item xs={12} md={6}>
-          <Paper 
-            elevation={0} 
-            sx={{ 
-              p: 3, 
-              height: '100%',
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'divider'
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <StoreIcon sx={{ fontSize: 28, mr: 2, color: 'primary.main' }} />
-                <Typography variant="h6">Mağaza Performansı</Typography>
-              </Box>
-              <IconButton size="small" sx={{ bgcolor: 'primary.light', color: 'white' }}>
-                <TrendingUpIcon />
-              </IconButton>
-            </Box>
-            <Divider sx={{ my: 2 }} />
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>En Aktif Mağaza</Typography>
-              <Typography variant="h6">Ataşehir Migros</Typography>
-            </Box>
-            <Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>Toplam Mağaza</Typography>
-              <Typography variant="h6">25</Typography>
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* Teknisyen Performansı */}
-        <Grid item xs={12} md={6}>
-          <Paper 
-            elevation={0} 
-            sx={{ 
-              p: 3, 
-              height: '100%',
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'divider'
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <TechnicianIcon sx={{ fontSize: 28, mr: 2, color: 'primary.main' }} />
-              <Typography variant="h6">Teknisyen Performansı</Typography>
-            </Box>
-            <Divider sx={{ my: 2 }} />
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>Aktif Teknisyen</Typography>
-                <Typography variant="h4" sx={{ color: 'primary.main', fontWeight: 'bold' }}>8</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>Ort. Müdahale</Typography>
-                <Typography variant="h4" sx={{ color: 'primary.main', fontWeight: 'bold' }}>45<Typography component="span" variant="body2">dk</Typography></Typography>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-
-        {/* Sistem Durumu */}
-        <Grid item xs={12} md={6}>
-          <Paper 
-            elevation={0} 
-            sx={{ 
-              p: 3, 
-              height: '100%',
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'divider'
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <SystemIcon sx={{ fontSize: 28, mr: 2, color: 'primary.main' }} />
-              <Typography variant="h6">Sistem Durumu</Typography>
-            </Box>
-            <Divider sx={{ my: 2 }} />
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>Çalışma Sıcaklığı</Typography>
-                <Typography variant="h4" sx={{ color: 'primary.main', fontWeight: 'bold' }}>22<Typography component="span" variant="body2">°C</Typography></Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>Enerji Verimliliği</Typography>
-                <Typography variant="h4" sx={{ color: 'primary.main', fontWeight: 'bold' }}>85<Typography component="span" variant="body2">%</Typography></Typography>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
+          );
+        })}
       </Grid>
     </Box>
   );

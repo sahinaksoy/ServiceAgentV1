@@ -11,7 +11,9 @@ import DataGrid, {
   Export,
   Selection,
   Scrolling,
-  LoadPanel
+  LoadPanel,
+  Toolbar,
+  Item
 } from 'devextreme-react/data-grid';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon } from '@mui/icons-material';
 import { User } from '../../types/user';
@@ -88,14 +90,11 @@ const UserList = () => {
   }
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h5">Kullanıcılar</Typography>
-        <IconButton color="primary" onClick={handleAdd}>
-          <AddIcon />
-        </IconButton>
-      </Box>
-
+    <Box sx={{ 
+      position: 'relative', 
+      minHeight: '100%',
+      px: { xs: 1, sm: 0 } // Mobilde yatayda 8px boşluk
+    }}>
       <Paper sx={{ flexGrow: 1, position: 'relative' }}>
         {isLoading ? (
           <Box 
@@ -130,6 +129,27 @@ const UserList = () => {
           <StateStoring enabled type="localStorage" storageKey="userListGridState" />
           <FilterRow visible />
           <HeaderFilter visible />
+          <Toolbar>
+            <Item location="after">
+              <Chip
+                icon={<AddIcon />}
+                label="Yeni Kullanıcı Ekle"
+                onClick={handleAdd}
+                sx={{
+                  bgcolor: 'primary.light',
+                  color: 'primary.main',
+                  border: '1px solid',
+                  borderColor: 'primary.main',
+                  '&:hover': {
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                  },
+                  cursor: 'pointer'
+                }}
+              />
+            </Item>
+            <Item name="columnChooserButton" />
+          </Toolbar>
           <ColumnChooser enabled />
           
           <Column dataField="firstName" caption="Ad" />

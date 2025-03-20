@@ -11,6 +11,7 @@ import {
   ExpandMore,
   Inventory as InventoryIcon,
   Assessment as AssessmentIcon,
+  Dashboard as DashboardIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
@@ -38,7 +39,7 @@ const SERVICES_MENU_ITEMS = [
 
 // Raporlar için alt menü öğeleri
 const REPORTS_MENU_ITEMS = [
-  { text: 'Genel Durum', icon: <AssessmentIcon />, path: '/reports' },
+  { text: 'Genel Durum', icon: <DashboardIcon />, path: '/reports' },
   { text: 'İş Emri Analizi', icon: <AssignmentIcon />, path: '/reports/work-order-analysis' },
 ];
 
@@ -51,6 +52,9 @@ export const Sidebar = () => {
   const isPathActive = (path: string) => {
     if (path === '/') {
       return location.pathname === '/';
+    }
+    if (path === '/reports' || path === '/reports/work-order-analysis') {
+      return location.pathname === path;
     }
     return location.pathname.startsWith(path);
   };

@@ -313,7 +313,12 @@ const WorkOrderList = () => {
   });
 
   return (
-    <Box sx={{ position: 'relative', minHeight: '100%' }}>
+    <Box sx={{ 
+      position: 'relative', 
+      minHeight: '100%',
+      px: { xs: 1, sm: 0 }, // Mobilde yatayda 8px boşluk
+      pt: 2 // Üstten 16px boşluk
+    }}>
       <Box sx={{ 
         display: 'flex', 
         flexDirection: { xs: 'column', sm: 'row' },
@@ -911,14 +916,14 @@ const WorkOrderList = () => {
                       Hizmetler
                     </Typography>
                     <TableContainer component={MuiPaper} variant="outlined">
-                      <Table size="small">
+                      <Table size="small" sx={{ '& td, & th': { py: 0.5, px: 1 } }}>
                         <TableBody>
                           {selectedWorkOrder.services.map((service) => (
                             <TableRow key={service.id}>
-                              <TableCell sx={{ width: '40%' }}>{service.name}</TableCell>
-                              <TableCell>{service.description}</TableCell>
-                              <TableCell align="right">{`${service.duration} dk`}</TableCell>
-                              <TableCell align="right">{`${service.price.toLocaleString('tr-TR')} ₺`}</TableCell>
+                              <TableCell sx={{ width: '30%' }}>{service.name}</TableCell>
+                              <TableCell sx={{ width: '40%' }}>{service.description}</TableCell>
+                              <TableCell align="right" sx={{ width: '15%' }}>{`${service.duration} dk`}</TableCell>
+                              <TableCell align="right" sx={{ width: '15%' }}>{`${service.price.toLocaleString('tr-TR')} ₺`}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -935,14 +940,14 @@ const WorkOrderList = () => {
                       Parçalar
                     </Typography>
                     <TableContainer component={MuiPaper} variant="outlined">
-                      <Table size="small">
+                      <Table size="small" sx={{ '& td, & th': { py: 0.5, px: 1 } }}>
                         <TableBody>
                           {selectedWorkOrder.parts.map((part) => (
                             <TableRow key={part.id}>
-                              <TableCell sx={{ width: '40%' }}>{part.name}</TableCell>
-                              <TableCell>{part.description}</TableCell>
-                              <TableCell align="right">{`${part.quantity} ${part.unit}`}</TableCell>
-                              <TableCell align="right">{`${(part.quantity * part.unitPrice).toLocaleString('tr-TR')} ₺`}</TableCell>
+                              <TableCell sx={{ width: '30%' }}>{part.name}</TableCell>
+                              <TableCell sx={{ width: '40%' }}>{part.description}</TableCell>
+                              <TableCell align="right" sx={{ width: '15%' }}>{`${part.quantity} ${part.unit}`}</TableCell>
+                              <TableCell align="right" sx={{ width: '15%' }}>{`${(part.quantity * part.unitPrice).toLocaleString('tr-TR')} ₺`}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>

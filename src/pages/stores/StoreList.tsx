@@ -256,10 +256,13 @@ const StoreList = () => {
   }
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="h5">Mağazalarım</Typography>
-        
+    <Box sx={{ 
+      position: 'relative', 
+      minHeight: '100%',
+      px: { xs: 1, sm: 0 }, // Mobilde yatayda 8px boşluk
+      pt: 2 // Üstten 16px boşluk
+    }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <TextField
             size="small"
@@ -289,9 +292,22 @@ const StoreList = () => {
             </ToggleButton>
           </ToggleButtonGroup>
 
-          <IconButton color="primary" onClick={handleAdd}>
-            <AddIcon />
-          </IconButton>
+          <Chip
+            icon={<AddIcon />}
+            label="Yeni Mağaza Ekle"
+            onClick={handleAdd}
+            sx={{
+              bgcolor: 'primary.light',
+              color: 'primary.main',
+              border: '1px solid',
+              borderColor: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.main',
+                color: 'white',
+              },
+              cursor: 'pointer'
+            }}
+          />
         </Box>
       </Box>
 

@@ -94,19 +94,27 @@ const WorkOrderAnalysis = () => {
           caption: 'Kullanılan Servisler',
           dataField: 'services',
           area: 'row',
-          selector: (data) => data.services.map(s => s.name).join(', '),
+          selector: (data: WorkOrderReport) => data.services.map(s => s.name).join(', '),
         },
         {
           caption: 'Kullanılan Parçalar',
           dataField: 'parts',
           area: 'row',
-          selector: (data) => data.parts.map(p => `${p.name} (${p.quantity} ${p.unit})`).join(', '),
+          selector: (data: WorkOrderReport) => data.parts.map(p => `${p.name} (${p.quantity} ${p.unit})`).join(', '),
         },
         {
           caption: 'İş Emri Sayısı',
           dataField: 'id',
           dataType: 'number',
           summaryType: 'count',
+          area: 'data'
+        },
+        {
+          caption: 'Toplam Süre (dk)',
+          dataField: 'services',
+          dataType: 'number',
+          summaryType: 'sum',
+          selector: (data: WorkOrderReport) => data.services.reduce((acc, service) => acc + service.duration, 0),
           area: 'data'
         },
         {
@@ -160,12 +168,15 @@ const WorkOrderAnalysis = () => {
           showRowGrandTotals={true}
           height={600}
         >
-          <FieldChooser enabled={true} />
+          <FieldChooser enabled={true} height={600} allowSearch={true} />
           <Scrolling mode="virtual" />
           <Export enabled={true} />
           <FieldPanel
             showFilterFields={true}
             allowFieldDragging={true}
+            showDataFields={true}
+            showColumnFields={true}
+            showRowFields={true}
             visible={true}
           />
           <HeaderFilter enabled={true} />

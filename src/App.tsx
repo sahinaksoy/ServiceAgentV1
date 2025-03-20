@@ -19,6 +19,7 @@ import { queryClient } from './hooks/useUsers';
 import Dashboard from './pages/dashboard/Dashboard';
 import Reports from './pages/Reports';
 import WorkOrderAnalysis from './pages/WorkOrderAnalysis';
+import WorkOrderReport from './pages/reports/WorkOrderReport';
 
 // DevExtreme CSS imports
 import 'devextreme/dist/css/dx.light.css';
@@ -48,6 +49,7 @@ function App() {
                   <Route path="/work-orders/:id/edit" element={<WorkOrderDetail />} />
                   <Route path="/reports" element={<Reports />} />
                   <Route path="/reports/work-order-analysis" element={<WorkOrderAnalysis />} />
+                  <Route path="/reports/work-order-report" element={<WorkOrderReport />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </MainLayout>
