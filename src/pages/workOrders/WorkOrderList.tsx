@@ -677,9 +677,18 @@ const WorkOrderList = () => {
                     <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
                       <Chip
                         label={typeLabels[workOrder.type]}
-                        variant="outlined"
+                        variant={workOrder.type === 'emergency' ? 'filled' : 'outlined'}
                         size="small"
-                        sx={{ borderRadius: '12px' }}
+                        sx={{ 
+                          borderRadius: '12px',
+                          ...(workOrder.type === 'emergency' && {
+                            bgcolor: 'error.main',
+                            color: 'white',
+                            '&:hover': {
+                              bgcolor: 'error.dark'
+                            }
+                          })
+                        }}
                       />
                       <Chip
                         label={categoryLabels[workOrder.category]}

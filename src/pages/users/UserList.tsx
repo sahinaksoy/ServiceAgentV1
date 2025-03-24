@@ -154,7 +154,6 @@ const UserList = () => {
           
           <Column dataField="firstName" caption="Ad" />
           <Column dataField="lastName" caption="Soyad" />
-          <Column dataField="email" caption="E-posta" />
           <Column dataField="phone" caption="Telefon" />
           <Column 
             dataField="roles" 

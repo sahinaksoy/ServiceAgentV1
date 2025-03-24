@@ -20,6 +20,7 @@ import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog
 import { StoreDialog } from '../../components/stores/StoreDialog';
 import { usePageTitle } from '../../contexts/PageTitleContext';
 import React from 'react';
+import { StoreDetailDialog } from '../../components/stores/StoreDetailDialog';
 
 interface Device {
   id: string;
@@ -262,36 +263,21 @@ const StoreList = () => {
       px: { xs: 1, sm: 0 }, // Mobilde yatayda 8px boşluk
       pt: 2 // Üstten 16px boşluk
     }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+        <TextField
+          size="small"
+          placeholder="Mağaza Ara..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <TextField
-            size="small"
-            placeholder="Mağaza Ara..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-          
-          <ToggleButtonGroup
-            value={viewMode}
-            exclusive
-            onChange={(_, newValue) => newValue && setViewMode(newValue)}
-            size="small"
-          >
-            <ToggleButton value="grid" aria-label="tablo görünümü">
-              <GridViewIcon />
-            </ToggleButton>
-            <ToggleButton value="card" aria-label="kart görünümü">
-              <CardViewIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-
           <Chip
             icon={<AddIcon />}
             label="Yeni Mağaza Ekle"
@@ -308,6 +294,20 @@ const StoreList = () => {
               cursor: 'pointer'
             }}
           />
+
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={(_, newValue) => newValue && setViewMode(newValue)}
+            size="small"
+          >
+            <ToggleButton value="grid" aria-label="tablo görünümü">
+              <GridViewIcon />
+            </ToggleButton>
+            <ToggleButton value="card" aria-label="kart görünümü">
+              <CardViewIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
         </Box>
       </Box>
 
@@ -546,15 +546,10 @@ const StoreList = () => {
             mode="edit"
           />
 
-          <StoreDialog
+          <StoreDetailDialog
             open={isDetailDialogOpen}
             onClose={handleDialogClose}
-            onSubmit={() => {}}
-            store={{
-              ...selectedStore,
-              devices: selectedStore.devices || []
-            }}
-            mode="view"
+            store={selectedStore}
           />
 
           <DeleteConfirmDialog

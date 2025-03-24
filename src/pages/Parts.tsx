@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogActions,
   Typography,
+  Chip,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { usePageTitle } from '../contexts/PageTitleContext';
@@ -100,13 +101,22 @@ const Parts: React.FC = () => {
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
+          <Chip
+            icon={<AddIcon />}
+            label="Yeni Parça Ekle"
             onClick={handleAdd}
-          >
-            Yeni Parça
-          </Button>
+            sx={{
+              bgcolor: 'primary.light',
+              color: 'primary.main',
+              border: '1px solid',
+              borderColor: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.main',
+                color: 'white',
+              },
+              cursor: 'pointer'
+            }}
+          />
         </Box>
         
         <DataGrid

@@ -6,7 +6,6 @@ import PivotGrid, {
   Scrolling,
   Export,
   FieldPanel,
-  HeaderFilter,
 } from 'devextreme-react/pivot-grid';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
@@ -153,9 +152,6 @@ const WorkOrderAnalysis = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Paper sx={{ p: 2, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          İş Emri Analizi - Pivot Tablo
-        </Typography>
         <PivotGrid
           dataSource={dataSource}
           allowSortingBySummary={true}
@@ -179,7 +175,6 @@ const WorkOrderAnalysis = () => {
             showRowFields={true}
             visible={true}
           />
-          <HeaderFilter enabled={true} />
         </PivotGrid>
       </Paper>
     </Box>

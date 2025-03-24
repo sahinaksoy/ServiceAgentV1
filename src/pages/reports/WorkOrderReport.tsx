@@ -65,9 +65,6 @@ const WorkOrderReport = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Paper sx={{ p: 2 }}>
-        <Typography variant="h6" gutterBottom>
-          İş Emri Raporu
-        </Typography>
         <DataGrid
           dataSource={reportData}
           showBorders={true}

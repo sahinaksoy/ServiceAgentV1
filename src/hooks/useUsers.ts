@@ -6,10 +6,10 @@ import { userAPI } from '../services/api';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: Infinity, // Veriyi hep taze kabul et
-      cacheTime: Infinity, // Süresiz cache
-      refetchOnWindowFocus: false, // Sekme değişiminde yeniden yükleme yapma
-      refetchOnMount: false, // Komponent mount olduğunda yeniden yükleme yapma
+      staleTime: 1000 * 60, // 1 dakika
+      gcTime: 1000 * 60 * 10, // 10 dakika
+      refetchOnWindowFocus: true, // Sekme değişiminde yeniden yükle
+      refetchOnMount: true, // Komponent mount olduğunda yeniden yükle
       retry: false, // Hata durumunda tekrar deneme
     },
   },
@@ -33,20 +33,11 @@ export const useUsers = () => {
         status: user.status === 'active' ? 'Aktif' : 'Pasif'
       }));
     },
-    initialData: () => {
-      const cachedData = queryClient.getQueryData(['users']);
-      if (cachedData) {
-        return (cachedData as any[]).map(user => ({
-          ...user,
-          status: user.status === 'active' ? 'Aktif' : 'Pasif'
-        }));
-      }
-      return undefined;
-    },
-    staleTime: Infinity,
-    cacheTime: Infinity,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    staleTime: 0, // Her zaman yeni veri çek
+    gcTime: 1000 * 60 * 5, // 5 dakika
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
   });
 };
 
