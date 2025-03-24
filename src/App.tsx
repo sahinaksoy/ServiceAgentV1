@@ -20,6 +20,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import Reports from './pages/Reports';
 import WorkOrderAnalysis from './pages/WorkOrderAnalysis';
 import WorkOrderReport from './pages/reports/WorkOrderReport';
+import Profile from './pages/profile/Profile';
 
 // DevExtreme CSS imports
 import 'devextreme/dist/css/dx.light.css';
@@ -50,6 +51,7 @@ function App() {
                   <Route path="/reports" element={<Reports />} />
                   <Route path="/reports/work-order-analysis" element={<WorkOrderAnalysis />} />
                   <Route path="/reports/work-order-report" element={<WorkOrderReport />} />
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </MainLayout>
