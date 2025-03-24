@@ -196,10 +196,20 @@ const UserList = () => {
           <Column dataField="region" caption="Bölge" />
           <Column dataField="company" caption="Şirket" />
           
+          <Paging defaultPageSize={10} />
+          <Pager
+            showPageSizeSelector
+            allowedPageSizes={[10, 20, 50]}
+            showInfo
+            showNavigationButtons
+          />
+
           <Column
             caption="İşlemler"
             width={120}
             alignment="center"
+            fixed={true}
+            fixedPosition="right"
             cellRender={(cell) => (
               <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                 <IconButton size="small" onClick={() => handleView(cell.data)}>
@@ -213,14 +223,6 @@ const UserList = () => {
                 </IconButton>
               </Box>
             )}
-          />
-
-          <Paging defaultPageSize={10} />
-          <Pager
-            showPageSizeSelector
-            allowedPageSizes={[10, 20, 50]}
-            showInfo
-            showNavigationButtons
           />
         </DataGrid>
       </Paper>
