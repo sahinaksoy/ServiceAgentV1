@@ -1138,6 +1138,66 @@ const WorkOrderDetail: React.FC = () => {
     doc.line(margin, yPos, pageWidth - margin, yPos);
     yPos += 30;
 
+    // Servisler
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.text('Servisler', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    localWorkOrder.services.forEach((service) => {
+      doc.text(`• ${service.name}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Açıklama: ${service.description}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Süre: ${service.duration} Saat`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Durum: ${service.status === 'completed' ? 'Tamamlandı' : service.status === 'partially_completed' ? 'Kısmen Tamamlandı' : 'Beklemede'}`, margin, yPos);
+      yPos += 30;
+    });
+
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 200) {
+      doc.addPage();
+      yPos = 40;
+    }
+
+    // Alt çizgi
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
+    // Parçalar
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.text('Parçalar', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    localWorkOrder.parts.forEach((part) => {
+      doc.text(`• ${part.name}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Açıklama: ${part.description}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Miktar: ${part.quantity} ${part.unit}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Birim Fiyat: ${part.unitPrice} ₺`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Toplam: ${part.quantity * part.unitPrice} ₺`, margin, yPos);
+      yPos += 30;
+    });
+
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 200) {
+      doc.addPage();
+      yPos = 40;
+    }
+
+    // Alt çizgi
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
     // Kontrol Listesi
     doc.setFont('Roboto', 'bold');
     doc.setFontSize(16);
@@ -1161,6 +1221,12 @@ const WorkOrderDetail: React.FC = () => {
     });
     yPos += 30;
 
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 200) {
+      doc.addPage();
+      yPos = 40;
+    }
+
     // Alt çizgi
     doc.line(margin, yPos, pageWidth - margin, yPos);
     yPos += 30;
@@ -1179,6 +1245,12 @@ const WorkOrderDetail: React.FC = () => {
       yPos += 20;
     });
     yPos += 10;
+
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 200) {
+      doc.addPage();
+      yPos = 40;
+    }
 
     // Alt çizgi
     doc.line(margin, yPos, pageWidth - margin, yPos);
@@ -1199,16 +1271,22 @@ const WorkOrderDetail: React.FC = () => {
     });
     yPos += 30;
 
-    // İmza
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 300) {
+      doc.addPage();
+      yPos = 40;
+    }
+
+    // İmza Alanı
     if (signature) {
       doc.setFont('Roboto', 'bold');
       doc.setFontSize(16);
       doc.text('Teknisyen İmzası', margin, yPos);
       yPos += 25;
       
-      // İmza boyutunu ve pozisyonunu ayarla
-      const imgWidth = 200;
-      const imgHeight = 100;
+      // İmza için daha büyük alan
+      const imgWidth = 300;
+      const imgHeight = 150;
       doc.addImage(signature, 'PNG', margin, yPos, imgWidth, imgHeight);
       yPos += imgHeight + 20;
     }
