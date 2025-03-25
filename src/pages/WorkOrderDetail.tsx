@@ -1281,7 +1281,7 @@ const WorkOrderDetail: React.FC = () => {
     if (signature) {
       doc.setFont('Roboto', 'bold');
       doc.setFontSize(16);
-      doc.text('Teknisyen İmzası', margin, yPos);
+      doc.text('Yetkili İmzası', margin, yPos);
       yPos += 25;
       
       // İmza için daha büyük alan
@@ -2214,7 +2214,7 @@ const WorkOrderDetail: React.FC = () => {
             {/* İmza Alanı */}
             <Box>
               <Typography variant="h6" gutterBottom color="primary">
-                Teknisyen İmzası
+                Yetkili İmzası
               </Typography>
               <Box 
                 sx={{ 
