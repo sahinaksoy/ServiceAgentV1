@@ -52,7 +52,19 @@ const PartSelectionDialog: React.FC<PartSelectionDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="md" 
+      fullWidth
+      disablePortal
+      keepMounted
+      slotProps={{
+        backdrop: {
+          'aria-hidden': true
+        }
+      }}
+    >
       <DialogTitle>Parça Seç</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 2 }}>

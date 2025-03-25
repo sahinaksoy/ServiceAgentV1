@@ -90,6 +90,7 @@ export interface WorkOrderFormData {
   category: WorkOrderCategory;
   dueDate: string;
   company: string;
+  store: string;
   contact: string;
   email: string;
   phone: string;

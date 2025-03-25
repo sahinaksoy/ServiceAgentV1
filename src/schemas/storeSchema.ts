@@ -18,8 +18,5 @@ export const storeSchema = z.object({
   status: z.enum(['active', 'inactive', 'maintenance'] as const),
   manager: z.string()
     .min(2, 'Yönetici adı en az 2 karakter olmalıdır')
-    .max(100, 'Yönetici adı en fazla 100 karakter olabilir'),
-  employeeCount: z.number()
-    .min(1, 'Çalışan sayısı en az 1 olmalıdır')
-    .max(1000, 'Çalışan sayısı en fazla 1000 olabilir'),
+    .max(100, 'Yönetici adı en fazla 100 karakter olabilir')
 }); 

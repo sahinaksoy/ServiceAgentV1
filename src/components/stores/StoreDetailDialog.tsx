@@ -5,7 +5,7 @@ import { DeviceThermostat as DeviceIcon } from '@mui/icons-material';
 interface StoreDetailDialogProps {
   open: boolean;
   onClose: () => void;
-  store: Store;
+  store?: Store;
 }
 
 const DetailRow = ({ label, value }: { label: string; value: string | number }) => {
@@ -42,6 +42,8 @@ const deviceTypeLabels: Record<string, string> = {
 };
 
 export const StoreDetailDialog = ({ open, onClose, store }: StoreDetailDialogProps) => {
+  if (!store) return null;
+
   return (
     <Dialog
       open={open}
@@ -60,9 +62,9 @@ export const StoreDetailDialog = ({ open, onClose, store }: StoreDetailDialogPro
 
       <DialogContent>
         <DetailRow label="Mağaza Adı" value={store.name} />
-        <DetailRow label="E-posta" value={store.email} />
-        <DetailRow label="Telefon" value={store.phone} />
-        <DetailRow label="Bölge" value={store.region} />
+        <DetailRow label="İl" value={store.city} />
+        <DetailRow label="İlçe" value={store.region} />
+        <DetailRow label="Bölge" value={store.zone} />
         <DetailRow label="Şirket" value={store.company} />
         <DetailRow label="Durum" value={store.status === 'active' ? 'Aktif' : store.status === 'inactive' ? 'Pasif' : 'Bakımda'} />
         <DetailRow label="Mağaza Yetkilisi" value={store.manager} />
@@ -97,14 +99,6 @@ export const StoreDetailDialog = ({ open, onClose, store }: StoreDetailDialogPro
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <Typography variant="body2" color="text.secondary">
-                  Seri No
-                </Typography>
-                <Typography variant="body1">
-                  {device.serialNumber}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" color="text.secondary">
                   Cihaz Tipi
                 </Typography>
                 <Typography variant="body1">
@@ -126,6 +120,14 @@ export const StoreDetailDialog = ({ open, onClose, store }: StoreDetailDialogPro
                   }
                   sx={{ mt: 0.5 }}
                 />
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">
+                  Seri No
+                </Typography>
+                <Typography variant="body1">
+                  {device.serialNumber}
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="text.secondary">

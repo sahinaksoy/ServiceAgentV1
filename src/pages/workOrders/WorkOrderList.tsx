@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -69,7 +69,7 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { WorkOrder } from '../../types/workOrder';
+import { WorkOrder, WorkOrderStatus, WorkOrderType, WorkOrderCategory, WorkOrderPriority } from '../../types/workOrder';
 import { User } from '../../types/user';
 import { useGlobalUsers } from '../../hooks/useGlobalUsers';
 import { useQuery } from '@tanstack/react-query';
@@ -78,6 +78,8 @@ import dayjs from 'dayjs';
 import { usePageTitle } from '../../contexts/PageTitleContext';
 import React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import WorkOrderForm from '../../components/work-orders/WorkOrderForm';
+import { useSnackbar } from 'notistack';
 
 const priorityLabels = {
   high: 'Yüksek',
@@ -134,6 +136,15 @@ const priorityIcons = {
   low: <LowPriorityIcon fontSize="small" sx={{ color: 'success.main' }} />,
 } as const;
 
+const statusOrder = {
+  'pool': 0,
+  'awaiting_approval': 1,
+  'pending': 2,
+  'in_progress': 3,
+  'completed': 4,
+  'cancelled': 5,
+} as const;
+
 const WorkOrderList = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -142,17 +153,25 @@ const WorkOrderList = () => {
   const { setTitle } = usePageTitle();
   const [currentFilter, setCurrentFilter] = useState<FilterType>('all');
   const [menuAnchorEl, setMenuAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});
-  const [sortBy, setSortBy] = useState<SortOption>('dueDate');
+  const [sortBy, setSortBy] = useState<SortOption>('status');
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [assigningWorkOrder, setAssigningWorkOrder] = useState<WorkOrder | null>(null);
   const [isAssigning, setIsAssigning] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [localWorkOrders, setLocalWorkOrders] = useState<WorkOrder[]>([]);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingWorkOrder, setEditingWorkOrder] = useState<WorkOrder | null>(null);
+  const { enqueueSnackbar } = useSnackbar();
 
-  const { data: workOrders = [] } = useQuery({
+  const { data: workOrders = [] } = useQuery<WorkOrder[]>({
     queryKey: ['workOrders'],
     queryFn: workOrderAPI.getWorkOrders,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false
   });
 
   const queryClient = useQueryClient();
@@ -161,30 +180,21 @@ const WorkOrderList = () => {
     setTitle('İş Emirleri');
   }, [setTitle]);
 
+  useEffect(() => {
+    setLocalWorkOrders(workOrders.map(wo => ({ ...wo })));
+  }, [workOrders]);
+
   const handleAdd = () => {
     navigate('/work-orders/create');
   };
 
-
-
-  const filteredWorkOrders = workOrders.filter(workOrder => {
-    switch (currentFilter) {
-      case 'pool':
-        return workOrder.status === 'pool';
-      case 'pending':
-        return workOrder.status === 'pending';
-      case 'in_progress':
-        return workOrder.status === 'in_progress';
-      case 'completed':
-        return workOrder.status === 'completed';
-      case 'cancelled':
-        return workOrder.status === 'cancelled';
-      case 'awaiting_approval':
-        return workOrder.status === 'awaiting_approval';
-      default:
-        return true;
-    }
-  });
+  const filteredWorkOrders = useMemo(() => {
+    return localWorkOrders.filter(workOrder => {
+      const matchesSearch = workOrder.summary.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = currentFilter === 'all' || workOrder.status === currentFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [localWorkOrders, searchQuery, currentFilter]);
 
   const filterCounts = {
     all: workOrders.length,
@@ -212,7 +222,7 @@ const WorkOrderList = () => {
 
   const handleViewDetails = (workOrderId: string) => {
     handleCardMenuClose(workOrderId);
-    const workOrder = workOrders.find(wo => wo.id.toString() === workOrderId);
+    const workOrder = localWorkOrders.find(wo => wo.id.toString() === workOrderId);
     if (workOrder) {
       setSelectedWorkOrder(workOrder);
     }
@@ -227,33 +237,46 @@ const WorkOrderList = () => {
     navigate(`/work-orders/${workOrderId}/edit`);
   };
 
+  const handleEditSave = async (updatedWorkOrder: WorkOrder) => {
+    try {
+      const result = await workOrderAPI.updateWorkOrder(updatedWorkOrder.id, updatedWorkOrder);
+      queryClient.invalidateQueries({ queryKey: ['workOrders'] });
+      navigate('/work-orders');
+      enqueueSnackbar('İş emri başarıyla güncellendi', { variant: 'success' });
+    } catch (error) {
+      console.error('İş emri güncellenirken bir hata oluştu:', error);
+      enqueueSnackbar('İş emri güncellenirken bir hata oluştu', { variant: 'error' });
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditDialogOpen(false);
+    setEditingWorkOrder(null);
+  };
+
   const handleSortChange = (event: SelectChangeEvent) => {
     setSortBy(event.target.value as SortOption);
   };
 
-  const getSortedWorkOrders = (orders: WorkOrder[]) => {
-    return [...orders].sort((a, b) => {
+  const sortedWorkOrders = useMemo(() => {
+    return [...filteredWorkOrders].sort((a: WorkOrder, b: WorkOrder) => {
       switch (sortBy) {
         case 'dueDate':
           return dayjs(a.dueDate).isBefore(dayjs(b.dueDate)) ? -1 : 1;
         case 'priority':
           const priorityOrder = { high: 1, medium: 2, low: 3 };
-          return priorityOrder[a.priority as keyof typeof priorityOrder] - priorityOrder[b.priority as keyof typeof priorityOrder];
+          return priorityOrder[a.priority as WorkOrderPriority] - priorityOrder[b.priority as WorkOrderPriority];
         case 'status':
-          return (statusLabels[a.status as keyof typeof statusLabels] || '').localeCompare(
-            statusLabels[b.status as keyof typeof statusLabels] || ''
-          );
+          return statusOrder[a.status as WorkOrderStatus] - statusOrder[b.status as WorkOrderStatus];
         case 'category':
-          return (categoryLabels[a.category as keyof typeof categoryLabels] || '').localeCompare(
-            categoryLabels[b.category as keyof typeof categoryLabels] || ''
+          return (categoryLabels[a.category as WorkOrderCategory] || '').localeCompare(
+            categoryLabels[b.category as WorkOrderCategory] || ''
           );
         default:
           return 0;
       }
     });
-  };
-
-  const sortedAndFilteredWorkOrders = getSortedWorkOrders(filteredWorkOrders);
+  }, [filteredWorkOrders, sortBy]);
 
   const getGoogleMapsUrl = (address: string) => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -261,11 +284,13 @@ const WorkOrderList = () => {
 
   const handleAssignmentOpen = (workOrderId: string) => {
     handleCardMenuClose(workOrderId);
-    const workOrder = workOrders.find(wo => wo.id.toString() === workOrderId);
+    const workOrder = localWorkOrders.find(wo => wo.id === Number(workOrderId));
     if (workOrder) {
       setAssigningWorkOrder(workOrder);
       setSelectedUserId(workOrder.assignedTo?.id || null);
       setAssignmentDialogOpen(true);
+    } else {
+      console.error('İş emri bulunamadı:', workOrderId);
     }
   };
 
@@ -273,30 +298,63 @@ const WorkOrderList = () => {
     setAssignmentDialogOpen(false);
     setAssigningWorkOrder(null);
     setSelectedUserId(null);
+    setSearchQuery('');
   };
 
   const handleAssignmentSave = async () => {
-    if (!assigningWorkOrder || !selectedUserId) return;
+    if (!assigningWorkOrder || !selectedUserId) {
+      console.error('Atama yapılamadı: İş emri veya kullanıcı seçilmedi');
+      return;
+    }
 
     setIsAssigning(true);
     try {
       const selectedUser = users.find(u => u.id === selectedUserId);
-      if (!selectedUser) return;
+      if (!selectedUser) {
+        console.error('Seçilen kullanıcı bulunamadı:', selectedUserId);
+        return;
+      }
 
       const updatedWorkOrder = {
         ...assigningWorkOrder,
-        assignedTo: selectedUser,
-        status: assigningWorkOrder.status === 'pending' ? 'in_progress' : assigningWorkOrder.status
+        assignedTo: {
+          id: selectedUser.id,
+          firstName: selectedUser.firstName,
+          lastName: selectedUser.lastName,
+          email: selectedUser.email,
+          status: selectedUser.status
+        },
+        status: assigningWorkOrder.status === 'pool' ? 'pending' : assigningWorkOrder.status,
+        updatedAt: new Date().toISOString()
       };
 
-      await workOrderAPI.updateWorkOrder(assigningWorkOrder.id, updatedWorkOrder);
-      
-      // Invalidate and refetch work orders
-      await queryClient.invalidateQueries({ queryKey: ['workOrders'] });
-      
+      // Önce local state'i güncelle
+      setLocalWorkOrders(prev => 
+        prev.map(wo => wo.id === updatedWorkOrder.id ? { ...updatedWorkOrder } : wo)
+      );
+
+      // API çağrısını yap
+      const result = await workOrderAPI.updateWorkOrder(assigningWorkOrder.id, updatedWorkOrder);
+
+      // Local state'i API sonucuyla güncelle
+      setLocalWorkOrders(prev => 
+        prev.map(wo => wo.id === result.id ? { ...result } : wo)
+      );
+
+      // Cache'i güncelle
+      queryClient.setQueryData(['workOrders'], (oldData: WorkOrder[] | undefined) => {
+        if (!oldData) return [result];
+        return oldData.map(wo => wo.id === result.id ? { ...result } : wo);
+      });
+
+      // Dialog'u kapat
       handleAssignmentClose();
     } catch (error) {
       console.error('Atama yapılırken bir hata oluştu:', error);
+      // Hata durumunda local state'i eski haline getir
+      setLocalWorkOrders(prev => 
+        prev.map(wo => wo.id === assigningWorkOrder.id ? assigningWorkOrder : wo)
+      );
     } finally {
       setIsAssigning(false);
     }
@@ -484,7 +542,7 @@ const WorkOrderList = () => {
       </Box>
 
       <Grid container spacing={2}>
-        {sortedAndFilteredWorkOrders.length === 0 ? (
+        {sortedWorkOrders.length === 0 ? (
           <Grid item xs={12}>
             <Box
               sx={{
@@ -507,7 +565,7 @@ const WorkOrderList = () => {
             </Box>
           </Grid>
         ) : (
-          sortedAndFilteredWorkOrders.map((workOrder) => (
+          sortedWorkOrders.map((workOrder: WorkOrder) => (
             <Grid item xs={12} sm={6} md={4} key={workOrder.id}>
               <Card 
                 sx={{ 
@@ -590,10 +648,12 @@ const WorkOrderList = () => {
                             <EditIcon fontSize="small" sx={{ mr: 1 }} />
                             Düzenle
                           </MenuItem>
-                          <MenuItem onClick={() => handleAssignmentOpen(workOrder.id.toString())}>
-                            <AssignmentIndIcon fontSize="small" sx={{ mr: 1 }} />
-                            Atama Yap
-                          </MenuItem>
+                          {workOrder.status === 'pool' && (
+                            <MenuItem onClick={() => handleAssignmentOpen(workOrder.id.toString())}>
+                              <AssignmentIndIcon fontSize="small" sx={{ mr: 1 }} />
+                              Atama Yap
+                            </MenuItem>
+                          )}
                           <MenuItem onClick={() => handleCardMenuClose(workOrder.id.toString())}>
                             <CancelIcon fontSize="small" sx={{ mr: 1 }} />
                             İptal Et
@@ -976,8 +1036,34 @@ const WorkOrderList = () => {
         onClose={handleAssignmentClose}
         maxWidth="sm"
         fullWidth
+        disableRestoreFocus
+        keepMounted={false}
+        disablePortal
+        aria-labelledby="assignment-dialog-title"
+        TransitionProps={{
+          onExited: () => {
+            const mainContent = document.querySelector('main');
+            if (mainContent) {
+              mainContent.setAttribute('tabindex', '-1');
+              mainContent.focus();
+              mainContent.removeAttribute('tabindex');
+            }
+          }
+        }}
+        PaperProps={{
+          sx: {
+            position: 'relative',
+            m: 2,
+            outline: 'none'
+          }
+        }}
+        sx={{
+          '& .MuiDialog-root': {
+            inset: 'unset'
+          }
+        }}
       >
-        <DialogTitle>
+        <DialogTitle id="assignment-dialog-title">
           <Typography variant="h6" component="span">
             İş Emri Atama
           </Typography>
@@ -1086,7 +1172,7 @@ const WorkOrderList = () => {
                         <ListItemText
                           primary={`${user.firstName} ${user.lastName}`}
                           secondary={
-                            <Stack direction="row" spacing={1} alignItems="center">
+                            <Stack direction="row" spacing={1} component="span">
                               <Typography variant="body2" component="span" color="text.secondary">
                                 {user.company || 'Şirket bilgisi yok'}
                               </Typography>

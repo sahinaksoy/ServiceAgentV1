@@ -1,9 +1,16 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem, Autocomplete, Chip } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, TextField, MenuItem, Autocomplete, Chip, FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { User, UserFormData, UserRole, UserStatus } from '../../types/user';
 import { userSchema } from '../../schemas/userSchema';
 import { useCreateUser, useUpdateUser } from '../../hooks/useUsers';
+import { useState, useEffect } from 'react';
+import { Box, Typography, IconButton } from '@mui/material';
+import EngineeringIcon from '@mui/icons-material/Engineering';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import BuildIcon from '@mui/icons-material/Build';
+import ArticleIcon from '@mui/icons-material/Article';
 
 interface UserDialogProps {
   open: boolean;
@@ -22,17 +29,29 @@ const roles: UserRole[] = [
   'admin'
 ];
 const statuses: UserStatus[] = ['active', 'inactive', 'pending'];
-const regions = ['Kadıköy', 'Beşiktaş', 'Şişli']; // API'den gelebilir
-const companies = ['Meser', 'Arveta', 'Noord']; // API'den gelebilir
+const companies = ['Meser', 'Arveta', 'Noord'];
+
+const cities = ['İstanbul', 'Bursa', 'Kocaeli'];
+
+const districts: Record<string, string[]> = {
+  'İstanbul': ['Kadıköy', 'Beşiktaş', 'Şişli', 'Üsküdar', 'Maltepe', 'Ataşehir', 'Kartal', 'Pendik', 'Bakırköy', 'Beylikdüzü'],
+  'Bursa': ['Nilüfer', 'Osmangazi', 'Yıldırım', 'Gemlik', 'Mudanya', 'İnegöl'],
+  'Kocaeli': ['İzmit', 'Gebze', 'Darıca', 'Körfez', 'Gölcük', 'Derince']
+};
+
+const regions = ['1. Bölge', '2. Bölge', '3. Bölge'];
 
 export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
+  const [selectedCity, setSelectedCity] = useState<string>('');
 
   const {
     control,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting }
   } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
@@ -43,10 +62,21 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
       phone: '',
       roles: [],
       status: 'active',
+      city: '',
+      district: '',
       region: '',
       company: '',
     }
   });
+
+  // İl değiştiğinde ilçeyi sıfırla
+  const cityValue = watch('city');
+  useEffect(() => {
+    if (cityValue !== selectedCity) {
+      setSelectedCity(cityValue);
+      setValue('district', '');
+    }
+  }, [cityValue, setValue, selectedCity]);
 
   const onSubmit = async (data: UserFormData) => {
     try {
@@ -145,6 +175,107 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
               />
             </Grid>
 
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="city"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.city}>
+                    <InputLabel>İl</InputLabel>
+                    <Select
+                      {...field}
+                      label="İl"
+                    >
+                      {cities.map((city) => (
+                        <MenuItem key={city} value={city}>
+                          {city}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.city && (
+                      <FormHelperText>{errors.city.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="district"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.district}>
+                    <InputLabel>İlçe</InputLabel>
+                    <Select
+                      {...field}
+                      label="İlçe"
+                      disabled={!selectedCity}
+                    >
+                      {selectedCity && districts[selectedCity]?.map((district) => (
+                        <MenuItem key={district} value={district}>
+                          {district}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.district && (
+                      <FormHelperText>{errors.district.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="region"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.region}>
+                    <InputLabel>Bölge</InputLabel>
+                    <Select
+                      {...field}
+                      label="Bölge"
+                    >
+                      {regions.map((region) => (
+                        <MenuItem key={region} value={region}>
+                          {region}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.region && (
+                      <FormHelperText>{errors.region.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="company"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.company}>
+                    <InputLabel>Şirket</InputLabel>
+                    <Select
+                      {...field}
+                      label="Şirket"
+                    >
+                      {companies.map((company) => (
+                        <MenuItem key={company} value={company}>
+                          {company}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.company && (
+                      <FormHelperText>{errors.company.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
+
             <Grid item xs={12}>
               <Controller
                 name="roles"
@@ -224,52 +355,6 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
                 )}
               />
             </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="region"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Bölge"
-                    fullWidth
-                    error={!!errors.region}
-                    helperText={errors.region?.message}
-                  >
-                    {regions.map((region) => (
-                      <MenuItem key={region} value={region}>
-                        {region}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Controller
-                name="company"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Şirket"
-                    fullWidth
-                    error={!!errors.company}
-                    helperText={errors.company?.message}
-                  >
-                    {companies.map((company) => (
-                      <MenuItem key={company} value={company}>
-                        {company}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
-            </Grid>
           </Grid>
         </DialogContent>
 
@@ -284,6 +369,92 @@ export const UserDialog = ({ open, onClose, mode, user }: UserDialogProps) => {
           </Button>
         </DialogActions>
       </form>
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <EngineeringIcon />
+            <Typography variant="h6">Servisler</Typography>
+          </Box>
+          <Button variant="outlined" startIcon={<AddIcon />}>
+            Ekle
+          </Button>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+            <Box>
+              <Typography variant="subtitle1">PANO ARIZASI</Typography>
+              <Typography variant="body2" color="text.secondary">Kategori: Elektrik panosu bakımı</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box>
+                <Typography variant="body2" color="text.secondary">Süre</Typography>
+                <Typography>120 Saat</Typography>
+              </Box>
+              <Box>
+                <Typography variant="body2" color="text.secondary">Durum</Typography>
+                <Chip label="Beklemede" color="warning" size="small" />
+              </Box>
+              <IconButton>
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <BuildIcon />
+            <Typography variant="h6">Parçalar</Typography>
+          </Box>
+          <Button variant="outlined" startIcon={<AddIcon />}>
+            Ekle
+          </Button>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+            <Box>
+              <Typography variant="subtitle1">Sigortalar</Typography>
+              <Typography variant="body2" color="text.secondary">Sigorta değişimi</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box>
+                <Typography variant="body2" color="text.secondary">Miktar</Typography>
+                <Typography>4 ADET</Typography>
+              </Box>
+              <Box>
+                <Typography variant="body2" color="text.secondary">Birim Fiyat</Typography>
+                <Typography>100 ₺</Typography>
+              </Box>
+              <IconButton>
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <ArticleIcon />
+          <Typography variant="h6">Form</Typography>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+            <ArticleIcon />
+            <Box>
+              <Typography variant="subtitle1">Teknik Servis Formu</Typography>
+              <Typography variant="body2" color="text.secondary">Form henüz doldurulmadı</Typography>
+            </Box>
+            <Box sx={{ flexGrow: 1 }} />
+            <Button variant="contained" color="primary">
+              Formu Doldur
+            </Button>
+          </Box>
+        </Box>
+      </Box>
     </Dialog>
   );
 }; 

@@ -42,12 +42,14 @@ import {
   AccordionDetails,
   FormControl,
   Menu,
+  ListItemAvatar,
+  InputAdornment,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
   Engineering as ServiceIcon,
   Build as PartIcon,
-  MonetizationOn as MoneyIcon,
+  MonetizationOn as MonetizationOnIcon,
   Person as PersonIcon,
   Email as EmailIcon,
   Phone as PhoneIcon,
@@ -56,7 +58,6 @@ import {
   Flag as FlagIcon,
   PriorityHigh as PriorityIcon,
   Schedule as ScheduleIcon,
-  Business as BusinessIcon,
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -76,6 +77,11 @@ import {
   MoreVert as MoreVertIcon,
   PlayArrow as PlayArrowIcon,
   Cancel as CancelIcon,
+  History as HistoryIcon,
+  Article as ArticleIcon,
+  Save as SaveIcon,
+  Close as CloseIcon,
+  Business as BusinessIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import { usePageTitle } from '../contexts/PageTitleContext';
@@ -274,15 +280,26 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   timelineEvents, 
   setTimelineEvents 
 }) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const queryClient = useQueryClient();
+  const { workOrderId } = useParams();
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  
+
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleApprove = async () => {
+    try {
+      await workOrderAPI.updateWorkOrder(Number(workOrderId), { status: 'completed' });
+      queryClient.invalidateQueries({ queryKey: ['workOrder', workOrderId] });
+      handleClose();
+    } catch (error) {
+      console.error('İş emri onaylanırken hata oluştu:', error);
+    }
   };
 
   const handleStatusChange = (event: SelectChangeEvent<string>) => {
@@ -374,7 +391,37 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 </Typography>
                 <StatusChip status={workOrder.status as WorkOrderStatus} />
               </Box>
-               
+              <Box>
+                <IconButton onClick={handleClick}>
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={() => {
+                    handleClose();
+                    // Düzenleme işlemi buraya gelecek
+                  }}>
+                    <EditIcon fontSize="small" sx={{ mr: 1 }} />
+                    Düzenle
+                  </MenuItem>
+                  {workOrder.status === 'awaiting_approval' && (
+                    <MenuItem onClick={handleApprove}>
+                      <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                      Onay Ver
+                    </MenuItem>
+                  )}
+                  <MenuItem onClick={() => {
+                    handleClose();
+                    // İptal işlemi buraya gelecek
+                  }}>
+                    <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
+                    İptal Et
+                  </MenuItem>
+                </Menu>
+              </Box>
             </Box>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
               {workOrder.summary}
@@ -1140,205 +1187,90 @@ const WorkOrderDetail: React.FC = () => {
                     }
                   }}
                 >
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    mb: 1.5
-                  }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Box>
-                      <Typography variant="subtitle1" fontWeight="medium">
+                      <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
                         {service.name}
                       </Typography>
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary"
-                        sx={{ mt: 0.5 }}
-                      >
-                        Kategori: {service.description}
-                      </Typography>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: 2,
-                        mt: 1.5,
-                        color: 'text.secondary',
-                        flexWrap: 'wrap'
-                      }}>
-                        <Box 
-                          sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 0.5,
-                            cursor: 'pointer',
-                            '&:hover': {
-                              color: 'primary.main',
-                            }
-                          }}
-                          onClick={() => handleServiceFormOpen(service)}
-                        >
-                          <DescriptionIcon fontSize="small" />
-                          <Typography variant="body2">
-                            Teknik Servis Formu
-                          </Typography>
-                        </Box>
-                        {service.hasServiceForm ? (
-                          <CheckCircleIcon 
-                            fontSize="small" 
-                            sx={{ 
-                              color: 'success.main'
-                            }} 
-                          />
-                        ) : (
-                          <RadioButtonUncheckedIcon 
-                            fontSize="small" 
-                            sx={{ 
-                              color: 'action.disabled'
-                            }} 
-                          />
-                        )}
-                      </Box>
-                    </Box>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleServiceDelete(service.id)}
-                      color="error"
-                      sx={{
-                        opacity: 0.7,
-                        '&:hover': {
-                          opacity: 1,
-                          bgcolor: 'error.lighter'
-                        }
-                      }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      alignItems: { xs: 'flex-start', sm: 'center' },
-                      gap: 1,
-                      mt: 1,
-                      pt: 1.5,
-                      borderTop: '1px solid',
-                      borderColor: 'divider'
-                    }}
-                  >
-                    <Box sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 1,
-                      width: { xs: '100%', sm: 'auto' }
-                    }}>
                       <Typography variant="body2" color="text.secondary">
-                        Süre:
-                      </Typography>
-                      <TextField
-                        type="number"
-                        size="small"
-                        value={editingServiceId === service.id ? editedDuration : service.duration}
-                        onChange={(e) => {
-                          if (editingServiceId !== service.id) {
-                            setEditingServiceId(service.id);
-                          }
-                          setEditedDuration(Number(e.target.value));
-                        }}
-                        onBlur={() => {
-                          if (editingServiceId === service.id) {
-                            handleServiceDurationSave(service.id);
-                          }
-                        }}
-                        inputProps={{ 
-                          min: 0,
-                          style: { 
-                            width: '60px',
-                            padding: '4px 8px',
-                          }
-                        }}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            '& fieldset': {
-                              borderColor: 'transparent',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: 'primary.main',
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: 'primary.main',
-                            },
-                            bgcolor: 'background.paper',
-                          },
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        Saat
+                        {service.description}
                       </Typography>
                     </Box>
-                    <Box sx={{ 
-                      width: { xs: '100%', sm: 'auto' },
-                      mt: { xs: 1, sm: 0 }
-                    }}>
-                      <Select
-                        size="small"
-                        value={service.status || 'pending'}
-                        onChange={(event) => handleServiceStatusChange(service.id, event)}
-                        fullWidth
-                        sx={{
-                          '& .MuiSelect-select': {
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                          }
-                        }}
-                      >
-                        {serviceStatusOptions.map((option) => (
-                          <MenuItem 
-                            key={option.value} 
-                            value={option.value}
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {editingServiceId === service.id ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <TextField
+                            type="number"
+                            size="small"
+                            value={editedDuration}
+                            onChange={(e) => setEditedDuration(Number(e.target.value))}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">Saat</InputAdornment>,
                             }}
+                            sx={{ width: 120 }}
+                          />
+                          <IconButton 
+                            size="small" 
+                            color="primary"
+                            onClick={() => handleServiceDurationSave(service.id)}
                           >
-                            <CheckCircleIcon 
-                              fontSize="small" 
-                              sx={{ 
-                                color: `${option.color}.main`,
-                              }} 
-                            />
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                            <SaveIcon />
+                          </IconButton>
+                          <IconButton 
+                            size="small"
+                            onClick={() => setEditingServiceId(null)}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        </Box>
+                      ) : (
+                        <>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <AccessTimeIcon fontSize="small" color="action" />
+                            <Typography variant="body2">
+                              {service.duration} Saat
+                            </Typography>
+                          </Box>
+                          <IconButton 
+                            size="small"
+                            onClick={() => handleServiceEdit(service)}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton 
+                            size="small"
+                            onClick={() => handleServiceDelete(service.id)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </>
+                      )}
                     </Box>
+                  </Box>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    mt: 2,
+                    pt: 2,
+                    borderTop: '1px solid',
+                    borderColor: 'divider'
+                  }}>
+                    <FormControl size="small" sx={{ minWidth: 150 }}>
+                      <Select
+                        value={service.status}
+                        onChange={(e) => handleServiceStatusChange(service.id, e)}
+                        sx={{ height: 32 }}
+                      >
+                        <MenuItem value="completed">Tamamlandı</MenuItem>
+                        <MenuItem value="partially_completed">Kısmen Tamamlandı</MenuItem>
+                        <MenuItem value="pending">Beklemede</MenuItem>
+                      </Select>
+                    </FormControl>
                   </Box>
                 </Box>
               ))}
             </Stack>
-            {localWorkOrder?.services.length > 0 && (
-              <Box sx={{ 
-                mt: 3, 
-                pt: 2, 
-                borderTop: '1px solid',
-                borderColor: 'divider',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1
-              }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Toplam Süre:
-                </Typography>
-                <Typography variant="subtitle2" fontWeight="medium">
-                  {calculateTotalDuration()}
-                </Typography>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Saat
-                </Typography>
-              </Box>
-            )}
           </CardContainer>
         </Grid>
 
@@ -1379,105 +1311,158 @@ const WorkOrderDetail: React.FC = () => {
                     }
                   }}
                 >
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    mb: 1.5
-                  }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Box>
-                      <Typography variant="subtitle1" fontWeight="medium">
+                      <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
                         {part.name}
                       </Typography>
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary"
-                        sx={{ mt: 0.5 }}
-                      >
+                      <Typography variant="body2" color="text.secondary">
                         {part.description}
                       </Typography>
                     </Box>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handlePartDelete(part.id)}
-                      color="error"
-                      sx={{
-                        opacity: 0.7,
-                        '&:hover': {
-                          opacity: 1,
-                          bgcolor: 'error.lighter'
-                        }
-                      }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {editingPartId === part.id ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <TextField
+                            type="number"
+                            size="small"
+                            value={editedQuantity}
+                            onChange={(e) => setEditedQuantity(Number(e.target.value))}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">{part.unit}</InputAdornment>,
+                            }}
+                            sx={{ width: 120 }}
+                          />
+                          <IconButton 
+                            size="small" 
+                            color="primary"
+                            onClick={() => handlePartQuantitySave(part.id)}
+                          >
+                            <SaveIcon />
+                          </IconButton>
+                          <IconButton 
+                            size="small"
+                            onClick={() => setEditingPartId(null)}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        </Box>
+                      ) : (
+                        <>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="body2">
+                              {part.quantity} {part.unit}
+                            </Typography>
+                          </Box>
+                          <IconButton 
+                            size="small"
+                            onClick={() => setEditingPartId(part.id)}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton 
+                            size="small"
+                            onClick={() => handlePartDelete(part.id)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </>
+                      )}
+                    </Box>
                   </Box>
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      alignItems: { xs: 'flex-start', sm: 'center' },
-                      justifyContent: { xs: 'flex-start', sm: 'space-between' },
-                      gap: 1,
-                      mt: 1,
-                      pt: 1.5,
-                      borderTop: '1px solid',
-                      borderColor: 'divider',
-                      width: '100%'
-                    }}
-                  >
-                    <Box sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 1,
-                      width: { xs: '100%', sm: 'auto' }
-                    }}>
-                      
-                      <TextField
-                        type="number"
-                        size="small"
-                        value={editingPartId === part.id ? editedQuantity : part.quantity}
-                        onChange={(e) => {
-                          if (editingPartId !== part.id) {
-                            setEditingPartId(part.id);
-                          }
-                          setEditedQuantity(Number(e.target.value));
-                        }}
-                        onBlur={() => {
-                          if (editingPartId === part.id) {
-                            handlePartQuantitySave(part.id);
-                          }
-                        }}
-                        inputProps={{ 
-                          min: 0,
-                          style: { 
-                            width: '60px',
-                            padding: '4px 8px',
-                          }
-                        }}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            '& fieldset': {
-                              borderColor: 'transparent',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: 'primary.main',
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: 'primary.main',
-                            },
-                            bgcolor: 'background.paper',
-                          },
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        {part.unit}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    mt: 2,
+                    pt: 2,
+                    borderTop: '1px solid',
+                    borderColor: 'divider'
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <MonetizationOnIcon fontSize="small" color="action" />
+                      <Typography variant="body2">
+                        {part.unitPrice} ₺
                       </Typography>
                     </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Toplam: {part.quantity * part.unitPrice} ₺
+                    </Typography>
                   </Box>
                 </Box>
               ))}
             </Stack>
+          </CardContainer>
+        </Grid>
+
+        {/* Form */}
+        <Grid item xs={12}>
+          <CardContainer
+            icon={<ArticleIcon />}
+            title="Form"
+          >
+            <Box 
+              sx={{
+                p: 2,
+                borderRadius: 1,
+                bgcolor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                '&:hover': {
+                  borderColor: theme.palette.primary.main,
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <ArticleIcon color="action" />
+                <Box>
+                  <Typography variant="h6" gutterBottom color="primary">
+                    Teknik Servis Formu
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {localWorkOrder.services.some(s => s.hasServiceForm) ? 'Form dolduruldu' : 'Form henüz doldurulmadı'}
+                  </Typography>
+                </Box>
+                <Box sx={{ flexGrow: 1 }} />
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {localWorkOrder.services.some(s => s.hasServiceForm) && (
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<DownloadIcon />}
+                      onClick={() => {
+                        // PDF indirme işlemi burada yapılacak
+                        console.log('PDF indiriliyor...');
+                      }}
+                      sx={{
+                        textTransform: 'none',
+                        px: 3,
+                        py: 1,
+                        borderRadius: 1,
+                        fontWeight: 500
+                      }}
+                    >
+                      PDF İndir
+                    </Button>
+                  )}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleServiceFormOpen(localWorkOrder.services[0])}
+                    sx={{
+                      textTransform: 'none',
+                      px: 3,
+                      py: 1,
+                      borderRadius: 1,
+                      fontWeight: 500
+                    }}
+                  >
+                    {localWorkOrder.services.some(s => s.hasServiceForm) ? 'Formu Görüntüle' : 'Formu Doldur'}
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
           </CardContainer>
         </Grid>
 

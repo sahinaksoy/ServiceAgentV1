@@ -1,5 +1,26 @@
-import { useState, useCallback } from 'react';
-import { Box, Paper, Typography, IconButton, useTheme, useMediaQuery, Grid, InputAdornment, TextField, ToggleButtonGroup, ToggleButton, Card, CardContent, Chip, Divider, Tooltip, Avatar } from '@mui/material';
+import React, { useState, useCallback } from 'react';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  Autocomplete,
+  IconButton,
+  Card,
+  CardContent,
+  Stack,
+  Divider,
+  List,
+  Dialog,
+  Avatar,
+  Tooltip,
+  InputAdornment,
+  ToggleButtonGroup,
+  ToggleButton,
+  Chip
+} from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon, GridView as GridViewIcon, ViewModule as CardViewIcon, Search as SearchIcon, Store as StoreIcon, DeviceThermostat as DeviceIcon, ArrowBack } from '@mui/icons-material';
 import DataGrid, {
   Column,
   Paging,
@@ -13,39 +34,15 @@ import DataGrid, {
   Scrolling,
   LoadPanel
 } from 'devextreme-react/data-grid';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon, GridView as GridViewIcon, ViewModule as CardViewIcon, Search as SearchIcon, Store as StoreIcon, DeviceThermostat as DeviceIcon, Warning as WarningIcon, CheckCircle as CheckIcon, Settings as SettingsIcon } from '@mui/icons-material';
-import { Store, StoreFormData } from '../../types/store';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useSnackbar } from 'notistack';
+import { usePageTitle } from '../../contexts/PageTitleContext';
 import { useStores, useCreateStore, useUpdateStore, useDeleteStore } from '../../hooks/useStores';
 import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog';
 import { StoreDialog } from '../../components/stores/StoreDialog';
-import { usePageTitle } from '../../contexts/PageTitleContext';
-import React from 'react';
 import { StoreDetailDialog } from '../../components/stores/StoreDetailDialog';
-
-interface Device {
-  id: string;
-  name: string;
-  type: string;
-  status: 'active' | 'warning' | 'error' | 'maintenance';
-  temperature: number;
-  lastMaintenance: string;
-  nextMaintenance: string;
-}
-
-interface Store {
-  id: string;
-  name: string;
-  address: string;
-  region: string;
-  devices: Device[];
-}
-
-interface StoreFormData {
-  name: string;
-  address: string;
-  region: string;
-  devices: Device[];
-}
+import { Device, Store, StoreFormData, StoreStatus } from '../../types/store';
 
 // Mock cihaz verileri
 const mockDevices: Device[] = [
@@ -54,48 +51,54 @@ const mockDevices: Device[] = [
     name: 'VRF Sistem A',
     type: 'vrf',
     status: 'active',
+    serialNumber: 'VRF-2024-0001',
     lastMaintenance: '2024-02-15',
     nextMaintenance: '2024-05-15'
   },
   {
     id: '2',
-    name: 'Chiller Ünitesi 1',
-    type: 'chiller',
-    status: 'warning',
+    name: 'Split Klima B',
+    type: 'split_klima',
+    status: 'active',
+    serialNumber: 'SPL-2024-0002',
     lastMaintenance: '2024-02-01',
-    nextMaintenance: '2024-04-01'
+    nextMaintenance: '2024-05-01'
   },
   {
     id: '3',
-    name: 'Havalandırma Sistemi',
-    type: 'havalandirma',
+    name: 'Chiller C',
+    type: 'chiller',
     status: 'active',
+    serialNumber: 'CHL-2024-0003',
     lastMaintenance: '2024-03-01',
     nextMaintenance: '2024-06-01'
   },
   {
     id: '4',
-    name: 'Fan Coil Ünitesi A',
-    type: 'fancoil',
+    name: 'Rooftop D',
+    type: 'rooftop',
     status: 'maintenance',
+    serialNumber: 'RTF-2024-0004',
     lastMaintenance: '2024-01-15',
     nextMaintenance: '2024-04-15'
   },
   {
     id: '5',
-    name: 'Split Klima 1',
-    type: 'split_klima',
-    status: 'active',
+    name: 'Fan Coil E',
+    type: 'fancoil',
+    status: 'warning',
+    serialNumber: 'FCL-2024-0005',
     lastMaintenance: '2024-02-20',
     nextMaintenance: '2024-05-20'
   },
   {
     id: '6',
-    name: 'Rooftop Ünitesi',
-    type: 'rooftop',
-    status: 'error',
-    lastMaintenance: '2024-01-30',
-    nextMaintenance: '2024-04-30'
+    name: 'Isı Pompası F',
+    type: 'isi_pompasi',
+    status: 'active',
+    serialNumber: 'ISP-2024-0006',
+    lastMaintenance: '2024-03-10',
+    nextMaintenance: '2024-06-10'
   }
 ];
 
@@ -105,38 +108,157 @@ const mockStores: Store[] = [
     id: '1',
     name: 'Ataşehir Migros',
     address: 'Ataşehir Bulvarı No:123',
-    region: 'İstanbul Anadolu',
-    devices: [mockDevices[0], mockDevices[1], mockDevices[4]] // VRF, Chiller ve Split Klima
+    city: 'İstanbul',
+    region: 'Ataşehir',
+    zone: '2',
+    company: 'Migros',
+    status: 'active',
+    manager: 'Ahmet Yılmaz',
+    managerPhone: '0532 123 4567',
+    devices: [mockDevices[0], mockDevices[1], mockDevices[4]],
+    createdAt: '2024-01-01',
+    updatedAt: '2024-03-15'
   },
   {
     id: '2',
     name: 'Kadıköy Migros',
     address: 'Bağdat Caddesi No:456',
-    region: 'İstanbul Anadolu',
-    devices: [mockDevices[2], mockDevices[3]] // Havalandırma ve Fan Coil
+    city: 'İstanbul',
+    region: 'Kadıköy',
+    zone: '1',
+    company: 'Migros',
+    status: 'active',
+    manager: 'Ayşe Demir',
+    managerPhone: '0533 234 5678',
+    devices: [mockDevices[2], mockDevices[3]],
+    createdAt: '2024-01-15',
+    updatedAt: '2024-03-15'
   },
   {
     id: '3',
     name: 'Maltepe Migros',
     address: 'Maltepe Sahil Yolu No:789',
-    region: 'İstanbul Anadolu',
-    devices: [mockDevices[5], mockDevices[1], mockDevices[4]] // Rooftop, Chiller ve Split Klima
+    city: 'İstanbul',
+    region: 'Maltepe',
+    zone: '2',
+    company: 'Migros',
+    status: 'active',
+    manager: 'Mehmet Kaya',
+    managerPhone: '0534 345 6789',
+    devices: [mockDevices[5], mockDevices[1], mockDevices[4]],
+    createdAt: '2024-02-01',
+    updatedAt: '2024-03-15'
   },
   {
     id: '4',
-    name: 'Beşiktaş Migros',
-    address: 'Barbaros Bulvarı No:101',
-    region: 'İstanbul Avrupa',
-    devices: [mockDevices[0], mockDevices[2], mockDevices[3]] // VRF, Havalandırma ve Fan Coil
+    name: 'Nilüfer Migros',
+    address: 'Nilüfer Caddesi No:101',
+    city: 'Bursa',
+    region: 'Nilüfer',
+    zone: '1',
+    company: 'Migros',
+    status: 'active',
+    manager: 'Zeynep Şahin',
+    managerPhone: '0535 456 7890',
+    devices: [mockDevices[0], mockDevices[2], mockDevices[3]],
+    createdAt: '2024-02-15',
+    updatedAt: '2024-03-15'
   },
   {
     id: '5',
-    name: 'Şişli Migros',
-    address: 'Halaskargazi Caddesi No:202',
-    region: 'İstanbul Avrupa',
-    devices: [mockDevices[1], mockDevices[4], mockDevices[5]] // Chiller, Split Klima ve Rooftop
+    name: 'Osmangazi Migros',
+    address: 'Osmangazi Caddesi No:202',
+    city: 'Bursa',
+    region: 'Osmangazi',
+    zone: '2',
+    company: 'Migros',
+    status: 'active',
+    manager: 'Can Öztürk',
+    managerPhone: '0536 567 8901',
+    devices: [mockDevices[1], mockDevices[4], mockDevices[5]],
+    createdAt: '2024-03-01',
+    updatedAt: '2024-03-15'
+  },
+  // Halkmar mağazaları
+  {
+    id: '6',
+    name: 'İzmit Hakmar',
+    address: 'İzmit Merkez No:45',
+    city: 'Kocaeli',
+    region: 'İzmit',
+    zone: '1',
+    company: 'Hakmar',
+    status: 'active',
+    manager: 'Ali Yıldız',
+    managerPhone: '0537 678 9012',
+    devices: [mockDevices[0], mockDevices[2], mockDevices[5]],
+    createdAt: '2024-03-01',
+    updatedAt: '2024-03-15'
+  },
+  {
+    id: '7',
+    name: 'Gebze Hakmar',
+    address: 'Gebze Merkez No:67',
+    city: 'Kocaeli',
+    region: 'Gebze',
+    zone: '3',
+    company: 'Hakmar',
+    status: 'active',
+    manager: 'Selin Aydın',
+    managerPhone: '0538 789 0123',
+    devices: [mockDevices[1], mockDevices[3]],
+    createdAt: '2024-01-20',
+    updatedAt: '2024-03-15'
+  },
+  {
+    id: '8',
+    name: 'Yıldırım Hakmar',
+    address: 'Yıldırım E5 Yanı No:89',
+    city: 'Bursa',
+    region: 'Yıldırım',
+    zone: '2',
+    company: 'Hakmar',
+    status: 'active',
+    manager: 'Burak Çelik',
+    managerPhone: '0539 890 1234',
+    devices: [mockDevices[4], mockDevices[5], mockDevices[2]],
+    createdAt: '2024-02-05',
+    updatedAt: '2024-03-15'
+  },
+  {
+    id: '9',
+    name: 'Derince Hakmar',
+    address: 'Derince Merkez No:34',
+    city: 'Kocaeli',
+    region: 'Derince',
+    zone: '2',
+    company: 'Hakmar',
+    status: 'active',
+    manager: 'Deniz Koç',
+    managerPhone: '0540 901 2345',
+    devices: [mockDevices[0], mockDevices[1], mockDevices[3]],
+    createdAt: '2024-02-20',
+    updatedAt: '2024-03-15'
+  },
+  {
+    id: '10',
+    name: 'Gürsu Hakmar',
+    address: 'Gürsu E5 Caddesi No:56',
+    city: 'Bursa',
+    region: 'Gürsu',
+    zone: '3',
+    company: 'Hakmar',
+    status: 'active',
+    manager: 'Ece Arslan',
+    managerPhone: '0541 012 3456',
+    devices: [mockDevices[2], mockDevices[4], mockDevices[5]],
+    createdAt: '2024-03-05',
+    updatedAt: '2024-03-15'
   }
 ];
+
+// Ana firma grupları
+const companies = ['Migros', 'Hakmar'];
 
 const StoreList = () => {
   const theme = useTheme();
@@ -148,17 +270,17 @@ const StoreList = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'card'>('card');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
 
   const { data: stores = mockStores, isLoading, error } = useStores();
   const createStoreMutation = useCreateStore();
   const updateStoreMutation = useUpdateStore();
   const deleteStoreMutation = useDeleteStore();
-
   const { setTitle } = usePageTitle();
 
   React.useEffect(() => {
-    setTitle('Mağazalar');
-  }, [setTitle]);
+    setTitle(selectedCompany ? `${selectedCompany} Mağazaları` : 'Mağazalar');
+  }, [setTitle, selectedCompany]);
 
   const handleAdd = () => {
     setIsAddDialogOpen(true);
@@ -195,7 +317,11 @@ const StoreList = () => {
     try {
       await createStoreMutation.mutateAsync({
         ...data,
-        devices: data.devices || []
+        status: 'active' as StoreStatus,
+        manager: data.manager,
+        managerPhone: data.managerPhone,
+        company: data.company,
+        devices: data.devices
       });
       setIsAddDialogOpen(false);
     } catch (error) {
@@ -210,7 +336,11 @@ const StoreList = () => {
           id: selectedStore.id,
           data: {
             ...data,
-            devices: data.devices || selectedStore.devices || []
+            status: 'active' as StoreStatus,
+            manager: data.manager,
+            managerPhone: data.managerPhone,
+            company: data.company,
+            devices: data.devices
           }
         });
         setIsEditDialogOpen(false);
@@ -228,10 +358,12 @@ const StoreList = () => {
     setSelectedStore(null);
   }, []);
 
-  const filteredStores = (stores || []).filter(store => 
-    store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  // Mağazaları ana firmalara göre filtrele
+  const filteredStores = mockStores.filter(store => 
+    (!selectedCompany || store.company === selectedCompany) &&
+    (store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     store.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    store.address?.toLowerCase().includes(searchTerm.toLowerCase())
+    store.address?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getStatusColor = (status: Device['status']) => {
@@ -252,315 +384,275 @@ const StoreList = () => {
     }
   };
 
+  // Ana firma seçimi için kart bileşeni
+  const CompanyCard = ({ company }: { company: string }) => {
+    // Mock verileri kullan
+    const companyStores = mockStores.filter(store => store.company === company);
+    
+    return (
+      <Card
+        sx={{
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: theme.shadows[4]
+          },
+          bgcolor: selectedCompany === company ? 'primary.light' : 'background.paper',
+          height: '100%'
+        }}
+        onClick={() => setSelectedCompany(company === selectedCompany ? null : company)}
+      >
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
+              <StoreIcon sx={{ fontSize: 32 }} />
+            </Avatar>
+            <Box>
+              <Typography variant="h6" sx={{ mb: 1 }}>{company}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {companyStores.length} Mağaza
+              </Typography>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+    );
+  };
+
   if (error) {
     return <Typography color="error">Bir hata oluştu: {error.message}</Typography>;
   }
 
   return (
-    <Box sx={{ 
-      position: 'relative', 
-      minHeight: '100%',
-      px: { xs: 1, sm: 0 }, // Mobilde yatayda 8px boşluk
-      pt: 2 // Üstten 16px boşluk
-    }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
-        <TextField
-          size="small"
-          placeholder="Mağaza Ara..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <Chip
-            icon={<AddIcon />}
-            label="Yeni Mağaza Ekle"
-            onClick={handleAdd}
-            sx={{
-              bgcolor: 'primary.light',
-              color: 'primary.main',
-              border: '1px solid',
-              borderColor: 'primary.main',
-              '&:hover': {
-                bgcolor: 'primary.main',
-                color: 'white',
-              },
-              cursor: 'pointer'
-            }}
-          />
-
-          <ToggleButtonGroup
-            value={viewMode}
-            exclusive
-            onChange={(_, newValue) => newValue && setViewMode(newValue)}
-            size="small"
-          >
-            <ToggleButton value="grid" aria-label="tablo görünümü">
-              <GridViewIcon />
-            </ToggleButton>
-            <ToggleButton value="card" aria-label="kart görünümü">
-              <CardViewIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-      </Box>
-
-      {viewMode === 'grid' ? (
-        <Paper sx={{ flexGrow: 1, overflow: 'hidden' }}>
-          <DataGrid
-            dataSource={filteredStores}
-            showBorders
-            rowAlternationEnabled
-            columnAutoWidth
-            wordWrapEnabled
-            height="100%"
-            remoteOperations={false}
-            noDataText="Mağaza bulunamadı"
-            repaintChangesOnly={true}
-          >
-            <LoadPanel enabled={isLoading} />
-            <Scrolling mode="virtual" rowRenderingMode="virtual" />
-            <StateStoring enabled type="localStorage" storageKey="storeListGridState" />
-            <Selection mode="single" />
-            <FilterRow visible />
-            <HeaderFilter visible />
-            <ColumnChooser enabled />
-            <Export enabled />
-            
-            <Column dataField="name" caption="Mağaza Adı" />
-            <Column dataField="address" caption="Adres" visible={!isMobile} />
-            <Column dataField="region" caption="Bölge" />
-            <Column dataField="manager" caption="Yetkili" />
-            <Column dataField="managerPhone" caption="Yetkili Telefon" />
-            <Column 
-              dataField="devices" 
-              caption="Cihaz Sayısı"
-              calculateCellValue={(rowData) => rowData.devices?.length || 0}
-            />
-            <Column
-              caption="İşlemler"
-              width={120}
-              alignment="center"
-              cellRender={(cell: any) => (
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                  <IconButton size="small" onClick={() => handleView(cell.data)}>
-                    <ViewIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" onClick={() => handleEdit(cell.data)}>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton 
-                    size="small" 
-                    onClick={() => handleDelete(cell.data)}
-                    sx={{ 
-                      color: 'error.main',
-                      '&:hover': {
-                        color: 'error.dark'
-                      }
-                    }}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              )}
-            />
-
-            <Paging defaultPageSize={10} />
-            <Pager
-              showPageSizeSelector
-              allowedPageSizes={[10, 20, 50]}
-              showInfo
-              showNavigationButtons
-            />
-          </DataGrid>
-        </Paper>
-      ) : (
-        <Grid container spacing={3}>
-          {filteredStores.map((store) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={store.id}>
-              <Card 
-                sx={{ 
-                  height: '100%',
-                  background: 'linear-gradient(to right bottom, #ffffff, #f8f9fa)',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 2,
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.12)'
-                  }
-                }}
-              >
-                <CardContent>
-                  {/* Mağaza Başlığı */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Avatar 
-                      sx={{ 
-                        bgcolor: 'primary.light',
-                        mr: 2
-                      }}
-                    >
-                      <StoreIcon />
-                    </Avatar>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="h6" component="div">
-                        {store.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {store.address}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <IconButton size="small" onClick={() => handleEdit(store)}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton 
-                        size="small" 
-                        onClick={() => handleDelete(store)}
-                        sx={{ 
-                          color: 'error.main',
-                          '&:hover': {
-                            color: 'error.dark'
-                          }
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </Box>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  {/* Mağaza Detayları */}
-                  <Box sx={{ mb: 2 }}>
-                    {/* Bölge */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary"
-                        sx={{ 
-                          minWidth: '80px',
-                          fontWeight: 500
-                        }}
-                      >
-                        Bölge:
-                      </Typography>
-                      <Typography variant="body2">
-                        {store.region}
-                      </Typography>
-                    </Box>
-
-                    {/* Yetkili */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary"
-                        sx={{ 
-                          minWidth: '80px',
-                          fontWeight: 500
-                        }}
-                      >
-                        Yetkili:
-                      </Typography>
-                      <Typography variant="body2">
-                        {store.manager}
-                      </Typography>
-                    </Box>
-
-                    {/* Yetkili Telefon */}
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary"
-                        sx={{ 
-                          minWidth: '80px',
-                          fontWeight: 500
-                        }}
-                      >
-                        Telefon:
-                      </Typography>
-                      <Typography variant="body2">
-                        {store.managerPhone}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  {/* Alt Bilgi ve Aksiyonlar */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <DeviceIcon sx={{ mr: 1, color: 'primary.main', opacity: 0.7 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {store.devices?.length || 0} Cihaz
-                      </Typography>
-                    </Box>
-                    <Tooltip title="Detaylı Bilgi">
-                      <IconButton 
-                        size="small" 
-                        color="primary"
-                        onClick={() => handleView(store)}
-                      >
-                        <ViewIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </CardContent>
-              </Card>
+    <Box sx={{ p: 3 }}>
+      {/* Ana Firma Kartları - Sadece firma seçili değilken göster */}
+      {!selectedCompany && (
+        <Grid container spacing={2}>
+          {companies.map((company) => (
+            <Grid item xs={12} sm={6} key={company}>
+              <CompanyCard company={company} />
             </Grid>
           ))}
         </Grid>
       )}
 
+      {/* Seçilen Firmaya Ait Mağazalar */}
+      {selectedCompany && (
+        <>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <IconButton size="small" onClick={() => setSelectedCompany(null)}>
+                  <ArrowBack />
+                </IconButton>
+                <Typography variant="h6">{selectedCompany} Mağazaları</Typography>
+              </Box>
+              <TextField
+                placeholder="Mağaza Ara..."
+                size="small"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ width: 300 }}
+              />
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, newValue) => newValue && setViewMode(newValue)}
+                size="small"
+              >
+                <ToggleButton value="grid">
+                  <GridViewIcon />
+                </ToggleButton>
+                <ToggleButton value="card">
+                  <CardViewIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAdd}
+              sx={{
+                bgcolor: 'primary.main',
+                color: 'white',
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                },
+                height: 40,
+                borderRadius: 2,
+                px: 3
+              }}
+            >
+              Yeni Mağaza Ekle
+            </Button>
+          </Box>
+
+          {viewMode === 'grid' ? (
+            <DataGrid
+              dataSource={filteredStores}
+              showBorders
+              columnAutoWidth
+              wordWrapEnabled
+              rowAlternationEnabled
+              hoverStateEnabled
+            >
+              <LoadPanel enabled={isLoading} />
+              <Scrolling mode="virtual" rowRenderingMode="virtual" />
+              <StateStoring enabled type="localStorage" storageKey="storeListGridState" />
+              <Selection mode="single" />
+              <FilterRow visible />
+              <HeaderFilter visible />
+              <ColumnChooser enabled />
+              <Export enabled />
+              
+              <Column dataField="name" caption="Mağaza Adı" visibleIndex={0} />
+              <Column dataField="address" caption="Adres" visibleIndex={1} />
+              <Column dataField="city" caption="İl" visibleIndex={2} />
+              <Column dataField="region" caption="İlçe" visibleIndex={3} />
+              <Column dataField="zone" caption="Bölge" visibleIndex={4} />
+              <Column dataField="manager" caption="Mağaza Yetkilisi" visibleIndex={5} />
+              <Column dataField="managerPhone" caption="Yetkili Telefon" visibleIndex={6} />
+              <Column 
+                dataField="devices" 
+                caption="Cihaz Sayısı"
+                calculateCellValue={(rowData) => rowData.devices?.length || 0}
+                visibleIndex={7}
+              />
+              <Column
+                caption="İşlemler"
+                width={120}
+                alignment="center"
+                fixed={true}
+                fixedPosition="right"
+                visibleIndex={8}
+                cellRender={(cell: any) => (
+                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                    <IconButton size="small" onClick={() => handleView(cell.data)}>
+                      <ViewIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small" onClick={() => handleEdit(cell.data)}>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleDelete(cell.data)}
+                      sx={{ 
+                        color: 'error.main',
+                        '&:hover': {
+                          color: 'error.dark'
+                        }
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                )}
+              />
+
+              <Paging defaultPageSize={10} />
+              <Pager
+                showPageSizeSelector
+                allowedPageSizes={[10, 20, 50]}
+                showInfo
+                showNavigationButtons
+              />
+            </DataGrid>
+          ) : (
+            <Grid container spacing={2}>
+              {filteredStores.map((store) => (
+                <Grid item xs={12} sm={6} md={4} key={store.id}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Typography variant="h6" gutterBottom>{store.name}</Typography>
+                        <Box>
+                          <IconButton size="small" onClick={() => handleView(store)}>
+                            <ViewIcon />
+                          </IconButton>
+                          <IconButton size="small" onClick={() => handleEdit(store)}>
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton size="small" color="error" onClick={() => handleDelete(store)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        {store.address}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        İl: {store.city}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        İlçe: {store.region}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Bölge: {store.zone}
+                      </Typography>
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle2" gutterBottom>
+                          Cihazlar ({store.devices.length})
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                          {store.devices.map((device) => (
+                            <Chip
+                              key={device.id}
+                              size="small"
+                              icon={<DeviceIcon />}
+                              label={device.name}
+                              sx={{
+                                bgcolor: getStatusColor(device.status).bg,
+                                color: getStatusColor(device.status).color,
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </>
+      )}
+
+      {/* Dialoglar */}
       <StoreDialog
         open={isAddDialogOpen}
         onClose={handleDialogClose}
         onSubmit={handleCreateStore}
         mode="add"
-        initialData={{
-          devices: []
-        }}
+        selectedCompany={selectedCompany || ''}
       />
-
-      {selectedStore && (
-        <>
-          <StoreDialog
-            open={isEditDialogOpen}
-            onClose={handleDialogClose}
-            onSubmit={handleUpdateStore}
-            store={{
-              ...selectedStore,
-              devices: selectedStore.devices || []
-            }}
-            mode="edit"
-          />
-
-          <StoreDetailDialog
-            open={isDetailDialogOpen}
-            onClose={handleDialogClose}
-            store={selectedStore}
-          />
-
-          <DeleteConfirmDialog
-            open={isDeleteDialogOpen}
-            onClose={() => setIsDeleteDialogOpen(false)}
-            onConfirm={handleConfirmDelete}
-            title="Mağaza Silme"
-            content={`${selectedStore.name} isimli mağazayı ve bağlı ${selectedStore.devices?.length || 0} cihazı silmek istediğinizden emin misiniz?`}
-          />
-        </>
-      )}
+      <StoreDialog
+        open={isEditDialogOpen}
+        onClose={handleDialogClose}
+        onSubmit={handleUpdateStore}
+        store={selectedStore || undefined}
+        mode="edit"
+        selectedCompany={selectedCompany || ''}
+      />
+      <StoreDetailDialog
+        open={isDetailDialogOpen}
+        onClose={handleDialogClose}
+        store={selectedStore || undefined}
+      />
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Mağaza Silme"
+        content="Bu mağazayı silmek istediğinizden emin misiniz?"
+      />
     </Box>
   );
 };

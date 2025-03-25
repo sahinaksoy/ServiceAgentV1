@@ -173,68 +173,104 @@ const mockCustomers: Customer[] = [
 ];
 
 // Mock iş emirleri
-const mockWorkOrders: WorkOrder[] = [
-  {
-    id: 1,
-    summary: 'Klima bakımı yapılacak',
-    type: 'emergency',
-    category: 'mechanical',
-    priority: 'high',
-    status: 'pending',
-    dueDate: dayjs().add(3, 'day').format(),
-    createdAt: dayjs().subtract(1, 'day').format(),
-    updatedAt: dayjs().subtract(1, 'day').format(),
-    company: {
-      id: '1',
-      name: 'ABC Market',
-      contactPerson: 'John Doe',
-      email: 'info@abcmarket.com',
-      mobile: '0532 555 0001',
-      address: 'ABC Market Merkez Şube, İstanbul'
-    },
-    assignedTo: {
-      id: '2',
-      firstName: 'Ayşe',
-      lastName: 'Demir',
-      email: 'ayse.demir@arveta.com.tr',
-      status: 'active'
-    },
-    services: [],
-    parts: [],
-    totalAmount: 0,
-    totalDuration: 0
-  },
-  {
-    id: 2,
-    summary: 'Buzdolabı tamiri',
-    type: 'maintenance',
-    category: 'electrical',
-    priority: 'medium',
-    status: 'in_progress',
-    dueDate: dayjs().add(5, 'day').format(),
-    createdAt: dayjs().subtract(2, 'day').format(),
-    updatedAt: dayjs().subtract(2, 'day').format(),
-    company: {
-      id: '2',
-      name: 'XYZ Mağazası',
-      contactPerson: 'Jane Smith',
-      email: 'info@xyzmagaza.com',
-      mobile: '0533 555 0002',
-      address: 'XYZ Mağazası Ana Cadde Şubesi, Ankara'
-    },
-    assignedTo: {
-      id: '3',
-      firstName: 'Mehmet',
-      lastName: 'Kaya',
-      email: 'mehmet.kaya@noord.com.tr',
-      status: 'active'
-    },
-    services: [],
-    parts: [],
-    totalAmount: 0,
-    totalDuration: 0
+const getInitialWorkOrders = (): WorkOrder[] => {
+  const storedWorkOrders = localStorage.getItem('mockWorkOrders');
+  if (storedWorkOrders) {
+    return JSON.parse(storedWorkOrders);
   }
-];
+  
+  const initialWorkOrders: WorkOrder[] = [
+    {
+      id: 1,
+      summary: 'Klima bakımı yapılacak',
+      type: 'emergency',
+      category: 'mechanical',
+      priority: 'high',
+      status: 'pending',
+      dueDate: dayjs().add(3, 'day').format(),
+      createdAt: dayjs().subtract(1, 'day').format(),
+      updatedAt: dayjs().subtract(1, 'day').format(),
+      company: {
+        id: '1',
+        name: 'ABC Market',
+        contactPerson: 'John Doe',
+        email: 'info@abcmarket.com',
+        mobile: '0532 555 0001',
+        address: 'ABC Market Merkez Şube, İstanbul'
+      },
+      assignedTo: {
+        id: '2',
+        firstName: 'Ayşe',
+        lastName: 'Demir',
+        email: 'ayse.demir@arveta.com.tr',
+        status: 'active'
+      },
+      services: [],
+      parts: [],
+      totalAmount: 0,
+      totalDuration: 0
+    },
+    {
+      id: 2,
+      summary: 'Buzdolabı tamiri',
+      type: 'maintenance',
+      category: 'electrical',
+      priority: 'medium',
+      status: 'in_progress',
+      dueDate: dayjs().add(5, 'day').format(),
+      createdAt: dayjs().subtract(2, 'day').format(),
+      updatedAt: dayjs().subtract(2, 'day').format(),
+      company: {
+        id: '2',
+        name: 'XYZ Mağazası',
+        contactPerson: 'Jane Smith',
+        email: 'info@xyzmagaza.com',
+        mobile: '0533 555 0002',
+        address: 'XYZ Mağazası Ana Cadde Şubesi, Ankara'
+      },
+      assignedTo: {
+        id: '3',
+        firstName: 'Mehmet',
+        lastName: 'Kaya',
+        email: 'mehmet.kaya@noord.com.tr',
+        status: 'active'
+      },
+      services: [],
+      parts: [],
+      totalAmount: 0,
+      totalDuration: 0
+    },
+    {
+      id: 3,
+      summary: 'Elektrik tesisatı kontrolü',
+      type: 'maintenance',
+      category: 'electrical',
+      priority: 'medium',
+      status: 'pool',
+      dueDate: dayjs().add(7, 'day').format(),
+      createdAt: dayjs().subtract(1, 'day').format(),
+      updatedAt: dayjs().subtract(1, 'day').format(),
+      company: {
+        id: '3',
+        name: 'DEF Mağazası',
+        contactPerson: 'Ali Yılmaz',
+        email: 'info@defmagaza.com',
+        mobile: '0534 555 0003',
+        address: 'DEF Mağazası Merkez Şube, İzmir'
+      },
+      assignedTo: null,
+      services: [],
+      parts: [],
+      totalAmount: 0,
+      totalDuration: 0
+    }
+  ];
+
+  localStorage.setItem('mockWorkOrders', JSON.stringify(initialWorkOrders));
+  return initialWorkOrders;
+};
+
+let mockWorkOrders = getInitialWorkOrders();
 
 // Mock kullanıcılar
 const mockUsers: User[] = [
@@ -249,7 +285,7 @@ const mockUsers: User[] = [
     region: 'Kadıköy',
     company: 'Meser',
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
     id: '2',
@@ -262,7 +298,7 @@ const mockUsers: User[] = [
     region: 'Beşiktaş',
     company: 'Arveta',
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
     id: '3',
@@ -275,7 +311,98 @@ const mockUsers: User[] = [
     region: 'Şişli',
     company: 'Noord',
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '4',
+    firstName: 'Fatma',
+    lastName: 'Şahin',
+    email: 'fatma.sahin@meser.com.tr',
+    phone: '0533 234 5678',
+    roles: ['saha_calisani'],
+    status: 'active',
+    region: 'Üsküdar',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '5',
+    firstName: 'Ali',
+    lastName: 'Öztürk',
+    email: 'ali.ozturk@arveta.com.tr',
+    phone: '0532 345 6789',
+    roles: ['muhendis'],
+    status: 'active',
+    region: 'Maltepe',
+    company: 'Arveta',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '6',
+    firstName: 'Zeynep',
+    lastName: 'Çelik',
+    email: 'zeynep.celik@noord.com.tr',
+    phone: '0533 456 7890',
+    roles: ['taseron_saha_calisani'],
+    status: 'active',
+    region: 'Ataşehir',
+    company: 'Noord',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '7',
+    firstName: 'Mustafa',
+    lastName: 'Aydın',
+    email: 'mustafa.aydin@meser.com.tr',
+    phone: '0532 567 8901',
+    roles: ['ekip_sefi'],
+    status: 'active',
+    region: 'Kartal',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '8',
+    firstName: 'Elif',
+    lastName: 'Yıldız',
+    email: 'elif.yildiz@arveta.com.tr',
+    phone: '0533 678 9012',
+    roles: ['yonetici'],
+    status: 'active',
+    region: 'Pendik',
+    company: 'Arveta',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '9',
+    firstName: 'Can',
+    lastName: 'Aksoy',
+    email: 'can.aksoy@noord.com.tr',
+    phone: '0532 789 0123',
+    roles: ['taseron_ekip_sefi'],
+    status: 'active',
+    region: 'Bakırköy',
+    company: 'Noord',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '10',
+    firstName: 'Selin',
+    lastName: 'Kara',
+    email: 'selin.kara@meser.com.tr',
+    phone: '0533 890 1234',
+    roles: ['saha_calisani', 'muhendis'],
+    status: 'active',
+    region: 'Beylikdüzü',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
@@ -434,9 +561,23 @@ export const workOrderAPI = {
       if (Array.isArray(response.data)) {
         return response.data;
       }
+      // Mock veriyi localStorage'dan al
+      const storedWorkOrders = localStorage.getItem('mockWorkOrders');
+      if (storedWorkOrders) {
+        const parsedWorkOrders = JSON.parse(storedWorkOrders);
+        mockWorkOrders = parsedWorkOrders; // Global mockWorkOrders'ı güncelle
+        return parsedWorkOrders;
+      }
       return mockWorkOrders;
     } catch (error) {
       console.error('İş emirleri alınırken hata oluştu:', error);
+      // Mock veriyi localStorage'dan al
+      const storedWorkOrders = localStorage.getItem('mockWorkOrders');
+      if (storedWorkOrders) {
+        const parsedWorkOrders = JSON.parse(storedWorkOrders);
+        mockWorkOrders = parsedWorkOrders; // Global mockWorkOrders'ı güncelle
+        return parsedWorkOrders;
+      }
       return mockWorkOrders;
     }
   },
@@ -471,15 +612,80 @@ export const workOrderAPI = {
 
   updateWorkOrder: async (id: number, workOrder: Partial<WorkOrder>): Promise<WorkOrder> => {
     try {
-      const response = await api.put(`/work-orders/${id}`, workOrder);
-      return response.data;
-    } catch (error) {
-      console.error('İş emri güncellenirken hata oluştu:', error);
       // Mock veriyi güncelle
       const index = mockWorkOrders.findIndex(wo => wo.id === id);
-      if (index === -1) throw new Error('İş emri bulunamadı');
-      mockWorkOrders[index] = { ...mockWorkOrders[index], ...workOrder };
-      return mockWorkOrders[index];
+      
+      // İş emri bulunamazsa yeni bir iş emri oluştur
+      if (index === -1) {
+        const newWorkOrder: WorkOrder = {
+          id: id,
+          summary: workOrder.summary || 'Yeni İş Emri',
+          type: workOrder.type || 'maintenance',
+          category: workOrder.category || 'mechanical',
+          priority: workOrder.priority || 'medium',
+          status: workOrder.status || 'pending',
+          dueDate: workOrder.dueDate || dayjs().add(7, 'day').format(),
+          company: workOrder.company || {
+            id: '1',
+            name: 'Yeni Şirket',
+            contactPerson: 'İletişim Kişisi',
+            email: 'info@example.com',
+            mobile: '0500 000 0000',
+            address: 'Adres'
+          },
+          assignedTo: workOrder.assignedTo ? {
+            ...workOrder.assignedTo,
+            id: workOrder.assignedTo.id,
+            firstName: workOrder.assignedTo.firstName,
+            lastName: workOrder.assignedTo.lastName,
+            email: workOrder.assignedTo.email,
+            status: workOrder.assignedTo.status
+          } : null,
+          services: workOrder.services || [],
+          parts: workOrder.parts || [],
+          totalAmount: workOrder.totalAmount || 0,
+          totalDuration: workOrder.totalDuration || 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        
+        // Yeni diziyi oluştur ve localStorage'a kaydet
+        const newWorkOrders = [...mockWorkOrders, newWorkOrder];
+        mockWorkOrders = newWorkOrders;
+        localStorage.setItem('mockWorkOrders', JSON.stringify(newWorkOrders));
+        
+        return { ...newWorkOrder }; // Yeni referans döndür
+      }
+      
+      // Mevcut iş emrini güncelle
+      const updatedWorkOrder: WorkOrder = {
+        ...mockWorkOrders[index],
+        ...workOrder,
+        id: id,
+        updatedAt: new Date().toISOString(),
+        assignedTo: workOrder.assignedTo ? {
+          ...workOrder.assignedTo,
+          id: workOrder.assignedTo.id,
+          firstName: workOrder.assignedTo.firstName,
+          lastName: workOrder.assignedTo.lastName,
+          email: workOrder.assignedTo.email,
+          status: workOrder.assignedTo.status
+        } : null
+      };
+      
+      // Yeni diziyi oluştur ve localStorage'a kaydet
+      const updatedWorkOrders = [...mockWorkOrders];
+      updatedWorkOrders[index] = updatedWorkOrder;
+      mockWorkOrders = updatedWorkOrders;
+      localStorage.setItem('mockWorkOrders', JSON.stringify(updatedWorkOrders));
+      
+      // API çağrısını simüle et
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      return { ...updatedWorkOrder }; // Yeni referans döndür
+    } catch (error) {
+      console.error('İş emri güncellenirken hata oluştu:', error);
+      throw error;
     }
   },
 

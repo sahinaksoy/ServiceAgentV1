@@ -11,9 +11,13 @@ export const userSchema = z.object({
     .email('Geçerli bir e-posta adresi giriniz'),
   phone: z.string()
     .regex(/^(\+90|0)?[0-9]{10}$/, 'Geçerli bir telefon numarası giriniz'),
-  roles: z.array(z.enum(['admin', 'manager', 'user'] as const))
+  roles: z.array(z.enum(['saha_calisani', 'ekip_sefi', 'muhendis', 'yonetici', 'taseron_saha_calisani', 'taseron_ekip_sefi', 'admin'] as const))
     .min(1, 'En az bir rol seçilmelidir'),
   status: z.enum(['active', 'inactive', 'pending'] as const),
+  city: z.string()
+    .min(2, 'İl seçilmelidir'),
+  district: z.string()
+    .min(2, 'İlçe seçilmelidir'),
   region: z.string()
     .min(2, 'Bölge seçilmelidir'),
   company: z.string()

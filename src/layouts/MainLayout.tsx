@@ -14,7 +14,8 @@ import {
 import { 
   Menu as MenuIcon, 
   ChevronLeft as ChevronLeftIcon,
-  AccountCircle as AccountIcon} from '@mui/icons-material';
+  AccountCircle as AccountIcon,
+  Notifications as NotificationsIcon} from '@mui/icons-material';
 import { Sidebar } from '../components/navigation/Sidebar';
 import { PageTitleProvider, usePageTitle } from '../contexts/PageTitleContext';
 import { queryClient } from '../hooks/useUsers';
@@ -37,6 +38,7 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { title } = usePageTitle();
@@ -56,6 +58,14 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
 
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationMenuClose = () => {
+    setNotificationAnchorEl(null);
   };
 
   const handleProfileClick = () => {
@@ -138,6 +148,20 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
             }}
           >
             <IconButton
+              onClick={handleNotificationMenuOpen}
+              sx={{ 
+                height: '64px',
+                width: '64px',
+                borderRadius: 0,
+                color: 'inherit',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                }
+              }}
+            >
+              <NotificationsIcon sx={{ fontSize: 28 }} />
+            </IconButton>
+            <IconButton
               onClick={handleProfileMenuOpen}
               sx={{ 
                 height: '64px',
@@ -152,6 +176,90 @@ const MainLayoutContent = ({ children }: MainLayoutProps) => {
               <AccountIcon sx={{ fontSize: 35 }} />
             </IconButton>
           </Box>
+          <Menu
+            anchorEl={notificationAnchorEl}
+            open={Boolean(notificationAnchorEl)}
+            onClose={handleNotificationMenuClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                width: 320,
+                maxWidth: '90vw',
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1.5,
+                '& .MuiMenuItem-root': {
+                  px: 2,
+                  py: 1.5,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  '&:last-child': {
+                    borderBottom: 'none'
+                  }
+                },
+                '&:before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: 'background.paper',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            }}
+          >
+            <MenuItem>
+              <Box sx={{ width: '100%', overflow: 'hidden' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5, whiteSpace: 'normal' }}>
+                  Yeni İş Emri Atandı
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem', whiteSpace: 'normal' }}>
+                  Ataşehir Migros mağazasına yeni bir iş emri atandı.
+                </Typography>
+                <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.5 }}>
+                  2 saat önce
+                </Typography>
+              </Box>
+            </MenuItem>
+            <MenuItem>
+              <Box sx={{ width: '100%', overflow: 'hidden' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5, whiteSpace: 'normal' }}>
+                  İş Emri Tamamlandı
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem', whiteSpace: 'normal' }}>
+                  Kadıköy Carrefour mağazasındaki iş emri tamamlandı.
+                </Typography>
+                <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.5 }}>
+                  5 saat önce
+                </Typography>
+              </Box>
+            </MenuItem>
+            <MenuItem>
+              <Box sx={{ width: '100%', overflow: 'hidden' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5, whiteSpace: 'normal' }}>
+                  Onay Bekleyen İş Emri
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem', whiteSpace: 'normal' }}>
+                  Maltepe Park AVM mağazasındaki iş emri onayınızı bekliyor.
+                </Typography>
+                <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.5 }}>
+                  1 gün önce
+                </Typography>
+              </Box>
+            </MenuItem>
+          </Menu>
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}

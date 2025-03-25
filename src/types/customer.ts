@@ -24,6 +24,7 @@ export interface Customer {
   contactPerson: string;
   address: string;
   status: CustomerStatus;
+  parentCompany?: string;
   createdAt: string;
   updatedAt: string;
 }

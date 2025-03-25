@@ -1,10 +1,6 @@
 export enum ServiceCategory {
   MECHANIC = 'MECHANIC',
-  ELECTRICAL = 'ELECTRICAL',
-  INSTALLATION = 'INSTALLATION',
-  SOFTWARE = 'SOFTWARE',
-  MARKETING = 'MARKETING',
-  OTHER = 'OTHER'
+  ELECTRICAL = 'ELECTRICAL'
 }
 
 export enum ServiceStatus {
@@ -17,7 +13,6 @@ export interface Service {
   name: string;
   category: string;
   description?: string;
-  estimatedDuration: number;
   duration: number; // dakika cinsinden
   price: number;
   status: ServiceStatus;
@@ -27,11 +22,7 @@ export interface Service {
 
 export const serviceCategoryLabels: Record<ServiceCategory, string> = {
   [ServiceCategory.MECHANIC]: 'Mekanik',
-  [ServiceCategory.ELECTRICAL]: 'Elektrik',
-  [ServiceCategory.INSTALLATION]: 'Kurulum',
-  [ServiceCategory.SOFTWARE]: 'Yazılım',
-  [ServiceCategory.MARKETING]: 'Pazarlama',
-  [ServiceCategory.OTHER]: 'Diğer'
+  [ServiceCategory.ELECTRICAL]: 'Elektrik'
 };
 
 export const serviceStatusLabels: Record<ServiceStatus, string> = {

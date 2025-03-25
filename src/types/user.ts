@@ -10,6 +10,8 @@ export interface User {
   phone: string;
   roles: UserRole[];
   status: UserStatus;
+  city: string;
+  district: string;
   region: string;
   company: string;
   createdAt: string;
@@ -23,6 +25,8 @@ export interface UserFormData {
   phone: string;
   roles: UserRole[];
   status: UserStatus;
+  city: string;
+  district: string;
   region: string;
   company: string;
 } 

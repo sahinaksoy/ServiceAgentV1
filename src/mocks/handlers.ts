@@ -134,10 +134,12 @@ let users: User[] = [
     firstName: 'Ahmet',
     lastName: 'Yılmaz',
     email: 'ahmet.yilmaz@example.com',
-    phone: '5551234567',
-    roles: ['admin'],
+    phone: '0532 123 4567',
+    roles: ['saha_calisani', 'ekip_sefi'],
     status: 'active',
-    region: 'Kadıköy',
+    city: 'İstanbul',
+    district: 'Kadıköy',
+    region: 'Bostancı',
     company: 'Meser',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -147,10 +149,12 @@ let users: User[] = [
     firstName: 'Ayşe',
     lastName: 'Demir',
     email: 'ayse.demir@example.com',
-    phone: '5559876543',
-    roles: ['manager'],
+    phone: '0533 765 4321',
+    roles: ['muhendis', 'yonetici'],
     status: 'active',
-    region: 'Beşiktaş',
+    city: 'İstanbul',
+    district: 'Beşiktaş',
+    region: 'Levent',
     company: 'Arveta',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -160,14 +164,121 @@ let users: User[] = [
     firstName: 'Mehmet',
     lastName: 'Kaya',
     email: 'mehmet.kaya@example.com',
-    phone: '5554567890',
-    roles: ['user'],
-    status: 'inactive',
-    region: 'Şişli',
+    phone: '0532 987 6543',
+    roles: ['taseron_saha_calisani', 'taseron_ekip_sefi'],
+    status: 'active',
+    city: 'İstanbul',
+    district: 'Şişli',
+    region: 'Mecidiyeköy',
     company: 'Noord',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
+  {
+    id: '4',
+    firstName: 'Fatma',
+    lastName: 'Şahin',
+    email: 'fatma.sahin@example.com',
+    phone: '0533 234 5678',
+    roles: ['saha_calisani'],
+    status: 'active',
+    city: 'İstanbul',
+    district: 'Üsküdar',
+    region: 'Acıbadem',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    firstName: 'Ali',
+    lastName: 'Öztürk',
+    email: 'ali.ozturk@example.com',
+    phone: '0532 345 6789',
+    roles: ['muhendis'],
+    status: 'active',
+    city: 'İstanbul',
+    district: 'Maltepe',
+    region: 'Cevizli',
+    company: 'Arveta',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    firstName: 'Zeynep',
+    lastName: 'Çelik',
+    email: 'zeynep.celik@example.com',
+    phone: '0533 456 7890',
+    roles: ['taseron_saha_calisani'],
+    status: 'active',
+    city: 'İstanbul',
+    district: 'Ataşehir',
+    region: 'Barbaros',
+    company: 'Noord',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '7',
+    firstName: 'Mustafa',
+    lastName: 'Aydın',
+    email: 'mustafa.aydin@example.com',
+    phone: '0532 567 8901',
+    roles: ['ekip_sefi'],
+    status: 'active',
+    city: 'İstanbul',
+    district: 'Kartal',
+    region: 'Kordonboyu',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '8',
+    firstName: 'Elif',
+    lastName: 'Yıldız',
+    email: 'elif.yildiz@example.com',
+    phone: '0533 678 9012',
+    roles: ['yonetici'],
+    status: 'active',
+    city: 'İstanbul',
+    district: 'Pendik',
+    region: 'Yenişehir',
+    company: 'Arveta',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '9',
+    firstName: 'Can',
+    lastName: 'Aksoy',
+    email: 'can.aksoy@example.com',
+    phone: '0532 789 0123',
+    roles: ['muhendis', 'ekip_sefi'],
+    status: 'active',
+    city: 'İstanbul',
+    district: 'Bakırköy',
+    region: 'Yeşilköy',
+    company: 'Noord',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '10',
+    firstName: 'Selin',
+    lastName: 'Kara',
+    email: 'selin.kara@example.com',
+    phone: '0533 890 1234',
+    roles: ['saha_calisani', 'muhendis'],
+    status: 'active',
+    city: 'İstanbul',
+    district: 'Beylikdüzü',
+    region: 'Cumhuriyet',
+    company: 'Meser',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
 ];
 
 let stores: Store[] = [
@@ -325,155 +436,6 @@ let stores: Store[] = [
 
 let workOrders: WorkOrder[] = [
   {
-    id: 1,
-    summary: 'Klima Bakım ve Onarım',
-    priority: 'high',
-    type: 'maintenance',
-    category: 'mechanical',
-    status: 'awaiting_approval',
-    dueDate: dayjs().add(2, 'day').toISOString(),
-    createdAt: dayjs().subtract(1, 'day').toISOString(),
-    updatedAt: dayjs().toISOString(),
-    company: customers[0],
-    assignedTo: {
-      id: '1',
-      firstName: 'Ahmet',
-      lastName: 'Yılmaz',
-      email: 'ahmet.yilmaz@example.com',
-      status: 'active'
-    },
-    services: [
-      {
-        id: 1,
-        name: 'Klima Bakım',
-        description: 'Periyodik klima bakımı',
-        duration: 2,
-        price: 1500,
-        hasServiceForm: true,
-        status: 'completed',
-        formData: {
-          genelGorunum: {
-            temizlik: true,
-            paslanma: false,
-            boyaBozulmasi: false,
-            fizikselHasar: false,
-            titresim: true,
-            sesliCalisma: true
-          },
-          merkeziSistem: {
-            marka: 'Mitsubishi',
-            model: 'X-2000',
-            seriNo: 'MIT123456',
-            kapasiteKcal: '24000',
-            uretimYili: '2022',
-            yakitTipi: 'Elektrik'
-          },
-          sistemGorunum: {
-            suBasinci: '2.4',
-            calismaSicakligi: '22',
-            donusSicakligi: '18',
-            bacaGaziSicakligi: 'N/A'
-          }
-        }
-      },
-      {
-        id: 2,
-        name: 'Filtre Değişimi',
-        description: 'Klima filtrelerinin değişimi',
-        duration: 1,
-        price: 500,
-        hasServiceForm: false,
-        status: 'completed'
-      }
-    ],
-    parts: [
-      {
-        id: 1,
-        name: 'Klima Filtresi',
-        description: 'Hepa Filtre',
-        unit: 'Adet',
-        quantity: 2,
-        unitPrice: 250
-      },
-      {
-        id: 2,
-        name: 'Temizlik Sıvısı',
-        description: 'Klima temizleme solüsyonu',
-        unit: 'Lt',
-        quantity: 1,
-        unitPrice: 150
-      }
-    ],
-    totalAmount: 2650,
-    totalDuration: 3
-  },
-  {
-    id: 2,
-    summary: 'Soğutma Sistemi Arıza Tespiti',
-    priority: 'high',
-    type: 'emergency',
-    category: 'mechanical',
-    status: 'awaiting_approval',
-    dueDate: dayjs().add(1, 'day').toISOString(),
-    createdAt: dayjs().subtract(2, 'hour').toISOString(),
-    updatedAt: dayjs().toISOString(),
-    company: customers[1],
-    assignedTo: {
-      id: '2',
-      firstName: 'Ayşe',
-      lastName: 'Demir',
-      email: 'ayse.demir@example.com',
-      status: 'active'
-    },
-    services: [
-      {
-        id: 3,
-        name: 'Arıza Tespiti',
-        description: 'Soğutma sistemi arıza tespiti',
-        duration: 1,
-        price: 750,
-        hasServiceForm: true,
-        status: 'completed',
-        formData: {
-          genelGorunum: {
-            temizlik: true,
-            paslanma: true,
-            boyaBozulmasi: false,
-            fizikselHasar: false,
-            titresim: false,
-            sesliCalisma: true
-          },
-          merkeziSistem: {
-            marka: 'Carrier',
-            model: 'C-500',
-            seriNo: 'CAR789012',
-            kapasiteKcal: '36000',
-            uretimYili: '2021',
-            yakitTipi: 'Elektrik'
-          },
-          sistemGorunum: {
-            suBasinci: '3.2',
-            calismaSicakligi: '25',
-            donusSicakligi: '20',
-            bacaGaziSicakligi: 'N/A'
-          }
-        }
-      }
-    ],
-    parts: [
-      {
-        id: 3,
-        name: 'Kompresör',
-        description: 'Soğutma sistemi kompresörü',
-        unit: 'Adet',
-        quantity: 1,
-        unitPrice: 3500
-      }
-    ],
-    totalAmount: 4250,
-    totalDuration: 1
-  },
-  {
     id: 3,
     summary: 'Soğutma sistemi arızası',
     priority: 'high',
@@ -529,85 +491,6 @@ let workOrders: WorkOrder[] = [
     totalDuration: 90
   },
   {
-    id: 4,
-    summary: 'Yıllık bakım kontrolü',
-    priority: 'low',
-    type: 'maintenance',
-    category: 'mechanical',
-    status: 'completed',
-    dueDate: dayjs().subtract(1, 'day').toISOString(),
-    createdAt: dayjs().subtract(2, 'day').toISOString(),
-    updatedAt: dayjs().subtract(1, 'day').toISOString(),
-    company: {
-      id: '6',
-      name: 'Bakırköy 3M Migros',
-      contactPerson: 'Hasan Kaya',
-      email: 'bakirkoy@migros.com.tr',
-      mobile: '5558765432',
-      address: 'Bakırköy Mah. Bakırköy, İstanbul'
-    },
-    assignedTo: {
-      id: '1',
-      firstName: 'Ahmet',
-      lastName: 'Yılmaz',
-      email: 'ahmet.yilmaz@example.com',
-      status: 'active'
-    },
-    services: [
-      {
-        id: 156,
-        name: 'PERİYODİK BAKIM',
-        description: 'Yıllık genel bakım',
-        duration: 180,
-        price: 1500
-      }
-    ],
-    parts: [
-      {
-        id: 5,
-        name: 'Kuru Filtre',
-        description: 'Filtre değişimi',
-        quantity: 2,
-        unit: 'ADET',
-        unitPrice: 800
-      },
-      {
-        id: 14,
-        name: 'Yağ',
-        description: 'Kompresör yağı',
-        quantity: 3,
-        unit: 'LITRE',
-        unitPrice: 250
-      }
-    ],
-    totalAmount: 3850,
-    totalDuration: 180
-  },
-  {
-    id: 5,
-    summary: 'Aydınlatma sistemi yenileme',
-    priority: 'medium',
-    type: 'renovation',
-    category: 'electrical',
-    status: 'cancelled',
-    dueDate: dayjs().add(7, 'day').toISOString(),
-    createdAt: dayjs().subtract(3, 'day').toISOString(),
-    updatedAt: dayjs().subtract(1, 'day').toISOString(),
-    company: {
-      id: '7',
-      name: 'Maltepe Makro Migros',
-      contactPerson: 'Zeynep Aydın',
-      email: 'maltepe@migros.com.tr',
-      mobile: '5554567890',
-      address: 'Maltepe Mah. Maltepe, İstanbul'
-    },
-    assignedTo: null,
-    services: [],
-    parts: [],
-    totalAmount: 0,
-    totalDuration: 0
-  },
-  {
     id: 6,
     summary: 'Kompresör değişimi',
     priority: 'high',
@@ -647,49 +530,7 @@ let workOrders: WorkOrder[] = [
       contactPerson: 'Ayşe Yıldız',
       email: 'sisli@migros.com.tr',
       mobile: '5550123456',
-      address: 'Şişli Mah. Şişli, İstanbul',
-      previousWorkOrders: [
-        {
-          id: 102,
-          summary: 'Elektrik arızası',
-          priority: 'high',
-          type: 'emergency',
-          category: 'electrical',
-          status: 'completed',
-          dueDate: dayjs().subtract(15, 'day').toISOString(),
-          createdAt: dayjs().subtract(16, 'day').toISOString(),
-          updatedAt: dayjs().subtract(15, 'day').toISOString(),
-          assignedTo: {
-            id: '2',
-            firstName: 'Ayşe',
-            lastName: 'Demir',
-            email: 'ayse.demir@example.com',
-            status: 'active'
-          },
-          services: [
-            {
-              id: 142,
-              name: 'PANO ARIZASI',
-              description: 'Acil pano arızası müdahalesi',
-              duration: 120,
-              price: 1000,
-              status: 'completed'
-            }
-          ],
-          parts: [
-            {
-              id: 15,
-              name: 'Kontaklar',
-              description: 'Kontaktör değişimi',
-              quantity: 1,
-              unit: 'ADET',
-              unitPrice: 150
-            }
-          ],
-          totalAmount: 1150,
-          totalDuration: 120
-        }
-      ]
+      address: 'Şişli Mah. Şişli, İstanbul'
     },
     assignedTo: {
       id: '2',
@@ -785,74 +626,278 @@ let workOrders: WorkOrder[] = [
   },
   {
     id: 9,
-    summary: 'UPS sistemi kurulumu',
-    priority: 'high',
-    type: 'investment',
-    category: 'electrical',
-    status: 'completed',
-    dueDate: dayjs().subtract(1, 'day').toISOString(),
-    createdAt: dayjs().subtract(5, 'day').toISOString(),
+    summary: 'Klima Sistemi Bakımı',
+    priority: 'low',
+    type: 'maintenance',
+    category: 'mechanical',
+    status: 'pending',
+    dueDate: dayjs().add(7, 'day').toISOString(),
+    createdAt: dayjs().subtract(1, 'day').toISOString(),
     updatedAt: dayjs().subtract(1, 'day').toISOString(),
     company: {
-      id: '1',
-      name: 'Beşiktaş MM Migros',
-      contactPerson: 'Mehmet Yılmaz',
-      email: 'besiktas@migros.com.tr',
-      mobile: '5559012345',
-      address: 'Beşiktaş Mah. Beşiktaş, İstanbul'
+      id: '3',
+      name: 'Ataşehir Makro Migros',
+      contactPerson: 'Mehmet Demir',
+      email: 'atasehir@migros.com.tr',
+      mobile: '5553456789',
+      address: 'Ataşehir Bulvarı, Ataşehir, İstanbul'
     },
     assignedTo: {
-      id: '2',
-      firstName: 'Ayşe',
-      lastName: 'Demir',
-      email: 'ayse.demir@example.com',
+      id: '5',
+      firstName: 'Ali',
+      lastName: 'Öztürk',
+      email: 'ali.ozturk@example.com',
       status: 'active'
     },
     services: [
       {
-        id: 148,
-        name: 'HAT ÇEKİMİ(KUVVETLİ AKIM)',
-        description: 'UPS güç hattı çekimi',
-        duration: 180,
-        price: 1500
+        id: 157,
+        name: 'KLİMA BAKIMI',
+        description: 'Yıllık klima bakımı',
+        duration: 240,
+        price: 2000
       }
     ],
     parts: [
       {
-        id: 17,
-        name: 'Kablolar',
-        description: 'UPS güç kablosu',
-        quantity: 50,
-        unit: 'METRE',
-        unitPrice: 50
+        id: 20,
+        name: 'Klima Filtresi',
+        description: 'Hepa filtre değişimi',
+        quantity: 4,
+        unit: 'ADET',
+        unitPrice: 300
       }
     ],
-    totalAmount: 4000,
-    totalDuration: 180
+    totalAmount: 3200,
+    totalDuration: 240
   },
   {
     id: 10,
-    summary: 'Havalandırma sistemi arızası',
-    priority: 'high',
+    summary: 'Aydınlatma Sistemi Arızası',
+    priority: 'medium',
     type: 'emergency',
-    category: 'mechanical',
-    status: 'cancelled',
-    dueDate: dayjs().add(1, 'day').toISOString(),
-    createdAt: dayjs().subtract(8, 'hour').toISOString(),
-    updatedAt: dayjs().subtract(6, 'hour').toISOString(),
+    category: 'electrical',
+    status: 'pool',
+    dueDate: dayjs().add(2, 'day').toISOString(),
+    createdAt: dayjs().subtract(3, 'hour').toISOString(),
+    updatedAt: dayjs().subtract(3, 'hour').toISOString(),
     company: {
-      id: '2',
-      name: 'Şişli 3M Migros',
-      contactPerson: 'Ayşe Yıldız',
-      email: 'sisli@migros.com.tr',
-      mobile: '5550123456',
-      address: 'Şişli Mah. Şişli, İstanbul'
+      id: '4',
+      name: 'Levent 5M Migros',
+      contactPerson: 'Ayşe Çelik',
+      email: 'levent@migros.com.tr',
+      mobile: '5557891234',
+      address: 'Levent Mah. Beşiktaş, İstanbul'
     },
     assignedTo: null,
     services: [],
     parts: [],
     totalAmount: 0,
     totalDuration: 0
+  },
+  {
+    id: 11,
+    summary: 'Soğutma Grubu Revizyonu',
+    priority: 'high',
+    type: 'renovation',
+    category: 'mechanical',
+    status: 'awaiting_approval',
+    dueDate: dayjs().add(10, 'day').toISOString(),
+    createdAt: dayjs().subtract(2, 'day').toISOString(),
+    updatedAt: dayjs().subtract(2, 'day').toISOString(),
+    company: {
+      id: '6',
+      name: 'Bakırköy 3M Migros',
+      contactPerson: 'Elif Yılmaz',
+      email: 'bakirkoy@migros.com.tr',
+      mobile: '5558765432',
+      address: 'Bakırköy Mah. Bakırköy, İstanbul'
+    },
+    assignedTo: {
+      id: '3',
+      firstName: 'Mehmet',
+      lastName: 'Kaya',
+      email: 'mehmet.kaya@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 158,
+        name: 'SOĞUTMA GRUBU REVİZYONU',
+        description: 'Soğutma grubu komple revizyon',
+        duration: 480,
+        price: 5000
+      }
+    ],
+    parts: [
+      {
+        id: 21,
+        name: 'Kompresör Grubu',
+        description: 'Komple kompresör grubu',
+        quantity: 1,
+        unit: 'SET',
+        unitPrice: 25000
+      },
+      {
+        id: 22,
+        name: 'Kontrol Paneli',
+        description: 'Elektronik kontrol ünitesi',
+        quantity: 1,
+        unit: 'ADET',
+        unitPrice: 8000
+      }
+    ],
+    totalAmount: 38000,
+    totalDuration: 480
+  },
+  {
+    id: 12,
+    summary: 'Yıllık Bakım Kontrolü',
+    priority: 'low',
+    type: 'maintenance',
+    category: 'mechanical',
+    status: 'pending',
+    dueDate: dayjs().add(15, 'day').toISOString(),
+    createdAt: dayjs().subtract(5, 'day').toISOString(),
+    updatedAt: dayjs().subtract(5, 'day').toISOString(),
+    company: {
+      id: '7',
+      name: 'Maltepe Makro Migros',
+      contactPerson: 'Can Öztürk',
+      email: 'maltepe@migros.com.tr',
+      mobile: '5554567890',
+      address: 'Maltepe Mah. Maltepe, İstanbul'
+    },
+    assignedTo: {
+      id: '4',
+      firstName: 'Fatma',
+      lastName: 'Şahin',
+      email: 'fatma.sahin@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 159,
+        name: 'YILLIK BAKIM',
+        description: 'Genel sistem kontrolü ve bakım',
+        duration: 360,
+        price: 3000
+      }
+    ],
+    parts: [
+      {
+        id: 23,
+        name: 'Filtre Seti',
+        description: 'Yıllık filtre değişim seti',
+        quantity: 1,
+        unit: 'SET',
+        unitPrice: 2500
+      }
+    ],
+    totalAmount: 5500,
+    totalDuration: 360
+  },
+  {
+    id: 13,
+    summary: 'Soğuk Oda Termostat Değişimi',
+    priority: 'high',
+    type: 'emergency',
+    category: 'mechanical',
+    status: 'completed',
+    dueDate: dayjs().subtract(1, 'day').toISOString(),
+    createdAt: dayjs().subtract(2, 'day').toISOString(),
+    updatedAt: dayjs().subtract(6, 'hour').toISOString(),
+    company: {
+      id: '3',
+      name: 'Bostancı 3M Migros',
+      contactPerson: 'Ahmet Yıldırım',
+      email: 'bostanci@migros.com.tr',
+      mobile: '5551234567',
+      address: 'Bostancı Mah. Kadıköy, İstanbul'
+    },
+    assignedTo: {
+      id: '1',
+      firstName: 'Ahmet',
+      lastName: 'Yılmaz',
+      email: 'ahmet.yilmaz@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 160,
+        name: 'TERMOSTAT DEĞİŞİMİ',
+        description: 'Soğuk oda termostat değişimi ve kalibrasyon',
+        duration: 120,
+        price: 800
+      }
+    ],
+    parts: [
+      {
+        id: 24,
+        name: 'Dijital Termostat',
+        description: 'Endüstriyel tip dijital termostat',
+        quantity: 1,
+        unit: 'ADET',
+        unitPrice: 1200
+      },
+      {
+        id: 25,
+        name: 'Sensör',
+        description: 'Sıcaklık sensörü',
+        quantity: 2,
+        unit: 'ADET',
+        unitPrice: 300
+      }
+    ],
+    totalAmount: 2600,
+    totalDuration: 120
+  },
+  {
+    id: 14,
+    summary: 'Vitrin Dolabı Tamir Bakım',
+    priority: 'medium',
+    type: 'maintenance',
+    category: 'mechanical',
+    status: 'cancelled',
+    dueDate: dayjs().subtract(3, 'day').toISOString(),
+    createdAt: dayjs().subtract(5, 'day').toISOString(),
+    updatedAt: dayjs().subtract(3, 'day').toISOString(),
+    company: {
+      id: '4',
+      name: 'Moda MM Migros',
+      contactPerson: 'Zeynep Kaya',
+      email: 'moda@migros.com.tr',
+      mobile: '5559876543',
+      address: 'Moda Cad. Kadıköy, İstanbul'
+    },
+    assignedTo: {
+      id: '5',
+      firstName: 'Ali',
+      lastName: 'Öztürk',
+      email: 'ali.ozturk@example.com',
+      status: 'active'
+    },
+    services: [
+      {
+        id: 161,
+        name: 'VİTRİN DOLABI BAKIM',
+        description: 'Vitrin dolabı genel bakım ve onarım',
+        duration: 180,
+        price: 1500
+      }
+    ],
+    parts: [
+      {
+        id: 26,
+        name: 'Fan Motoru',
+        description: 'Vitrin dolabı fan motoru',
+        quantity: 2,
+        unit: 'ADET',
+        unitPrice: 450
+      }
+    ],
+    totalAmount: 2400,
+    totalDuration: 180
   }
 ];
 
@@ -916,37 +961,43 @@ export const handlers = [
         id: '1',
         firstName: 'Ahmet',
         lastName: 'Yılmaz',
-        email: 'ahmet@example.com',
-        phone: '5551234567',
-        roles: ['saha_calisani'],
+        email: 'ahmet.yilmaz@meser.com.tr',
+        phone: '0532 123 4567',
+        roles: ['saha_calisani', 'ekip_sefi'],
         status: 'active',
-        region: 'Kadıköy',
+        city: 'İstanbul',
+        district: 'Kadıköy',
+        region: 'Bostancı',
         company: 'Meser',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       },
       {
         id: '2',
-        firstName: 'Mehmet',
+        firstName: 'Ayşe',
         lastName: 'Demir',
-        email: 'mehmet@example.com',
-        phone: '5551234568',
-        roles: ['ekip_sefi', 'muhendis'],
+        email: 'ayse.demir@arveta.com.tr',
+        phone: '0533 765 4321',
+        roles: ['muhendis', 'yonetici'],
         status: 'active',
-        region: 'Beşiktaş',
+        city: 'İstanbul',
+        district: 'Beşiktaş',
+        region: 'Levent',
         company: 'Arveta',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       },
       {
         id: '3',
-        firstName: 'Ayşe',
+        firstName: 'Mehmet',
         lastName: 'Kaya',
-        email: 'ayse@example.com',
-        phone: '5551234569',
-        roles: ['muhendis'],
+        email: 'mehmet.kaya@noord.com.tr',
+        phone: '0532 987 6543',
+        roles: ['taseron_saha_calisani', 'taseron_ekip_sefi'],
         status: 'active',
-        region: 'Şişli',
+        city: 'İstanbul',
+        district: 'Şişli',
+        region: 'Mecidiyeköy',
         company: 'Noord',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -955,11 +1006,13 @@ export const handlers = [
         id: '4',
         firstName: 'Fatma',
         lastName: 'Şahin',
-        email: 'fatma@example.com',
-        phone: '5551234570',
-        roles: ['mudur'],
+        email: 'fatma.sahin@meser.com.tr',
+        phone: '0533 234 5678',
+        roles: ['saha_calisani'],
         status: 'active',
-        region: 'Kadıköy',
+        city: 'İstanbul',
+        district: 'Üsküdar',
+        region: 'Acıbadem',
         company: 'Meser',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -968,37 +1021,88 @@ export const handlers = [
         id: '5',
         firstName: 'Ali',
         lastName: 'Öztürk',
-        email: 'ali@example.com',
-        phone: '5551234571',
-        roles: ['yonetici'],
+        email: 'ali.ozturk@arveta.com.tr',
+        phone: '0532 345 6789',
+        roles: ['muhendis'],
         status: 'active',
-        region: 'Beşiktaş',
+        city: 'İstanbul',
+        district: 'Maltepe',
+        region: 'Cevizli',
         company: 'Arveta',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       },
       {
         id: '6',
-        firstName: 'Can',
-        lastName: 'Yıldız',
-        email: 'can@example.com',
-        phone: '5551234572',
+        firstName: 'Zeynep',
+        lastName: 'Çelik',
+        email: 'zeynep.celik@noord.com.tr',
+        phone: '0533 456 7890',
         roles: ['taseron_saha_calisani'],
         status: 'active',
-        region: 'Şişli',
+        city: 'İstanbul',
+        district: 'Ataşehir',
+        region: 'Barbaros',
         company: 'Noord',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       },
       {
         id: '7',
-        firstName: 'Zeynep',
-        lastName: 'Aksoy',
-        email: 'zeynep@example.com',
-        phone: '5551234573',
-        roles: ['taseron_ekip_sefi'],
+        firstName: 'Mustafa',
+        lastName: 'Aydın',
+        email: 'mustafa.aydin@meser.com.tr',
+        phone: '0532 567 8901',
+        roles: ['ekip_sefi'],
         status: 'active',
-        region: 'Kadıköy',
+        city: 'İstanbul',
+        district: 'Kartal',
+        region: 'Kordonboyu',
+        company: 'Meser',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: '8',
+        firstName: 'Elif',
+        lastName: 'Yıldız',
+        email: 'elif.yildiz@arveta.com.tr',
+        phone: '0533 678 9012',
+        roles: ['yonetici'],
+        status: 'active',
+        city: 'İstanbul',
+        district: 'Pendik',
+        region: 'Yenişehir',
+        company: 'Arveta',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: '9',
+        firstName: 'Can',
+        lastName: 'Aksoy',
+        email: 'can.aksoy@noord.com.tr',
+        phone: '0532 789 0123',
+        roles: ['muhendis', 'ekip_sefi'],
+        status: 'active',
+        city: 'İstanbul',
+        district: 'Bakırköy',
+        region: 'Yeşilköy',
+        company: 'Noord',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: '10',
+        firstName: 'Selin',
+        lastName: 'Kara',
+        email: 'selin.kara@meser.com.tr',
+        phone: '0533 890 1234',
+        roles: ['saha_calisani', 'muhendis'],
+        status: 'active',
+        city: 'İstanbul',
+        district: 'Beylikdüzü',
+        region: 'Cumhuriyet',
         company: 'Meser',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

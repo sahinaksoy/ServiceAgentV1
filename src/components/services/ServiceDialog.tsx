@@ -28,7 +28,6 @@ const ServiceDialog: React.FC<ServiceDialogProps> = ({
     category: ServiceCategory.MECHANIC,
     name: '',
     duration: 0,
-    estimatedDuration: 0,
     price: 0,
     status: ServiceStatus.ACTIVE,
   });
@@ -39,7 +38,6 @@ const ServiceDialog: React.FC<ServiceDialogProps> = ({
         category: initialData.category,
         name: initialData.name,
         duration: initialData.duration,
-        estimatedDuration: initialData.estimatedDuration,
         price: initialData.price,
         status: initialData.status,
       });
@@ -88,16 +86,6 @@ const ServiceDialog: React.FC<ServiceDialogProps> = ({
               type="number"
               value={formData.duration}
               onChange={(e) => setFormData({ ...formData, duration: Number(e.target.value) })}
-              fullWidth
-              required
-              inputProps={{ min: 0 }}
-            />
-
-            <TextField
-              label="Tahmini Süre (dk)"
-              type="number"
-              value={formData.estimatedDuration}
-              onChange={(e) => setFormData({ ...formData, estimatedDuration: Number(e.target.value) })}
               fullWidth
               required
               inputProps={{ min: 0 }}

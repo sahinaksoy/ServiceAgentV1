@@ -125,10 +125,15 @@ const UserList = () => {
           remoteOperations={false}
           noDataText="Kullanıcı bulunamadı"
           repaintChangesOnly={true}
+          allowColumnReordering={true}
+          allowColumnResizing={true}
+          showColumnLines={true}
+          showRowLines={true}
         >
-          <StateStoring enabled type="localStorage" storageKey="userListGridState" />
-          <FilterRow visible />
-          <HeaderFilter visible />
+          <StateStoring enabled={false} />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Scrolling mode="standard" />
           <Toolbar>
             <Item location="after">
               <Chip
@@ -150,14 +155,20 @@ const UserList = () => {
             </Item>
             <Item name="columnChooserButton" />
           </Toolbar>
-          <ColumnChooser enabled />
+          <ColumnChooser enabled={true} mode="select" />
           
-          <Column dataField="firstName" caption="Ad" />
-          <Column dataField="lastName" caption="Soyad" />
-          <Column dataField="phone" caption="Telefon" />
+          <Column dataField="firstName" caption="Ad" allowSorting={true} allowFiltering={true} />
+          <Column dataField="lastName" caption="Soyad" allowSorting={true} allowFiltering={true} />
+          <Column dataField="phone" caption="Telefon" allowSorting={true} allowFiltering={true} />
+          <Column dataField="company" caption="Şirket" allowSorting={true} allowFiltering={true} />
+          <Column dataField="city" caption="İl" allowSorting={true} allowFiltering={true} />
+          <Column dataField="district" caption="İlçe" allowSorting={true} allowFiltering={true} />
+          <Column dataField="region" caption="Bölge" allowSorting={true} allowFiltering={true} />
           <Column 
             dataField="roles" 
             caption="Roller"
+            allowSorting={true}
+            allowFiltering={true}
             cellRender={(cell) => {
               const roleLabels: Record<string, string> = {
                 'saha_calisani': 'Saha Çalışanı',
@@ -168,6 +179,10 @@ const UserList = () => {
                 'taseron_ekip_sefi': 'Taşeron Ekip Şefi',
                 'admin': 'Yönetici'
               };
+              
+              if (!cell.value || !Array.isArray(cell.value)) {
+                return null;
+              }
               
               return (
                 <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
@@ -193,18 +208,7 @@ const UserList = () => {
               );
             }}
           />
-          <Column dataField="region" caption="Bölge" />
-          <Column dataField="company" caption="Şirket" />
-          
-          <Paging defaultPageSize={10} />
-          <Pager
-            showPageSizeSelector
-            allowedPageSizes={[10, 20, 50]}
-            showInfo
-            showNavigationButtons
-          />
-
-          <Column
+          <Column 
             caption="İşlemler"
             width={120}
             alignment="center"
@@ -223,6 +227,14 @@ const UserList = () => {
                 </IconButton>
               </Box>
             )}
+          />
+          
+          <Paging defaultPageSize={10} />
+          <Pager
+            showPageSizeSelector
+            allowedPageSizes={[10, 20, 50]}
+            showInfo
+            showNavigationButtons
           />
         </DataGrid>
       </Paper>

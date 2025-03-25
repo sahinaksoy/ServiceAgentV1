@@ -7,6 +7,7 @@ import Parts from './pages/Parts';
 import WorkOrderList from './pages/workOrders/WorkOrderList';
 import CreateWorkOrder from './pages/workOrders/CreateWorkOrder';
 import WorkOrderDetail from './pages/WorkOrderDetail';
+import WorkOrderEdit from './pages/workOrders/WorkOrderEdit';
 
 const MainLayoutWrapper = () => {
   return (
@@ -80,6 +81,10 @@ export const router = createBrowserRouter([
         element: <Navigate to="/" replace />,
       },
     ],
+  },
+  {
+    path: '/work-orders/:workOrderId/edit',
+    element: <WorkOrderEdit />
   },
 ], {
   future: {
