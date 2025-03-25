@@ -99,6 +99,7 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
+import { jsPDF } from 'jspdf';
 
 const priorityLabels = {
   high: 'Yüksek',
@@ -1069,6 +1070,238 @@ const WorkOrderDetail: React.FC = () => {
     }
   };
 
+  const generatePDF = () => {
+    if (!localWorkOrder || !selectedService) return;
+
+    const doc = new jsPDF('p', 'pt', 'a4');
+    doc.addFont('https://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Me5Q.ttf', 'Roboto', 'normal');
+    doc.addFont('https://fonts.gstatic.com/s/roboto/v29/KFOlCnqEu92Fr1MmWUlvAw.ttf', 'Roboto', 'bold');
+    
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPos = 40;
+    const margin = 40;
+    const contentWidth = pageWidth - (margin * 2);
+
+    // Başlık
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(24);
+    doc.setTextColor(41, 98, 255);
+    doc.text('Teknik Servis Formu', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 40;
+
+    // Üst çizgi
+    doc.setDrawColor(41, 98, 255);
+    doc.setLineWidth(1);
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
+    // Firma Bilgileri
+    doc.setTextColor(0);
+    doc.setFontSize(16);
+    doc.text('Firma Bilgileri', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    doc.text(`Firma: ${localWorkOrder.company.name}`, margin, yPos);
+    yPos += 20;
+    doc.text(`İletişim: ${localWorkOrder.company.contactPerson}`, margin, yPos);
+    yPos += 20;
+    doc.text(`Telefon: ${localWorkOrder.company.mobile}`, margin, yPos);
+    yPos += 20;
+    doc.text(`Adres: ${localWorkOrder.company.address}`, margin, yPos);
+    yPos += 30;
+
+    // Alt çizgi
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
+    // İş Emri Detayları
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.text('İş Emri Detayları', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    doc.text(`İş Emri No: ${localWorkOrder.id}`, margin, yPos);
+    yPos += 20;
+    doc.text(`Tarih: ${dayjs(localWorkOrder.createdAt).format('DD.MM.YYYY')}`, margin, yPos);
+    yPos += 20;
+    doc.text(`Durum: ${statusLabels[localWorkOrder.status as WorkOrderStatus]}`, margin, yPos);
+    yPos += 30;
+
+    // Alt çizgi
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
+    // Servisler
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.text('Servisler', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    localWorkOrder.services.forEach((service) => {
+      doc.text(`• ${service.name}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Açıklama: ${service.description}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Süre: ${service.duration} Saat`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Durum: ${service.status === 'completed' ? 'Tamamlandı' : service.status === 'partially_completed' ? 'Kısmen Tamamlandı' : 'Beklemede'}`, margin, yPos);
+      yPos += 30;
+    });
+
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 200) {
+      doc.addPage();
+      yPos = 40;
+    }
+
+    // Alt çizgi
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
+    // Parçalar
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.text('Parçalar', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    localWorkOrder.parts.forEach((part) => {
+      doc.text(`• ${part.name}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Açıklama: ${part.description}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Miktar: ${part.quantity} ${part.unit}`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Birim Fiyat: ${part.unitPrice} ₺`, margin, yPos);
+      yPos += 20;
+      doc.text(`  Toplam: ${part.quantity * part.unitPrice} ₺`, margin, yPos);
+      yPos += 30;
+    });
+
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 200) {
+      doc.addPage();
+      yPos = 40;
+    }
+
+    // Alt çizgi
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
+    // Kontrol Listesi
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.text('Kontrol Listesi', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    
+    // Kontrol listesi için iki sütunlu düzen
+    const checklistItems = Object.entries(formData.genelGorunum);
+    const itemWidth = (contentWidth - 40) / 2;
+    
+    checklistItems.forEach(([key, value], index) => {
+      const xPos = index % 2 === 0 ? margin : margin + itemWidth + 40;
+      if (index % 2 === 0) {
+        yPos += 20;
+      }
+      const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+      doc.text(`${label}: ${value ? '✓' : '✗'}`, xPos, yPos);
+    });
+    yPos += 30;
+
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 200) {
+      doc.addPage();
+      yPos = 40;
+    }
+
+    // Alt çizgi
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
+    // Merkezi Sistem Bilgileri
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.text('Merkezi Sistem Bilgileri', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    Object.entries(formData.merkeziSistem).forEach(([key, value]) => {
+      const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+      doc.text(`${label}: ${value || '-'}`, margin, yPos);
+      yPos += 20;
+    });
+    yPos += 10;
+
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 200) {
+      doc.addPage();
+      yPos = 40;
+    }
+
+    // Alt çizgi
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 30;
+
+    // Sistem Görünüm Değerleri
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.text('Sistem Görünüm Değerleri', margin, yPos);
+    yPos += 25;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(12);
+    Object.entries(formData.sistemGorunum).forEach(([key, value]) => {
+      const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+      doc.text(`${label}: ${value || '-'}`, margin, yPos);
+      yPos += 20;
+    });
+    yPos += 30;
+
+    // Yeni sayfa kontrolü
+    if (yPos > pageHeight - 300) {
+      doc.addPage();
+      yPos = 40;
+    }
+
+    // İmza Alanı
+    if (signature) {
+      doc.setFont('Roboto', 'bold');
+      doc.setFontSize(16);
+      doc.text('Yetkili İmzası', margin, yPos);
+      yPos += 25;
+      
+      // İmza için daha büyük alan
+      const imgWidth = 300;
+      const imgHeight = 150;
+      doc.addImage(signature, 'PNG', margin, yPos, imgWidth, imgHeight);
+      yPos += imgHeight + 20;
+    }
+
+    // Alt bilgi
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(128, 128, 128);
+    const footerText = `Bu belge ${dayjs().format('DD.MM.YYYY HH:mm')} tarihinde oluşturulmuştur.`;
+    doc.text(footerText, pageWidth / 2, pageHeight - margin, { align: 'center' });
+
+    // PDF'i indir
+    doc.save(`teknik-servis-formu-${localWorkOrder.id}.pdf`);
+  };
+
   if (isLoading) {
   return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
@@ -1431,10 +1664,7 @@ const WorkOrderDetail: React.FC = () => {
                       variant="outlined"
                       color="primary"
                       startIcon={<DownloadIcon />}
-                      onClick={() => {
-                        // PDF indirme işlemi burada yapılacak
-                        console.log('PDF indiriliyor...');
-                      }}
+                      onClick={generatePDF}
                       sx={{
                         textTransform: 'none',
                         px: 3,
@@ -1984,7 +2214,7 @@ const WorkOrderDetail: React.FC = () => {
             {/* İmza Alanı */}
             <Box>
               <Typography variant="h6" gutterBottom color="primary">
-                Teknisyen İmzası
+                Yetkili İmzası
               </Typography>
               <Box 
                 sx={{ 
